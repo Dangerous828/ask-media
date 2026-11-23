@@ -60,6 +60,16 @@ for skill in drama-skills/skills/*/; do ln -s "$PWD/$skill" "$HOME/.claude/skill
 - 影像任务先读 `ask-media/SKILL.md` 选路，再按阶段读对应的 owner 技能。
 - 需要额外环境的技能：`video-previs` 需要智谱 GLM API Key（`ZHIPUAI_API_KEY` 或 `GLM_API_KEY`）；`h3-queue` / `video-studio` 需要本地 ComfyUI + h3q 生产队列，不附带；`shortvideo-understand` 需要 yt-dlp。其余技能多为纯文档，直接可用。
 
+## 模型栈
+
+作者实际运行这套技能的模型组合（技能描述方法与判据，不绑定任何特定模型，均可按各技能的环境变量替换为自己的）：
+
+- **Agent 运行**：桌面 Agent（Alma）经本地聚合网关路由多家模型——日常对话、文档写作与路由判读用 flash 档快模型，跨文档联动与双轴审查等重活用旗舰档。
+- **视频生成**：MiniMax H3（H3-Video）。本地 ComfyUI 经 h3q 队列串行提交，模式含 Ref2VA（参考图）、I2VA（首帧）、FL2VA（首尾帧）、Multishot（多窗一次生成），档位与帧网格见 `h3-queue/`。
+- **图像生成**：本地 Qwen Image 2.1（ComfyUI，8 步 Turbo LoRA）为主，H3-Image 作二次采样；云端混元（OpenAI-compatible 接口）作无 GPU 时的补充通道。
+- **画质增强**：SeedVR2 事后超分与 latent 放大（`h3_upscale_video`，成品帧回编码、不重采样）。
+- **语音转写**：本地 whisper-large-v3（Apple Silicon 权重），全程离线零上传。
+
 ## 说明
 
 这是从内部技能库整理出的公开版本，仅包含通用方法论：
