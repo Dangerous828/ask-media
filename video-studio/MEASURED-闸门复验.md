@@ -187,18 +187,18 @@ is_fl = (1 in pics and 2 in pics) or (has_align and len(pics) >= 2)
 ## 五、复现命令
 
 ```bash
+# 本块命令除标注外均以仓库根为工作目录；需要切目录的用子 shell 包住，不影响后续
 # 帧级复现全部接缝与切点
-cd <本地项目目录>/example-project/smooth3d/ep01_v4/tools && python3 cut_detect.py
+( cd <本地项目目录>/example-project/smooth3d/ep01_v4/tools && python3 cut_detect.py )  # 子 shell，不改变后续命令的 cwd
 
 # 闸门退出码（P0-4 / G28 / G21）
 python3 video-studio/scripts/h3_lint.py /tmp/lintchk2/full1.txt;         echo $?   # 1
 python3 video-studio/scripts/h3_lint.py /tmp/lintchk2/official_single.txt; echo $? # 0
 python3 h3-video-gate/scripts/h3_gate.py /tmp/lintchk2/full1.txt --frames 107 --strict
-# 在仓库根执行，先进入 h3-video-gate/
-cd h3-video-gate && python3 -m pytest tests/ -q                                   # 28 passed
+python3 -m pytest h3-video-gate/tests -q                                        # 28 passed
 
 # 版本溯源（提示词 mtime ≤ 渲染 mtime）
-cd <本地项目目录>/example-project/smooth3d/ep01_v4/h3_prompts && stat -f '%Sm %N' -t '%H:%M:%S' *_*.txt
+( cd <本地项目目录>/example-project/smooth3d/ep01_v4/h3_prompts && stat -f '%Sm %N' -t '%H:%M:%S' *_*.txt )
 
 # 回滚
 mv video-studio/scripts/h3_lint.py.bak-20261022-1518 video-studio/scripts/h3_lint.py
