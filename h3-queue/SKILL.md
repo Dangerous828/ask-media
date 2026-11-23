@@ -178,8 +178,8 @@ $PY -s $CLI submit --kind image --engine h3-image-w4a8 \
 像素值以实现实读为准；历史值见 [still-standard-tier-20261105.md](references/still-standard-tier-20261105.md) §四（2026-11-05 快照）。
 `--size` 直接给预设名即可，不要写死像素。显存与耗时随尺寸增大；视频首帧按项目目标画布显式选择尺寸。
 
-用 `qwen-image-2.1-fix-1.0` 那种画质修正 LoRA 时，按该 LoRA 自己文档给的推荐值**显式**传 `--steps` / `--cfg`
-（fix-1.0 的文档推荐是 20 步 / CFG 3，属该 LoRA 的参数，不是本仓缺省），不要叠加本档默认。
+用 `qwen-image-2.1-fix-1.0` 那种画质修正 LoRA 时，按该 LoRA 自己文档给的推荐值**显式**传 `--steps` / `--cfg`，
+不要叠加本档默认（具体数值以该 LoRA 文档为准，本仓不转抄）。
 
 参数来源与 A/B 量化数据见
 [references/still-standard-tier-20261105.md](references/still-standard-tier-20261105.md)
