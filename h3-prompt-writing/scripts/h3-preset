@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+"""h3-preset: 查询 references/ostris-presets.json.gz (ostris/minimax_h3_1k, 1000 条 T2VA 官方格式提示词)。
+纯本地、只读、不联网、不下载视频。
+  h3-preset --list-styles
+  h3-preset --style documentary --topic animals-nature --n 3
+  h3-preset --id 000244 --full
+  h3-preset --style film-stock --seconds 10 --n 2
+"""
+import argparse, ast, gzip, json, os, sys
+HERE = os.path.dirname(os.path.abspath(__file__))
+DATA = os.path.join(HERE, "..", "references", "ostris-presets.json.gz")
+DOC_FAMILY = {"documentary", "film-stock", "live-action-cinema", "surveillance", "vhs-camcorder"}
+
+def load():
+    with gzip.open(DATA, "rt", encoding="utf-8") as f:
+        return json.load(f)
+
+def topics_of(r):
+    t = r.get("topics")
+    if isinstance(t, list):
+        return t
+    try:
+        return list(ast.literal_eval(t))
+    except Exception:
+        return [t] if t else []
+
+def show(r, full):
+    print("== id=%s style=%s topics=%s %sx%s %ss shots=%s langs=%s" % (
+        r["id"], r["style"], ",".join(topics_of(r)), r.get("w"), r.get("h"), r.get("seconds"), r.get("shots"), r.get("langs")))
+    desc = r["description"]
+    print(desc if full else desc[:600] + (" ..." if len(desc) > 600 else ""))
+    print("-- soundscape:", r.get("soundscape", ""))
+    print("-- music:", r.get("music", ""))
+    print()
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--list-styles", action="store_true")
+    ap.add_argument("--list-topics", action="store_true")
+    ap.add_argument("--style"); ap.add_argument("--topic"); ap.add_argument("--id")
+    ap.add_argument("--seconds", type=float, help="选时长最接近的")
+    ap.add_argument("--n", type=int, default=3)
+    ap.add_argument("--full", action="store_true")
+    a = ap.parse_args()
+    d = load()
+    if a.list_styles:
+        cnt = {}
+        for r in d["records"]:
+            cnt[r["style"]] = cnt.get(r["style"], 0) + 1
+        for k, v in d["styles"].items():
+            print("%-22s %-28s %3d%s" % (k, v, cnt.get(k, 0), "  (documentary family)" if k in DOC_FAMILY else ""))
+        return 0
+    if a.list_topics:
+        for k, v in d["topics"].items():
+            print("%-22s %s" % (k, v))
+        return 0
+    recs = d["records"]
+    if a.id:
+        recs = [r for r in recs if r["id"] == a.id]
+        if not recs:
+            print("no such id", file=sys.stderr); return 1
+        show(recs[0], True); return 0
+    if a.style:
+        recs = [r for r in recs if r["style"] == a.style]
+    if a.topic:
+        recs = [r for r in recs if a.topic in topics_of(r)]
+    if a.seconds is not None:
+        recs = sorted(recs, key=lambda r: abs(float(r.get("seconds") or 0) - a.seconds))
+    if not recs:
+        print("no match", file=sys.stderr); return 1
+    for r in recs[:a.n]:
+        show(r, a.full)
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())

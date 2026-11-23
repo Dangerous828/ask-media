@@ -1,0 +1,10 @@
+*.env
+*.bak-*
+.scratch/
+__pycache__/
+*.pyc
+.DS_Store
+
+# video-studio：只收代码/文档/官方参考，过程实验图（98M）不入仓
+# 需要图片时按 MANIFEST/sha256 复现，或从 NAS 归档取
+video-studio/projects/

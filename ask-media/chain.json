@@ -1,0 +1,183 @@
+{
+  "_comment": "中枢影像阶段链的单一来源。ask-media/SKILL.md 的表由 gen_table.py 从本文件生成；改阶段只改这里再跑生成器。这是链条顺序，不是分类。",
+  "chain": [
+    {
+      "no": 1,
+      "stage": "开发",
+      "doc": null,
+      "nodes": [
+        {
+          "skill": "short-drama-novel-analyze"
+        },
+        {
+          "skill": "short-drama-develop"
+        }
+      ]
+    },
+    {
+      "no": 2,
+      "stage": "剧本",
+      "doc": "剧本.md",
+      "nodes": [
+        {
+          "skill": "short-drama-write"
+        },
+        {
+          "skill": "short-film-scene-continuity"
+        }
+      ]
+    },
+    {
+      "no": 3,
+      "stage": "资产",
+      "doc": "视觉设定.md",
+      "nodes": [
+        {
+          "skill": "short-drama-assets"
+        }
+      ]
+    },
+    {
+      "no": 4,
+      "stage": "导演",
+      "doc": "导演.md",
+      "nodes": [
+        {
+          "skill": "short-drama-direct"
+        },
+        {
+          "skill": "director-style-presets"
+        }
+      ]
+    },
+    {
+      "no": 5,
+      "stage": "场记",
+      "doc": "设定集/场记.md",
+      "nodes": [
+        {
+          "skill": "short-drama"
+        },
+        {
+          "skill": "video-previs"
+        }
+      ]
+    },
+    {
+      "no": 6,
+      "stage": "分镜",
+      "doc": "分镜.md",
+      "nodes": [
+        {
+          "skill": "short-drama-storyboard"
+        },
+        {
+          "skill": "storyboard-30s"
+        },
+        {
+          "skill": "acting-beats-dual-track"
+        }
+      ]
+    },
+    {
+      "no": 7,
+      "stage": "图片提示词",
+      "doc": "图片提示词.md",
+      "nodes": [
+        {
+          "skill": "short-drama-image-prompts"
+        },
+        {
+          "skill": "doc-still-prompt"
+        },
+        {
+          "skill": "anim3d-still-pitfalls"
+        }
+      ]
+    },
+    {
+      "no": 8,
+      "stage": "视频提示词",
+      "doc": "视频提示词.md",
+      "nodes": [
+        {
+          "skill": "short-drama-video-prompts"
+        },
+        {
+          "skill": "h3-prompt-writing"
+        },
+        {
+          "skill": "h3-video-gate"
+        }
+      ]
+    },
+    {
+      "no": 9,
+      "stage": "生产",
+      "doc": "制作成果/",
+      "nodes": [
+        {
+          "skill": "short-drama-produce"
+        },
+        {
+          "skill": "h3-queue"
+        }
+      ]
+    },
+    {
+      "no": 10,
+      "stage": "验收",
+      "doc": "审查/",
+      "nodes": [
+        {
+          "skill": "short-drama-review"
+        },
+        {
+          "skill": "video-studio"
+        }
+      ]
+    },
+    {
+      "no": 11,
+      "stage": "剪辑交付",
+      "doc": "剪辑单.md",
+      "nodes": [
+        {
+          "skill": "short-drama-edit"
+        },
+        {
+          "skill": "concat-video"
+        },
+        {
+          "skill": "narration-route"
+        }
+      ]
+    }
+  ],
+  "bypass": {
+    "label": "旁路 · 复刻",
+    "nodes": [
+      {
+        "skill": "shortvideo-understand"
+      },
+      {
+        "skill": "video-shot-reverse"
+      }
+    ]
+  },
+  "standalone": [
+    {
+      "skill": "h3-queue"
+    },
+    {
+      "skill": "short-drama-review"
+    },
+    {
+      "skill": "video-studio"
+    },
+    {
+      "skill": "concat-video"
+    }
+  ],
+  "discipline": "references/discipline.md"
+}

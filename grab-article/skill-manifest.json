@@ -1,0 +1,112 @@
+{
+  "schema_version": "1.0.0",
+  "id": "grab-article",
+  "version": "1.0.2",
+  "display_name": "grab-article",
+  "description": "快速抓取微信公众号 / X(推特) / 任意网页文章正文为 Markdown，不需要登录、不需要 cookie、不需要浏览器，也不走第三方 SaaS",
+  "kind": "agent-skill",
+  "entrypoint": {
+    "type": "markdown-agent-skill",
+    "path": "SKILL.md",
+    "frontmatter_required": true,
+    "instruction_encoding": "utf-8"
+  },
+  "package": {
+    "include": [
+      "SKILL.md",
+      "scripts/grab.py",
+      "skill-manifest.json"
+    ],
+    "metadata_files": [
+      "skill-manifest.json"
+    ],
+    "deny_extra_files": false,
+    "hash_strategy": {
+      "algorithm": "sha256",
+      "encoding": "hex-lower",
+      "byte_mode": "raw",
+      "path_base": "manifest-directory",
+      "path_separator": "/",
+      "manifest_included": false,
+      "reason_manifest_excluded": "prevents self-referential digest",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "5a3a6688e137a0c21fb0fd61ba602f7674d8f4dffa912bd5d643510b9c8f9ecf",
+          "required": true
+        },
+        {
+          "path": "scripts/grab.py",
+          "sha256": "2d7f0bd57f1ddbb02b3c5b82c29eb2d92ff3c1c9b0a814051fa21bbfd14e809b",
+          "required": true
+        }
+      ]
+    }
+  },
+  "self_check": {
+    "mode": "declarative",
+    "fail_closed": true,
+    "checks": [
+      {
+        "type": "schema-version",
+        "expected": "1.0.0"
+      },
+      {
+        "type": "file-exists",
+        "path": "SKILL.md"
+      },
+      {
+        "type": "file-sha256",
+        "path": "SKILL.md",
+        "expected": "5a3a6688e137a0c21fb0fd61ba602f7674d8f4dffa912bd5d643510b9c8f9ecf"
+      },
+      {
+        "type": "utf8-decode",
+        "path": "SKILL.md",
+        "bom_allowed": false
+      },
+      {
+        "type": "markdown-frontmatter",
+        "path": "SKILL.md",
+        "required_keys": [
+          "name",
+          "version",
+          "kind",
+          "entrypoint",
+          "summary"
+        ],
+        "expected_values": {
+          "name": "grab-article",
+          "version": "1.0.2",
+          "entrypoint": "SKILL.md"
+        }
+      },
+      {
+        "type": "markdown-sections",
+        "path": "SKILL.md",
+        "required": [
+          "目标",
+          "调用契约",
+          "执行流程",
+          "安全与权限边界",
+          "自检"
+        ]
+      }
+    ]
+  },
+  "security": {
+    "trust_model": "workspace-content-is-untrusted",
+    "default_posture": "read-only",
+    "destructive_actions": "denied",
+    "secret_redaction": "required",
+    "production_access": "denied"
+  },
+  "tags": [
+    "article",
+    "wechat",
+    "x-twitter",
+    "markdown",
+    "no-browser",
+    "read-only"
+  ]
+}

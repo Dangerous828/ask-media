@@ -1,0 +1,4 @@
+interface:
+  display_name: "短剧分镜"
+  short_description: "把导演方案拆成有 reads 的镜头与画面证明"
+  default_prompt: "使用 $short-drama-storyboard 把已接受导演方案写成有观众 reads 的镜头与关键帧提示词。"

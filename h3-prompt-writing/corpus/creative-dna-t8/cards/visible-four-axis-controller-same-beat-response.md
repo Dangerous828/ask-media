@@ -1,0 +1,191 @@
+# visible-four-axis-controller-same-beat-response
+
+- 类型：Creative DNA 机制卡（全量收录）
+- 来源：T8mars/minimax-h3-prompt-skill-T8（案例库）· CC BY 4.0 内容许可（署名 T8mars；附仓库链接；本条目加入本地目录信息与检索元数据）。
+- 验证状态：外部案例机制，**本地 h3q 未测**；不写成通过配方。
+- 边界：英文骨架不是 H3 正文，禁止直接复制投产；机制不等于全局禁令。
+
+## 原文（逐字收录，不改写）
+
+### SKILL.md
+
+````text
+---
+name: visible-four-axis-controller-same-beat-response
+description: "Create original short videos using the 指尖控制｜四向同拍全身响应 Creative DNA for MiniMax H3 or Seedance 2.0. Use when the user wants this causal, camera, motion, rhythm, or payoff structure with new subjects and surfaces."
+---
+
+# 指尖控制｜四向同拍全身响应
+
+Create a new execution from the reusable mechanism, not a surface reskin of any reference video.
+
+## Workflow
+
+1. Read [references/summary.md](references/summary.md) for fit, input slots, and the concise starting example.
+2. Read [references/template.md](references/template.md) completely before drafting.
+3. Preserve the user's subject and objective, then fill every missing scene, trigger, event-chain, camera, sound, and payoff slot.
+4. Treat these anchors as mandatory:
+
+- 第一条指令前，控制器和完整响应者已经同框且都可读。
+- 屏幕方向固定：上=升、下=降、左=整体左移、右=整体右移。
+- 每个指令只对应一个同拍响应；无提前、延迟、轴向翻转或独立即兴。
+- 横向是可见全身位移，纵向改变重心；纵横轴都至少重复一次再收尾。
+
+5. Change source-specific people, setting, props, palette, dialogue, shot boundaries, sound family, and payoff surfaces together.
+6. Compile MiniMax H3 and Seedance 2.0 independently; do not leak one model's field syntax into the other.
+7. Silently verify anchor coverage, continuity, timing, physical causality, and anti-copy distance before returning the final prompts.
+
+## MiniMax H3
+
+- Use the current official H3 task grammar and language profile.
+- Separate integrated visual action, overall soundscape, and non-diegetic music or explicit silence.
+- Use timestamps only to make event order executable; keep shots consecutive and duration-safe.
+
+## Seedance 2.0
+
+- Define stable subjects once and preserve event order, camera motivation, sound intent, and overall duration.
+- Use a simple paragraph for simple concepts or an ordered multi-shot structure for complex concepts.
+- State overall duration once; do not copy H3 field labels or per-shot timecode grammar.
+
+## Output
+
+Return one concept sentence, the filled slots, an anchor-coverage check, one MiniMax H3 prompt, one Seedance 2.0 prompt, and a short anti-copy validation note.
+
+## Non-Negotiable
+
+- A subject-only request is underspecified. Preserve that subject and complete the mechanism instead of returning a generic portrait or showcase.
+- Do not omit, reorder, or weaken a required anchor.
+- Do not reuse source people, brands, dialogue, exact storyboard, signature props, exact timings, or recognizable effect surfaces.
+````
+
+### summary.md
+
+````text
+# 指尖控制｜四向同拍全身响应 — 摘要
+
+## 用途
+
+前景控制器用固定上下左右屏幕映射逐拍驱动同框响应者做清楚全身动作；纵横轴重复验证后才允许一次短收尾。
+
+## 推荐输入格式
+
+`稳定单镜头 + 同框前景控制器与完整响应者 + 固定四向映射 + 每拍一条指令与一个同拍全身响应 + 纵横轴重复验证 + 最后一次短收尾`
+
+## 可直接改写的简短示例
+
+> 明亮机器人实验室里，浅灰手套技术员只把小型发光触控笔留在右下前景；原创全尺寸机器人按“上、下、左、右、左、右、上、下、左、右”十拍同步升降或全身横移，最后只闪一次琥珀灯并抬臂。
+
+## 必须保留的结构锚点
+
+- 第一条指令前，控制器和完整响应者已经同框且都可读。
+- 屏幕方向固定：上=升、下=降、左=整体左移、右=整体右移。
+- 每个指令只对应一个同拍响应；无提前、延迟、轴向翻转或独立即兴。
+- 横向是可见全身位移，纵向改变重心；纵横轴都至少重复一次再收尾。
+
+## 使用方法
+
+1. 保留用户给出的主体与目标。
+2. 按推荐输入格式补齐场景、事件链、镜头职责和结果。
+3. 同时改变人物、环境、道具、风格、声音与结局表面，禁止只换名词。
+4. 分别编译 MiniMax H3 与 Seedance 2.0，并逐项核对结构锚点。
+````
+
+### template.md
+
+````text
+# 指尖控制｜四向同拍全身响应 Template
+
+## Mechanism
+
+A visible foreground controller establishes a fixed four-direction screen-space language; a co-visible responder begins one matching full-body movement within the same beat for every cue, and repeated axis alternation lets the audience learn and verify the causal rule inside one continuous frame.
+
+## Invariants
+
+### inv-01
+
+- Rule: The visible controller and full responder must be co-visible before the first command and remain jointly readable throughout.
+- Purpose: 
+- Failure if removed: If either party leaves frame or the hand covers the responder, the audience cannot verify causality and the hook becomes an ordinary dance or mime.
+
+### inv-02
+
+- Rule: Use one fixed screen-coordinate mapping: up means rise, down means lower, left means shift left and right means shift right.
+- Purpose: 
+- Failure if removed: If axes invert, rotate or change meaning, the learned visual rule collapses and repeated commands feel random.
+
+### inv-03
+
+- Rule: Each deliberate cue receives one immediate beat-level response; the responder does not freestyle between commands.
+- Purpose: 
+- Failure if removed: Delay, anticipation or unrelated choreography breaks the controller illusion even when individual poses look attractive.
+
+### inv-04
+
+- Rule: Horizontal commands produce whole-body displacement and vertical commands change center of gravity, keeping response amplitude unmistakable.
+- Purpose: 
+- Failure if removed: Tiny wrist, shoulder or hip twitches are too ambiguous to read as directional control.
+
+### inv-05
+
+- Rule: Alternate and repeat both axes in one continuous take, then end with a brief release only after the rule has been proven.
+- Purpose: 
+- Failure if removed: A single demonstration cannot teach and verify the mapping; cuts or an early freestyle ending remove the proof.
+
+
+## Variable Slots
+
+| Slot | Constraint |
+|---|---|
+| responder |  |
+| controller |  |
+| setting |  |
+| command_sequence |  |
+| response_vocabulary |  |
+| camera |  |
+| sound_family |  |
+| release |  |
+
+## Required Human-Facing Anchors
+
+- 第一条指令前，控制器和完整响应者已经同框且都可读。
+- 屏幕方向固定：上=升、下=降、左=整体左移、右=整体右移。
+- 每个指令只对应一个同拍响应；无提前、延迟、轴向翻转或独立即兴。
+- 横向是可见全身位移，纵向改变重心；纵横轴都至少重复一次再收尾。
+
+## Anti-Copy Boundary
+
+- Do not reproduce the source woman's face, hairstyle, body proportions or recognizable likeness.
+- Do not reproduce the black cutout bodysuit or its exact silhouette.
+- Do not reproduce the source blue-gray room, wall-mounted television, door placement, ceiling-light layout or floor arrangement.
+- Do not reproduce the source foreground hand's exact appearance, scale path or framing errors.
+- Do not reuse the exact observed dance surface, exact source command timing or source audio; preserve only the abstract causal grammar.
+
+## Transfer Tests
+
+1. Luminous stylus controls a studio robot
+   - Preserved: inv-01, inv-02, inv-03, inv-04, inv-05
+   - Changed: responder, controller, setting, response_vocabulary, sound_family, release
+2. Conductor baton controls an adult mime
+   - Preserved: inv-01, inv-02, inv-03, inv-04, inv-05
+   - Changed: responder, controller, setting, camera, sound_family, release
+
+## Model Skeletons
+
+### MiniMax H3
+
+    integrated_multimodal_description: [new subject, environment, ordered actions, camera, light and final state preserving every anchor]
+    overall_soundscape: [diegetic ambience, action cues and causal payoff]
+    non_diegetic_music: [original music arc or N/A]
+
+### Seedance 2.0
+
+    任务：[原创实例意图]
+    总时长约[4–15]秒。
+    主体定义：[稳定人物、物体与空间关系]
+    事件或镜头：[按因果顺序实现全部锚点]
+    整体风格与画质：[原创媒介、光影、色彩与声音]
+    约束：[连续性、物理逻辑、反复制与结尾状态]
+
+Adapt shot count to the user's concept. Preserve the causal mechanism, not a fixed storyboard.
+````
+
