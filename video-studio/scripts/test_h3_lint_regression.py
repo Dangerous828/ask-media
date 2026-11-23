@@ -68,6 +68,28 @@ class H3LintRegressionTests(unittest.TestCase):
         self.assertEqual(result["status"], "PASS")
         self.assertEqual(result["notchecked"], [])
 
+    def test_p0_1_undefined_picture_reference_blocks(self):
+        text = "[Shot 1] A woman stands beside <Picture 4> and looks out the window."
+        issues = h3_lint.check_picture_definitions(text)
+        self.assertTrue(any("P0-1" in x and "Picture 4" in x for x in issues), issues)
+        path = self.write_prompt(text)
+        result = h3_lint.lint(path)
+        self.assertTrue(any("P0-1" in x for x in result["p0"]), result["p0"])
+        self.assertEqual(result["status"], "BLOCK")
+        self.assertFalse(result["pass"])
+
+    def test_p0_3_physical_hint_is_warn_not_block(self):
+        text = ("[Shot 1] A woman is holding hands with a child while "
+                "waving to the camera with her free hand.")
+        hints = h3_lint.check_physical_heuristic(text)
+        self.assertTrue(any("P0-3" in x for x in hints), hints)
+        path = self.write_prompt(text)
+        result = h3_lint.lint(path)
+        self.assertEqual(result["p0"], [], result["p0"])
+        self.assertTrue(any("P0-3" in x for x in result["p1"]), result["p1"])
+        self.assertEqual(result["status"], "WARN")
+        self.assertTrue(result["pass"])
+
     def test_p0_4_official_single_shot_is_allowed(self):
         # 官方 base-en.txt :201-203：双帧都写成 (from Shot 1)，单个 [Shot 1] 连续插值。
         text = (
@@ -141,6 +163,33 @@ class H3LintRegressionTests(unittest.TestCase):
         self.assertEqual(human.returncode, 2)
         self.assertIn("NOTCHK", human.stdout)
         self.assertNotIn("PASS  prompt.txt", human.stdout)
+
+    def test_p0_2_cross_line_subject_binding_is_allowed(self):
+        """合法跨行 Subject 定义不应被误判为 P0-2（issue #32-3）。"""
+        text = (
+            "<Subject 2> is the woman in a blue coat, "
+            "introduced here and carrying the same face\n"
+            "in <Picture 3>. She stands beside the bench.\n"
+            "[Shot 1] <Subject 2> waits for the train."
+        )
+        self.assertEqual(h3_lint.check_reference_loaded(text), [])
+
+    def test_p0_2_same_line_subject_binding_is_allowed(self):
+        """同行官方写法仍应通过（防回归，保留原行为）。"""
+        text = (
+            "<Subject 1> is the traveler in <Picture 1>, with short brown hair.\n"
+            "[Shot 1] <Subject 1> waits beside the bench."
+        )
+        self.assertEqual(h3_lint.check_reference_loaded(text), [])
+
+    def test_p0_2_subject_with_no_picture_is_still_blocked(self):
+        """非法 Subject（无任何 Picture 绑定）仍必须判 P0-2。"""
+        text = (
+            "<Picture 1> is the opening composition of the station.\n"
+            "[Shot 1] <Subject 7> smiles at the camera."
+        )
+        issues = h3_lint.check_reference_loaded(text)
+        self.assertTrue(any("P0-2" in x and "Subject 7" in x for x in issues), issues)
 
 
 if __name__ == "__main__":

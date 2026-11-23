@@ -149,7 +149,7 @@ SHA 的 `manifest.json`（含 `checker_source`、argv、context、`exit_code`）
 原文件在检查期间被改也不影响这次结论；闸门失败同样留全报告。
 
 生产接线：short-drama 的 h3q adapter 把证据放在持久目录 `<handle_path>.evidence/`，并上传证据里那份
-冻结 prompt；Magpie MCP 的视频提交把证据放在 `~/Downloads/h3q/gate-evidence/<uuid>/`。手工跑
+冻结 prompt；Magpie MCP 的视频提交把证据放在其默认输出目录（`save_path` 未指定时）的 gate-evidence/<uuid>/ 下。手工跑
 `h3_gate.py` 不会自动留档，提交汇报里引用的结论必须是**对最终提交文件整份实跑**的那一次。
 
 **不要用新规则解释旧报告。** 规则与阈值改动后，旧证据目录里的报告仍代表当时那一版检查器（哈希可对

@@ -84,6 +84,7 @@ description: >
 - **ASR 语音（补充）**：无字幕/对白超出字幕/需要听语气停顿
   `python scripts/extract_speech.py <video> --start S --end E --model small --lang zh`
   → `<名>_ASR.srt` + `_ASR_台词.txt`。依赖 faster-whisper（本地 CPU，首次下模型）。
+  需要更快或更高精度时可加 `--engine cloud --vendor glm|doubao` 走云端 ASR；配置从工作区的 `<工作区>/workbench/providers.json` 读取（不在本仓），骨架见 `templates/providers.example.json`，填自己的端点与凭据，详见 `references/environment_setup.md` 第 4 节。默认本地链路不依赖该文件。
 - **交叉校正规则**：
   - 有烧录字幕 → 以 **OCR 为准**（字幕是片方正本）；ASR 仅补字幕未覆盖的口语/停顿/笑声。
   - 无字幕 → 以 **ASR 为准**，可换 `--model medium/large-v3` 提精度。

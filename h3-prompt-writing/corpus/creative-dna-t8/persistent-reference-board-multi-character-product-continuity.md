@@ -1,7 +1,7 @@
 # 多人商品一致性｜常驻参考板与角色接力实证 · Creative DNA 机制卡（T8）
 
 - 验证状态：**外部案例机制，本地 h3q 未测**。原卡来自案例库，未在 MiniMax H3 本地通道出片验收；不得写成"通过配方"。
-- 来源：T8mars/minimax-h3-prompt-skill-T8（案例库）与 comfyui-minimax-h3-prompt-enhancer-T8（插件）。本条目收录的案例库原创摘要、机制说明与提示词模板依 **CC BY 4.0**（[LICENSE-CONTENT](https://github.com/T8mars/minimax-h3-prompt-skill-T8/blob/main/LICENSE-CONTENT)）使用：署名 T8mars，附仓库链接，并说明本条目加入了中文结构分析与本地适用边界。仓库中的应用/公共校验代码为 MIT；ComfyUI 插件为保留全部权利，**未收录任何插件代码**。抓取日期 2026-11-17。
+- 来源：T8mars/minimax-h3-prompt-skill-T8（案例库）与 comfyui-minimax-h3-prompt-enhancer-T8（插件）。本条目收录的案例库原创摘要、机制说明与提示词模板依 **CC BY 4.0**（许可声明内联于各卡正文，本公开版不附单独文件）使用：署名 T8mars，附仓库链接，并说明本条目加入了中文结构分析与本地适用边界。仓库中的应用/公共校验代码为 MIT；ComfyUI 插件为保留全部权利，**未收录任何插件代码**。抓取日期 2026-11-17。
 - 完整原文：下方 `` SKILL.md `` 与 `` template.md `` 为逐字收录，不改写；中文结构分析在原文之后。
 
 ## 什么时候查这张卡

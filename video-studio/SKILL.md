@@ -61,7 +61,7 @@ description: 短剧/动画出图的验收与工程检查工具箱。当明确用
 
 | 项 | 值 | 说明 |
 |---|---|---|
-| 出图后端 | Qwen Image 2.1（Turbo LoRA 档 8 步 / `cfg=1.0`，挂 `qwen_image_2.1_turbo_lora_avg_rank_178_bf16:1.0`；2026-11-07 起） | 本机 ComfyUI 8199 |
+| 出图后端 | Qwen Image 2.1（默认档位见 [h3-queue 档位实测](../h3-queue/references/still-standard-tier-20261105.md)，此处不复述数字） | 本机 ComfyUI 8199 |
 | 出视频后端 | MiniMax H3（本地） | 本机 ComfyUI 8199 |
 | **提交入口** | **`h3q` 队列 127.0.0.1:8200** | **唯一入口，禁止直连 8199 提交** |
 | 画幅 | 由创作者拍板，写在 `projects/<剧名>/project.md` | **不默认横屏或竖屏** |
@@ -252,7 +252,7 @@ python3 scripts/qc_signals.py <图片或目录> --baseline <项目>/qc/baselines
 **分工**：四带判「这张图像不像话」（同题材同构图横向比 + 灾难线）；
 「词写进去了没有」要看**具体物件是否出现**（光柱、地平线、姿态、道具）。
 不要把四带当提示词好坏的判据。详见
-`<本地对比目录>/h3-demo-repro/wordlen_lab/RESULTS.md`。
+对比结果存内部工程档案（未随公开版发布）。
 
 参照：官方 Gemini 基准 = 死黑 0.0% / 中间调 84.8% / 熵 7.67。
 
@@ -375,15 +375,16 @@ A/B 两版同 PASS，真真切镜就这样漏过了闸门。现在 `check_fl2va_
 
 ```bash
 # 在 Windows 上跑（h3qc 与队列同机）
+# h3qc.py 为渲染机侧私有脚本，须另行部署（见 h3-queue §8）
 python h3qc.py submit --kind image \
   --prompt-file p.txt --out <渲染机产物目录>\o.png \
   --size 1344x768 --seed 42 --label my-shot \
   --idem-key my-shot-s42 --wait
 ```
 
-- 队列默认**Turbo LoRA 档 8 步 / `cfg=1.0`**（2026-11-07 起，取代旧 40 步标准档；实测 2K 全缺省 15–30 s）
-- **`cfg=1` 无负向通道**：排除项写进正文正向，不要用 `--negative`（会被静默丢弃）；
-  回退旧 40 步档用 `--loras none --steps 40 --cfg 3.5`。`--fast` 仍被接受但被忽略。详见 `h3-queue` §2.7
+- 队列默认档位见 [h3-queue 档位实测](../h3-queue/references/still-standard-tier-20261105.md)，此处不复述数字
+- **无负向通道**：排除项写进正文正向，不要用 `--negative`（会被静默丢弃）；
+  `--fast` 仍被接受但被忽略。档位与回退配置详见 `h3-queue` §2.7 与上述档位实测文档
 - **身份板、资产板**参考图压到长边 768 + JPEG q80（实测压后画面更干净）；**首帧、起始状态与构图参考**按目标画布无损 PNG 上传，不要压（short-drama adapter 已自动区分）
 - **要挂参考图就走 `h3qg.py`**（= h3qc + 提交前闸门）：`python h3qg.py submit ...`
 - **`--idem-key` 必须含 seed / 输出名**：同 prompt 换 seed 是不同活，

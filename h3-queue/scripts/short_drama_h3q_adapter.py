@@ -447,14 +447,18 @@ def write_handle(path, provider_job_id):
 def queue_show(provider_job_id):
     command = f'"{PYTHON}" -s "{CLI}" show {provider_job_id}'
     result = ssh(command, check=False)
-    # CLI 可能先打警告（含 "{"）再打 JSON；只从第一个 { 开始试解析，并容忍尾部杂文。
-    start = result.stdout.find("{")
-    if start < 0:
-        raise RuntimeError("h3q show returned no JSON: %s" % (result.stdout or "")[:400])
-    try:
-        return json.JSONDecoder().raw_decode(result.stdout[start:].lstrip())[0]
-    except json.JSONDecodeError as exc:
-        raise RuntimeError("h3q show returned invalid JSON: %s" % (result.stdout[start:])[:400]) from exc
+    # CLI 可能先打警告（警告本身也可能含 "{"）再打 JSON。逐个 "{" 候选试解析，
+    # 跳过警告行，绝不把警告里的花括号当成 JSON 起点；容忍 JSON 后面的尾部杂文。
+    out = result.stdout or ""
+    decoder = json.JSONDecoder()
+    for start in [i for i, ch in enumerate(out) if ch == "{"]:
+        try:
+            obj, _end = decoder.raw_decode(out[start:].lstrip())
+        except json.JSONDecodeError:
+            continue
+        if isinstance(obj, dict):
+            return obj
+    raise RuntimeError("h3q show returned no JSON: %s" % out[:400])
 
 
 def prepare_reference(source, output_root, index, lossless=False, modality="video"):

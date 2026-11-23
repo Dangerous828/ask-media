@@ -30,8 +30,8 @@ unambiguous and fail-closed.
 
 No filesystem access: the caller owns the project documents.
 
-SYNC NOTE: this file is byte-identical to short-drama-produce/scripts/cast_gate.py.
-Keep both copies in sync; any change must be applied to both.
+SYNC NOTE: keep this file in sync with short-drama-produce/scripts/cast_gate.py;
+any behavior change must be applied to both copies.
 """
 from __future__ import annotations
 

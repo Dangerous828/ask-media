@@ -5,7 +5,7 @@
 ## 三条进来路径
 
 1. **从阶段链进来**：文档准备／`ask-media` 第 ④ 导演就按需检索；⑤ 场记落实，⑥ 分镜和⑧ 视频词继承已选条款。按 `ask-media/references/route-table.md` → 本索引 → 症状表或检索；不是直到写词才首次用卡。
-2. **从写词技能进来**：`h3-prompt-writing/SKILL.md` Workflow 第 5 步 → `corpus/README.md` → 本索引 → 症状表或检索。
+2. **从写词技能进来**：`h3-prompt-writing/SKILL.md` Workflow 第 5 步 → `../README.md` → 本索引 → 症状表或检索。
 3. **从验收进来**：独立验收按写作阶段留下的锚点逐条核，FAIL 写成带时间码的 Finding 交还 owner；返工换路线可再查卡，但卡的主入口是写作前，不是事后。完整链路实证见 [PRODUCTION-INTEGRATION.md](PRODUCTION-INTEGRATION.md)。
 
 > **卡内 / 案例内嵌的 `references/summary.md`、`references/template.md` 是上游 T8mars 原文残留链接，本地未收录，属死链**：
@@ -41,6 +41,6 @@ python3 corpus/creative-dna-t8/search.py 关键词 [关键词...]
 
 - 全量库是**外部案例机制**，不是通过配方；本地 h3q 未测，标"在该案例条件下观察到"。
 - 一次只读一张卡；检索是找卡，不是加载全库。
-- 署名：内容 © T8mars，CC BY 4.0（[LICENSE-CONTENT](https://github.com/T8mars/minimax-h3-prompt-skill-T8/blob/main/LICENSE-CONTENT)）；每张卡头部已标注来源与本地补写边界。ComfyUI 插件为保留全部权利，未收录其代码。
+- 署名：内容 © T8mars，CC BY 4.0（许可声明内联于各卡正文，本公开版不附单独文件）；每张卡头部已标注来源与本地补写边界。ComfyUI 插件为保留全部权利，未收录其代码。
 - **只做文本机制参考，不调用 T8mars 云端 API**（中枢禁区）。
 - 机制卡不替代阶段 owner：选卡不改导演/分镜/场记的决定，改动仍回上游。

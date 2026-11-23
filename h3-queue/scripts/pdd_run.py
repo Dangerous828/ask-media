@@ -25,6 +25,8 @@ BASE = "http://127.0.0.1:8199"
 # 必须设为渲染机上 ComfyUI 的实际 output 绝对路径；默认相对路径 "ComfyUI/output"
 # 只在 ComfyUI 根目录作为当前目录运行时成立，换目录运行会拷错地方。
 COMFY_OUT = os.environ.get("COMFYUI_OUTPUT", "ComfyUI/output")
+if not os.environ.get("COMFYUI_OUTPUT"):
+    print("[WARN] COMFYUI_OUTPUT 未设置，按相对当前工作目录解析:", os.path.abspath(COMFY_OUT))
 # 等渲染超时：7000s 级长任务（动作驱动）会逼近 2h，默认放宽到 6h，与等空闲一致。
 RENDER_TIMEOUT = int(os.environ.get("H3Q_RENDER_TIMEOUT", "21600"))
 

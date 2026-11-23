@@ -39,6 +39,13 @@ def main() -> int:
         print(f"ERROR: profile 不存在: {profile_path}", file=sys.stderr)
         return 2
 
+    # --prompt / --image 的路径不存在时给出干净报错（exit 2），不要抛未捕获的 FileNotFoundError traceback。
+    # 必须在任何 sha256() 之前检查：否则缺失文件会在算 hash 时先抛异常，这段成了死代码。
+    for p in list(args.prompt) + list(args.image):
+        if not Path(p).is_file():
+            print(f"ERROR: 文件不存在: {p}", file=sys.stderr)
+            return 2
+
     entry = {
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "profile": args.profile,
@@ -51,11 +58,6 @@ def main() -> int:
         "prompts": [{"path": str(p), "sha256": sha256(Path(p))} for p in args.prompt],
         "images": [{"path": str(p), "sha256": sha256(Path(p))} for p in args.image],
     }
-    # --prompt / --image 的路径不存在时给出干净报错（exit 2），不要抛未捕获的 FileNotFoundError traceback。
-    for p in list(args.prompt) + list(args.image):
-        if not Path(p).is_file():
-            print(f"ERROR: 文件不存在: {p}", file=sys.stderr)
-            return 2
 
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

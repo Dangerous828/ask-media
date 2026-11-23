@@ -925,5 +925,28 @@ class H3QAdapterContractTest(unittest.TestCase):
         self.assertFalse(any(" submit " in " ".join(call) for call in self.calls))
 
 
+class QueueShowWarningParsingTest(unittest.TestCase):
+    """queue_show 必须跳过警告行再找 JSON；警告里的 '{' 不得被当成 JSON 起点。"""
+
+    def test_warning_with_brace_then_json(self):
+        out = ('WARN: retry rule {attempt:1} applied\n'
+               '{"state": "done", "output": "result.png"}')
+        with patch.object(adapter, "ssh", return_value=SimpleNamespace(stdout=out, returncode=0)):
+            obj = adapter.queue_show("job-1")
+        self.assertEqual(obj["state"], "done")
+        self.assertEqual(obj["output"], "result.png")
+
+    def test_warning_with_brace_no_json_raises(self):
+        out = 'WARN: retry rule {attempt:1} applied, no job record'
+        with patch.object(adapter, "ssh", return_value=SimpleNamespace(stdout=out, returncode=0)):
+            with self.assertRaises(RuntimeError):
+                adapter.queue_show("job-1")
+
+    def test_plain_json_still_parses(self):
+        out = '{"state": "queued"}'
+        with patch.object(adapter, "ssh", return_value=SimpleNamespace(stdout=out, returncode=0)):
+            self.assertEqual(adapter.queue_show("job-1")["state"], "queued")
+
+
 if __name__ == "__main__":
     unittest.main()

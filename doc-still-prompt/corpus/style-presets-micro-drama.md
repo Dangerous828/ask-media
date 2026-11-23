@@ -1,7 +1,7 @@
 # 风格预设工具箱-Micro-Drama十式-001
 
 - 验证状态：来源项目实际使用（示例项目按 anime 风格走完全流程）；本地通道未测
-- 来源：[zhaihao118/Micro-Drama-Skills](https://github.com/zhaihao118/Micro-Drama-Skills) `.config/visual_styles.json`，作者将其注入 storyboard_config 与 AI 生成提示词
+- 来源：[zhaihao118/Micro-Drama-Skills](https://github.com/zhaihao118/Micro-Drama-Skills) 的 .config/visual_styles.json（上游仓库文件），作者将其注入 storyboard_config 与 AI 生成提示词
 - 用法定位：**工具箱，不是规则**。每行是一个可选起笔词汇包，按项目挑选、按通道调整；没有任何一行是"必须"。
 
 ## 十套风格后缀（逐字保留）

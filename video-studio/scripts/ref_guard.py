@@ -18,8 +18,9 @@
 **2026-11-01 创作者裁决：层1「贯穿线」判据停用**
 --------------------------------------------
 门框、墙线、栏杆等画面自身的长直线会被误判成拼版分割线（本项目 001 门口场景板实测误拦）。
-创作者要求彻底去掉该判据，视频模态也不例外。相关历史代码与对外字段均已删除，
-不再参与判定，也不再展示恒为 0 的计数。现在只剩「多主体面板」告警（不阻断）。
+创作者要求彻底去掉该判据，视频模态也不例外。`span_lines()` / `edge_contact()` 作为
+兼容契约保留，但不再参与判定，`span_lines` 对外恒为 0。现在只剩「多主体面板」告警
+（first_frame 链路阻断，其余链路不阻断）。
 
 **2026-10-30 现场复测（本机真实资产，两条判据均失效）**
 ----------------------------------------------------------------
@@ -144,7 +145,10 @@ except ImportError as e:
 
 IMG_EXT = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tif", ".tiff"}
 
+SPAN_RATIO = 0.80        # 【已停用 2026-11-01】贯穿线长度阈值；span_lines() 不再参与判定
+SPAN_THICK = 0.03        # 视为「近似水平/垂直」的厚度容差
 LONG_SIDE_MAX = 768      # 参考图长边上限
+EDGE_BAND = 0.02         # 贴边检测的边框带宽
 
 
 def _load(path: Path):
@@ -156,6 +160,44 @@ def _load(path: Path):
     if img.ndim == 2:
         img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
     return img
+
+
+def span_lines(gray):
+    """【已停用 2026-11-01，仅为兼容契约保留】找贯穿画幅的近似水平/垂直线。
+
+    门框/墙线/栏杆等画面自身的长直线会被误判成拼版分割线，创作者裁决停用该判据。
+    本函数不再参与 check() 判定，对外 `span_lines` 计数恒为 0。
+    """
+    h, w = gray.shape
+    edges = cv2.Canny(gray, 50, 150)
+    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, threshold=100,
+                            minLineLength=int(min(h, w) * SPAN_RATIO), maxLineGap=8)
+    hits = []
+    if lines is None:
+        return hits
+    for l in np.asarray(lines).reshape(-1, 4):
+        x1, y1, x2, y2 = (int(v) for v in l)
+        dx, dy = abs(x2 - x1), abs(y2 - y1)
+        if dx > w * SPAN_RATIO and dy < h * SPAN_THICK:
+            hits.append({"dir": "H", "len": dx, "of": w})
+        elif dy > h * SPAN_RATIO and dx < w * SPAN_THICK:
+            hits.append({"dir": "V", "len": dy, "of": h})
+    return hits
+
+
+def edge_contact(gray: np.ndarray) -> float:
+    """【弱提示，未参与判定】画面四边窄带里非背景像素占比（主体贴边的弱信号）。
+
+    实测单张正常角色图也能到 91–100%，判据不可分，保留仅为兼容契约，不参与 check()。
+    """
+    h, w = gray.shape
+    b = max(1, int(min(h, w) * EDGE_BAND))
+    med = float(np.median(gray))
+    bands = [gray[:b, :], gray[-b:, :], gray[:, :b], gray[:, -b:]]
+    vals = []
+    for band in bands:
+        vals.append(float((np.abs(band.astype(np.float32) - med) > 25).mean() * 100))
+    return max(vals) if vals else 0.0
 
 
 def multi_subject_panels(gray: np.ndarray,
@@ -215,18 +257,18 @@ def check(path: Path, target_aspect=None, chain="still", prompt_text="") -> dict
     issues = []
     warns = []
 
-    # 2026-11-01：层1「贯穿线」判据已按创作者要求整体移除（误杀门框/墙线等），
-    # 相关死代码与对外恒 0 字段一并删除。现在只剩多主体面板告警。
+    # 2026-11-01：层1「贯穿线」判据已按创作者要求停用（误杀门框/墙线等），不再参与判定。
+    # span_lines() 作为兼容契约保留，恒不命中；只保留多主体面板判据。
+    hits = []   # span_lines(gray) 已停用：恒为空，对外 span_lines 计数恒为 0
     ms = multi_subject_panels(gray)
 
     if ms.get("panel"):
         msg = (f"画面里有 {ms['n']} 个**大小相近**的主体（面积变异系数 {ms['cv']}，"
                f"合计占画幅 {ms['sum_pct']}%）→ 疑似无缝拼接的多视图面板")
         if chain == "first_frame":
-            # 文档自认非拼版的双人/群体/道具同框仍有 8.1% 面板命中，硬阻断会误拦正常双人帧。
-            # 降为强告警 + 人工确认，不再直接 BLOCK。
-            warns.append(msg + "；【强告警】首帧应是单画面，但双人/群体同框亦有 8.1% 命中，"
-                              "请人工确认是否真为拼版，确认后放行")
+            # 首帧/尾帧是闸门：并排多主体会被直接画进画面，必须 BLOCK。
+            # 降为告警会放行废片（issue #32-1 回归），故此链路恢复阻断。
+            issues.append(msg + "；作首帧/尾帧时并排多主体会被直接画进画面")
         elif chain == "still":
             warns.append(msg + "（历史实测：贯穿线判据对这种图 0/18 全漏，靠本条兜；仍不阻断，请人眼确认）")
         else:
@@ -269,6 +311,7 @@ def check(path: Path, target_aspect=None, chain="still", prompt_text="") -> dict
     return {
         "path": str(path),
         "size": [w, h],
+        "span_lines": len(hits),
         "chain": chain,
         "issues": issues,
         "warns": warns,
@@ -277,7 +320,7 @@ def check(path: Path, target_aspect=None, chain="still", prompt_text="") -> dict
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="参考图体检（层1贯穿线判据已停用；层2多主体面板只告警）")
+    ap = argparse.ArgumentParser(description="参考图体检（层1贯穿线判据已停用；层2多主体面板 first_frame 阻断、其余告警）")
     ap.add_argument("targets", nargs="+")
     ap.add_argument("--target-aspect", default=None, help="目标画幅，如 16:9")
     ap.add_argument("--chain", default="still", choices=sorted(CHAINS),
@@ -324,7 +367,7 @@ def main() -> int:
     else:
         for r in results:
             w, h = r["size"]
-            print(f"{Path(r['path']).name}  ({w}x{h})  "
+            print(f"{Path(r['path']).name}  ({w}x{h})  贯穿线 {r['span_lines']}  "
                   f"{'PASS' if r['pass'] else 'REJECT'}")
             for i in r["issues"]:
                 print(f"   ✗ {i}")
@@ -332,10 +375,11 @@ def main() -> int:
                 print(f"   ! {x}")
         n_rej = sum(1 for r in results if not r["pass"])
         n_panel = sum(1 for r in results
-                      if any("大小相近" in x for x in r["warns"]))
-        print(f"\n需拦截 {n_rej} / {len(results)}；多主体面板告警 {n_panel} / {len(results)}")
+                      if any("大小相近" in x for x in r["issues"] + r["warns"]))
+        print(f"\n需拦截 {n_rej} / {len(results)}；多主体面板命中 {n_panel} / {len(results)}")
         print("⚠️ 层1「贯穿线」阻断判据已于 2026-11-01 移除（它误杀门框/墙线/栏杆等画面自身长直线）。")
-        print("   现在只剩层2「多主体面板」，且只告警不阻断；通过 exit 0 **不等于**参考图安全。")
+        print("   层2「多主体面板」在 first_frame 链路阻断（首帧并排多主体会被画进画面），"
+              "其余链路只告警；通过 exit 0 **不等于**参考图安全。")
         print("   ⇒ 拼版/多主体仍需人眼确认，剩余 7/18 机器判不出。")
 
     return 1 if any(not r["pass"] for r in results) else 0

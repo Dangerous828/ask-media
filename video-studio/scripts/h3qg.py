@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """h3qg.py -- h3qc 的闸门包装（Gate wrapper）：提交前自动跑 preflight。
 
+`h3qc.py` 为渲染机侧私有脚本，须另行部署（见 h3-queue SKILL.md §8），不在本仓库中。
+
 为什么要有这一层
 ----------------
 `preflight.py` 已经能做 5 项检查，但它**不在提交路径上**：

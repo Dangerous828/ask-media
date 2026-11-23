@@ -171,7 +171,11 @@ class StoryCheckRegressionTests(unittest.TestCase):
         )
 
         passed = story_check.check(script, self.prompts)
-        self.assertEqual(passed["status"], "PASS")
+        # 中文动作链 + 全英文提示词：§1 中文字面指纹无从比对，记 NOTCHK 交 §3 事件对账。
+        # 不得静默当作 PASS（issue #32-4）。
+        self.assertEqual(passed["status"], "NOTCHK")
+        self.assertIn("SHOT_FINGERPRINT_CROSS_LANG_NOTCHK",
+                      {f["kind"] for f in passed["findings"]})
         self.assertEqual(passed["events_by_type"]["handover"], 1)
 
         prompt.write_text("Lin holds the brass key near Chen.", encoding="utf-8")
@@ -179,6 +183,28 @@ class StoryCheckRegressionTests(unittest.TestCase):
         self.assertEqual(degraded["status"], "BLOCK")
         self.assertIn("HANDOVER_DEGRADED",
                       {finding["kind"] for finding in degraded["findings"]})
+
+    def test_chinese_chain_english_prompt_is_explicit_notchk(self):
+        """中文动作链 + 全英文提示词：不得静默跳过，必须显式 NOTCHK（issue #32-4）。"""
+        script = self.write_script(
+            """## SHOT-EP001-001 · 递钥匙
+- 唯一动作：林夏把钥匙递给陈默。
+"""
+        )
+        self.write_prompt("SHOT-EP001-001.txt",
+                          "Lin hands the brass key to Chen. Chen accepts it.")
+
+        result = story_check.check(script, self.prompts)
+        kinds = {f["kind"] for f in result["findings"]}
+        self.assertIn("SHOT_FINGERPRINT_CROSS_LANG_NOTCHK", kinds)
+        self.assertGreaterEqual(result["notchecked_total"], 1)
+        self.assertEqual(result["status"], "NOTCHK")
+
+        # CLI 退出码 2（NOTCHK），不得假装 PASS 放行。
+        completed = self.run_cli(script, "--json")
+        payload = json.loads(completed.stdout)
+        self.assertEqual(completed.returncode, 2)
+        self.assertEqual(payload["status"], "NOTCHK")
 
     def test_pure_chinese_action_chain_fingerprint(self):
         """纯中文动作链必须能参与整镜丢失检查，不能静默跳过，也不能因分词粒度误判。"""

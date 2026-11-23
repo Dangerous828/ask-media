@@ -12,6 +12,9 @@
 - 适用：无字幕片源、字幕未覆盖的口语/笑声/停顿、需要语气节奏。
 - 依赖：faster-whisper（本地 CPU，int8）；首次下载模型。中文用 --lang zh；
   精度不足时 --model medium 或 large-v3。
+- 可选云端引擎：加 `--engine cloud --vendor glm|doubao` 可走厂商 ASR（更快/更高精度）；
+  配置源为工作区 `<工作区>/workbench/providers.json`（不在本公开仓），骨架见 `../templates/providers.example.json`，
+  填自己的端点与凭据；详见 `../references/environment_setup.md` 第 4 节。默认本地链路不依赖该文件。
 - 注意：背景音乐/多人轻声/外语背景会降低准确率（如生活流片 small 模型易误识别）。
 
 ## 交叉校正

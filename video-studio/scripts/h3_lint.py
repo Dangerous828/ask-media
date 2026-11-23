@@ -101,6 +101,8 @@ def check_reference_loaded(text: str) -> list[str]:
     查不出「<Subject 2> 缺图但 <Picture 1> 已存在」这类主语参考未加载。
     现改为编号映射：从 `<Subject N> is ... in <Picture M>` / `<Picture M> ... <Subject N>`
     等定义句收集 N→{M}，任何出场的 Subject 没有对应 Picture 即报。
+    绑定按「定义句」识别，允许 `<Subject N> is ...` 与 `<Picture M>` 跨行/分句出现；
+    句与句之间以句号/分号/空行分隔，跨句的孤立标签不会乱绑（issue #32-3）。
     """
     issues = []
     subjects = sorted({int(m) for m in SUBJECT_REF.findall(text)})
@@ -108,15 +110,26 @@ def check_reference_loaded(text: str) -> list[str]:
         return issues
 
     loaded = {n: set() for n in subjects}
-    # (a) <Subject N> is ... in <Picture M>（官方主用写法）
-    for m in re.finditer(r"<Subject\s+(\d+)>[^\n]*?\bin\s+<Picture\s+(\d+)>", text):
-        n, pic = int(m.group(1)), int(m.group(2))
-        if n in loaded:
-            loaded[n].add(pic)
-    # (b) <Picture M> ... <Subject N>：同一行/定义句内反向绑定
-    for line in text.splitlines():
-        pics = {int(x) for x in PICTURE_REF.findall(line)}
-        subs = {int(x) for x in SUBJECT_REF.findall(line)}
+
+    def _sentence_chunks(raw: str) -> list[str]:
+        """按句号/分号/空行切「定义句」，允许句内跨行。
+
+        官方定义句常把 `<Subject N> is ...` 写在上一行、`<Picture M>` 出现在下一行，
+        或以分号分句。只按单行匹配会把合法跨行 Subject 误判成「主语参考未加载」
+        （issue #32-3）。这里只放宽**识别范围**：段内正文照常逐句看，不引入跨句乱绑。
+        """
+        return [c for c in re.split(r"[.;。；]\s*|\n\s*\n", raw) if c.strip()]
+
+    # (a) <Subject N> is ... in <Picture M>（官方主用写法）——允许同一句内跨行/分句
+    # 用 [\s\S] 而非 [^\n]：跨行时仍只在同一句（_sentence_chunks 已切分）内匹配。
+    for chunk in _sentence_chunks(text):
+        for m in re.finditer(r"<Subject\s+(\d+)>[\s\S]*?\bin\s+<Picture\s+(\d+)>", chunk):
+            n, pic = int(m.group(1)), int(m.group(2))
+            if n in loaded:
+                loaded[n].add(pic)
+        # (b) <Picture M> ... <Subject N>：同一定义句内反向绑定（含跨行）
+        pics = {int(x) for x in PICTURE_REF.findall(chunk)}
+        subs = {int(x) for x in SUBJECT_REF.findall(chunk)}
         if pics and subs:
             for n in subs:
                 if n in loaded:

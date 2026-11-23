@@ -1,6 +1,6 @@
 """Shared reference acceptance evidence used by produce, adapters and MCP."""
-# SYNC NOTE: byte-identical to short-drama-review/scripts/ref_gate.py.
-# Keep both copies in sync; any change must be applied to both.
+# SYNC NOTE: keep in sync with short-drama-review/scripts/ref_gate.py;
+# any behavior change must be applied to both copies.
 from __future__ import annotations
 
 import hashlib

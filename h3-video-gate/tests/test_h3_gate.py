@@ -596,6 +596,42 @@ class AuditGapRegressionTests(unittest.TestCase):
         self.assertEqual(code, 1, data)
         self.assertEqual([f["level"] for f in self._hits(data, "G30")], ["error"])
 
+    def test_g30_cross_line_subject_binding_is_legal(self):
+        """合法跨行 Subject 定义：'is a woman' 后换行才写 'in <Picture 1>'。
+
+        官方允许定义跨行/分句；绑定识别只看同行会把这类合法稿误判 BLOCK（issue #32-3）。
+        """
+        text = self._ref().replace(
+            "<Subject 1> is a woman in <Picture 1>.\n",
+            "<Subject 1> is a woman,\nwearing a coat in <Picture 1>.\n",
+            1,
+        )
+        code, data = self._run(text, "--refs", "1")
+        self.assertEqual(code, 0, data)
+        self.assertFalse(self._hits(data, "G30"), data["findings"])
+
+    def test_g30_semicolon_clause_subject_binding_is_legal(self):
+        """合法分句 Subject 定义：'; in <Picture 1>' 在分号后另起一句。"""
+        text = self._ref().replace(
+            "<Subject 1> is a woman in <Picture 1>.\n",
+            "<Subject 1> is a woman; she appears in <Picture 1>.\n",
+            1,
+        )
+        code, data = self._run(text, "--refs", "1")
+        self.assertEqual(code, 0, data)
+        self.assertFalse(self._hits(data, "G30"), data["findings"])
+
+    def test_g30_cross_line_subject_without_binding_still_blocked(self):
+        """跨行但仍无素材绑定：必须继续 BLOCK（放宽不等于放行）。"""
+        text = self._ref().replace(
+            "<Subject 1> is a woman in <Picture 1>.\n",
+            "<Subject 1> is a woman,\nstanding near the window.\n",
+            1,
+        )
+        code, data = self._run(text, "--refs", "1")
+        self.assertEqual(code, 1, data)
+        self.assertEqual([f["level"] for f in self._hits(data, "G30")], ["error"])
+
     def test_g30_subject_picture_cannot_exceed_refs(self):
         bad = self._ref().replace("a woman in <Picture 1>", "a woman in <Picture 2>", 1)
         code, data = self._run(bad, "--refs", "1")

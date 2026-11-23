@@ -19,7 +19,7 @@ VHS_LoadVideo（原帧序，force_rate=0）
 - 权重取自 `models/latent_upscale_models/`：本链路节点 `H3LatentUpscaleLBH` 记录名为
   `minimax_h3_latent_upscaler_3d_bf16.safetensors`（690 MB）。注意本仓
   `scripts/mkdraft.py` 的 `MinimaxH3LatentUpscaler3D` 节点写的是 `..._fp16.safetensors`；
-  两者是否为同一权重、渲染机实际文件名以实际部署为准（核对 `models/latent_upscale_models/`），
+  两条链路节点不同（LBH vs 3D upscaler）、权重各按其节点记录，非同一权重的口径矛盾；部署机核对 `models/latent_upscale_models/` 下实际文件名，
   不符会报找不到权重。
 - 纯 video latent 输入也接受（`_streams()` 返回单流时直接放大）；AV latent 输入会原样带过音频流。
 
@@ -31,7 +31,7 @@ VHS_LoadVideo（原帧序，force_rate=0）
 {"source": "/path/to/take.mp4", "scale": 2.0, "label": "EP001-upscale"}
 ```
 
-- 默认 2×，也可显式给 `width`/`height`；`save_path` 缺省 `~/Downloads/h3q/`。
+- 默认 2×，也可显式给 `width`/`height`；`save_path` 缺省为 MCP 默认输出目录。
 - 工具自动 ffprobe 源、上传到 `ComfyUI/input/`、生成图、提交、轮询、取回并校验非空。
 - 实测：451f / 768×448 → 1536×896，**165.1 s**，GPU 峰值约 6.8 GB。
   这是修正前的旧值：1536×896 强拉 16:9 会变形，交付须用 `aspect="16:9"` 得到

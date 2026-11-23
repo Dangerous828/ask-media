@@ -15,7 +15,7 @@ description: 仅在要往渲染机（RTX 5070 Ti 16GB，SSH 别名按部署配�
 
 ## 入口与环境
 
-- **最低 ComfyUI 版本（以实际部署为准）**：H3-Image 需 v0.45.0+、Qwen 2.1 Turbo 需 v0.40.0+、H3 视频需 v0.30.0+（Multishot 建议 v0.34+）。
+- **最低 ComfyUI 版本（以实际部署为准）**：H3-Image 需 v0.45.0+、Qwen 2.1 Turbo 需 v0.40.0+、H3 视频需 v0.30.0+（Multishot 建议 v0.34+）。此处 Turbo 指权重/节点支持版本，与已退役的 Turbo LoRA 出图档不是一回事。
 - **版本口径**：同一部署可能出现多个"版本号"（`comfyui_version.py` / `pyproject.toml`、`git describe`、运行实例 `git commit` 不一致）。判断当前版本只看 `comfyui_version.py` / `pyproject.toml` 的实际值；`git describe` 与提交号受仓库 tag / 工作树状态影响，不作为版本依据。特性是否可用以 `/object_info` 中节点是否注册为准。具体以实际部署为准。
 
 ## 0. 队列速查：先入队，轮到再检查显存
@@ -154,7 +154,7 @@ $PY -s $CLI submit --kind image --engine h3-image-w4a8 \
 - `--refine-denoise` 缺省 0 = 单次采样；大于 0 才追加二采节点，`--refine-steps 0` 用渲染器默认步数。二采保构图与文字，纹理区会重绘；实测同 seed 下几何/文字类 PSNR 27–32 dB，高纹理类 17–19 dB。
 - `--refs` 透传到 conditioning 节点的 `images.image_N`；命令行文件名须已在 ComfyUI `input/`。`--checkpoint`、`--loras`、`--alpha`、输出尺寸覆盖不适用于该引擎。
 - **参考图实测边界（2026-11-15，7 素材 × 忠实重绘/只改冷光）**：W4A8 的 `--refs` 全批通过。原社区量化 Q4_K_M 在 1152×768 带参考图时卡死（GPU 100%、显存占满、渲染器 903s 超时），已从脚本移除，不再作为可选档。
-- 同批对照结论：**参考图编辑维度 Qwen 2.1 比 H3 W4A8 更忠实**（7 例里 6 例结构保真更高），H3 W4A8 改光时常连主体、机位一起重绘并顺手抬曝光。纯文生复杂规格仍是 H3 更强；两者按任务类型分开选。详见 `~/Downloads/h3-project-frames-20261115/项目素材参考图编辑实测.md`。
+- 同批对照结论：**参考图编辑维度 Qwen 2.1 比 H3 W4A8 更忠实**（7 例里 6 例结构保真更高），H3 W4A8 改光时常连主体、机位一起重绘并顺手抬曝光。纯文生复杂规格仍是 H3 更强；两者按任务类型分开选。实测记录存内部工程档案（未随公开版发布）。
 - MCP 的 `h3_generate_image` 目前只走 Qwen 通路，未暴露 `engine`；要用 W4A8 走上面的队列 CLI。
 
 ### 出图参数
@@ -218,6 +218,8 @@ CLI 默认在入队后返回 `job_id`，MCP 使用 `wait=false` 获得同样行�
 详见 [short-drama-produce 接入口](references/produce-adapter.md)。
 
 ## 2.10 二采 split 引擎（tiled）+ SeedVR2 事后超分
+
+> 无 §2.9，编号为历史遗留，内容无缺失。
 
 详见 [二采 split 引擎（tiled）+ SeedVR2 事后超分](references/upscale-split-engine.md)。
 

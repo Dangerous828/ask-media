@@ -409,6 +409,29 @@ class Doc:
                 out.setdefault((m.group(1), int(m.group(2))), (pos, entry))
         return out
 
+    def subject_definition_bodies(self) -> Dict[Tuple[str, int], Tuple[int, str]]:
+        """每个独立定义行的**完整定义体**（可跨行/跨分句），到下一个 '<Label N> is' 为止。
+
+        G30 要判断一个 Subject 有没有绑定素材，必须看它整段定义体，而不是只看
+        '<Subject N> is' 那一行：官方写法允许换行或分句后再写 'in <Picture k>'。
+        边界只认行首或句末分隔后的 '<Label N> is'，所以同句/下一行里的
+        '<Picture k>'（不是 'is' 开头）不会被误切成新定义，仍归当前 Subject。
+        """
+        sd = self.sec.get("subject_definitions")
+        if not sd:
+            return {}
+        start_re = re.compile(
+            r"(?:^[ \t]*|(?<=[.;])\s+)<(Subject|Picture|Video|Audio) (\d+)>\s+is\b",
+            re.M,
+        )
+        starts = list(start_re.finditer(sd.text))
+        out: Dict[Tuple[str, int], Tuple[int, str]] = {}
+        for i, m in enumerate(starts):
+            stop = starts[i + 1].start() if i + 1 < len(starts) else len(sd.text)
+            key = (m.group(1), int(m.group(2)))
+            out.setdefault(key, (sd.cstart + m.start(), sd.text[m.start():stop]))
+        return out
+
     def retention_entries(self) -> List[Tuple[int, str]]:
         ra = self.sec.get("retention_analysis")
         if not ra:
@@ -1427,12 +1450,22 @@ def rule_g29(doc: Doc) -> None:
 
 
 def rule_g30(doc: Doc) -> None:
-    """每个可见 Subject 都要有可核对的素材来源；不做违反官方多对多关系的数量相等检查。"""
-    for (typ, num), (pos, entry) in sorted(doc.standalone_labels().items(), key=lambda kv: kv[1][0]):
+    """每个可见 Subject 都要有可核对的素材来源；不做违反官方多对多关系的数量相等检查。
+
+    绑定识别按**完整定义体**：'<Subject N> is ... in <Picture k>' 里的 Picture 允许
+    跨行或分句出现（issue #32-3），不能只认同行，否则合法定义会被误判 BLOCK。
+    """
+    # 位置仍用独立定义行的行首（报错行号稳定），绑定素材从完整定义体里取。
+    positions = {k: pos for k, (pos, _entry) in doc.standalone_labels().items()}
+    bodies = doc.subject_definition_bodies()
+    for (typ, num), (pos, body) in sorted(bodies.items(), key=lambda kv: kv[1][0]):
         if typ != "Subject":
             continue
+        if (typ, num) not in positions:
+            continue  # 没有独立定义行 —— 交给 G05/G06，不在 G30 重复判
+        pos = positions[(typ, num)]
         label = "<Subject %d>" % num
-        refs = [(m.group(1), int(m.group(2)), m.start()) for m in LABEL_RE.finditer(entry)]
+        refs = [(m.group(1), int(m.group(2)), m.start()) for m in LABEL_RE.finditer(body)]
         pictures = [(n, p) for t, n, p in refs if t == "Picture"]
         if doc.refs is not None:
             for pic_num, rel_pos in pictures:
@@ -1443,9 +1476,9 @@ def rule_g30(doc: Doc) -> None:
         # 官方允许 in/from、多图共享，也允许 Subject 来自 Video；Audio/纯画外声音是合法例外。
         if pictures or any(t in ("Video", "Audio") for t, _n, _p in refs):
             continue
-        if VOICE_SUBJECT_RE.search(entry):
+        if VOICE_SUBJECT_RE.search(body):
             continue
-        if LEGACY_SUBJECT_SOURCE_RE.search(entry):
+        if LEGACY_SUBJECT_SOURCE_RE.search(body):
             if doc.refs is not None:
                 level = "error" if doc.refs == 0 else "warn"
                 doc.add(level, "G30", pos,

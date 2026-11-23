@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """check_references.py — 校验公开文档里的路径引用。
 
-范围：所有 SKILL.md、所有 references/ 下的文档、仓库根文档（AGENTS.md / SHORT-DRAMA-ROUTING.md / README.md）。
+范围：仓库内全部 .md 文档（含 SKILL.md、references/、根文档、语料、实测记录与索引）。
 
 对每条引用（markdown 链接与反引号路径）依次尝试：
   1. 相对所在文件目录解析；
@@ -31,6 +31,17 @@ EXTS = {'.md', '.py', '.json', '.txt', '.sh', '.ps1', '.yml', '.yaml', '.jsonl'}
 SKIP_DIR = {'.git', '__pycache__', '.pytest_cache', 'node_modules'}
 
 # 项目产物 / 现场生成文件：不检查
+# 历史实测/交接/变更记录：引用以记录原貌保留，不作现行断链判定
+ARCHIVE_DOC = re.compile(r'(MEASURED-|HANDOFF-|CHANGELOG\.md$|结论-)')
+# 上游 vendored 仓库有意未收录的夹具目录（引用有效于上游、本仓豁免）
+UPSTREAM_FITTURE = re.compile(
+    r'^(\.\./)*(examples|evaluations|tests|tools|\.clawhub|\.agents|\.config|\.short-drama|'
+    r'\.release|Delivery|delivery)/'
+)
+# T8 语料卡：上游原文逐字收录（卡片头注明来源），其内部路径属上游结构
+T8_CORPUS = re.compile(r'h3-prompt-writing.corpus.creative-dna-t8.(cards|cards-community|cases)/')
+T8_ROOT_CARDS = re.compile(r'h3-prompt-writing.corpus.creative-dna-t8.[^.]+\.md$')
+
 PROJECT_ARTIFACT = re.compile(
     r'^(剧集|审查|设定集|项目开发|制作成果|交付|输入|关键帧|创作文档|文档|素材|'
     r'剧本|视觉设定|导演|分镜|图片提示词|视频提示词|剪辑单|场记|白模|MEASURED-|'
@@ -61,8 +72,9 @@ def load_ignore_patterns():
 
 
 def is_ignored(rel, dirs, patterns):
-    """判断相对路径 rel 是否命中任一 .gitignore 规则。"""
-    for pat in patterns:
+    """判断相对路径 rel 是否命中 .gitignore。规则按「后规则优先」：
+    从最后一条往前找，第一条匹配（含 ! 否定）即决定结果。"""
+    for pat in reversed(patterns):
         neg = pat.startswith('!')
         p = pat[1:] if neg else pat
         if not p:
@@ -92,12 +104,9 @@ for dirpath, dirnames, filenames in os.walk(ROOT):
 
 
 def in_scope(rel):
-    parts = rel.split(os.sep)
-    if rel in ('AGENTS.md', 'SHORT-DRAMA-ROUTING.md', 'README.md'):
-        return True
-    if parts[-1] == 'SKILL.md':
-        return True
-    return 'references' in parts
+    """检查范围 = 仓库内全部 .md 文档（SKILL.md、references/、根文档、
+    语料与实测记录等一律纳入；跳过规则负责排除命令示例与占位符）。"""
+    return True
 
 
 basename_index = defaultdict(list)
@@ -109,6 +118,10 @@ checked = 0
 for rel in sorted(all_files):
     if not rel.endswith('.md') or not in_scope(rel):
         continue
+    if ARCHIVE_DOC.search(rel):
+        continue
+    if T8_CORPUS.search(rel) or T8_ROOT_CARDS.match(rel):
+        continue
     dirn = os.path.dirname(rel)
     with open(os.path.join(ROOT, rel), encoding='utf-8') as fh:
         text = fh.read()
@@ -117,14 +130,25 @@ for rel in sorted(all_files):
             ref = m.group(1) or m.group(2)
             checked += 1
             if (' ' in ref or '*' in ref or '\\' in ref or '<' in ref or '>' in ref
+                    or '{' in ref
                     or PLACEHOLDER.match(ref) or PROJECT_ARTIFACT.match(ref)
                     or '/' not in ref):
+                continue
+            if rel.startswith('drama-skills') and UPSTREAM_FITTURE.match(ref):
                 continue
             if os.path.exists(os.path.join(ROOT, dirn, ref)):
                 continue
             norm = os.path.normpath(ref)
             if norm in all_files:
                 continue
+            # 套件根相对：drama-skills 文档里以技能名为首段的路径，实际在 drama-skills/skills/ 下
+            suite_ref = os.path.join('drama-skills', 'skills', norm)
+            if suite_ref in all_files:
+                continue
+            # 带套件容器前缀的写法：skills/<...> → drama-skills/skills/<...>
+            if norm.startswith('skills/'):
+                if os.path.join('drama-skills', norm) in all_files:
+                    continue
             if len(basename_index.get(os.path.basename(ref), [])) == 1:
                 continue
             broken.append(f"{rel}:{lineno}  {ref}")

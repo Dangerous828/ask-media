@@ -1,0 +1,21 @@
+{
+  "_note": "云端 ASR 配置模板（OpenAI 兼容 /audio/transcriptions 与豆包 Agent Plan SAUC）。使用时复制到工作区 workbench/providers.json 并填自己的值；本公开仓不含真实凭据。键名与 extract_speech.py 的 vendor_cfg()/doubao_rows() 对齐。本地 --engine local（faster-whisper）不需要此文件。",
+  "vendors": [
+    {
+      "id": "glm",
+      "base_url": "https://<云端端点>/v1",
+      "api_key": "<API-KEY>",
+      "enabled": false,
+      "model": "<ASR-模型名>"
+    },
+    {
+      "id": "doubao",
+      "base_url": "https://ark.cn-beijing.volces.com/api/plan/v3",
+      "api_key": "<API-KEY>",
+      "enabled": false,
+      "extra": {
+        "speech_api_key": "<SPEECH-API-KEY>"
+      }
+    }
+  ]
+}

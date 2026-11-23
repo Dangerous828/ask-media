@@ -31,7 +31,7 @@
 
 同机位且确需无缝连续时，用 `--workflow multishot` 一次出两窗，接缝由模型内部处理。
 
-**通道**：`h3qc submit --workflow multishot --frames-per-shot 226 --shot-count 2 --refs a.png,b.png,...`
+**通道**：`h3qc submit --workflow multishot --frames-per-shot 226 --shot-count 2 --refs a.png,b.png,...`（`h3qc.py` 为渲染机侧私有脚本，须另行部署，见 [h3-queue §8](../SKILL.md)）
 → h3q 调用渲染机上的 `multishot_render_ref.py`（不入本仓库）→ **V2 `H3MultishotMemorySampler`（模板 `<渲染机根目录>\config\multishot-v2.json`）**。
 
 > **2026-11-15 起 multishot = V2 取代 CORE（操作者指令"去掉 CORE 全部替换"）**。改动已落地并实测跑通全生产链（h3_generate_video → h3q.py → multishot_render_ref.py → H3MultishotMemorySampler+context_pin → 8199 → 出片）：

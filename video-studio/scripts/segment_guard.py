@@ -69,7 +69,7 @@ ss02/s02_push 的设计就是推镜进屏幕，drop 不涨反跌，绝不能拦�
     python3 segment_guard.py seg.mp4
     # 整目录（每条独立判）
     python3 segment_guard.py <视频目录>
-    # 创意上允许黑框自己出画
+    # 创意上允许黑框自己出画（只豁免 DECAY；帧数不足的 NOTCHK 仍阻断）
     python3 segment_guard.py seg.mp4 --allow-decay
     python3 segment_guard.py <目录> --json
 
@@ -77,7 +77,7 @@ ss02/s02_push 的设计就是推镜进屏幕，drop 不涨反跌，绝不能拦�
 ------
     0  无自溶
     1  检出自溶（DECAY）
-    2  参数错误 / 读不到视频
+    2  参数错误 / 读不到视频 / NOTCHK（帧数不足或解码为空，--allow-decay 不豁免）
 """
 import argparse
 import json
@@ -189,7 +189,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="段内黑框自溶帧级检查")
     ap.add_argument("targets", nargs="+", help="视频文件或目录")
     ap.add_argument("--allow-decay", action="store_true",
-                    help="创意上允许黑框在段内自己出画：只报告，不阻断")
+                    help="创意上允许黑框在段内自己出画：只豁免 DECAY，NOTCHK（帧数不足/解码为空）仍阻断")
     ap.add_argument("--json", action="store_true", help="输出 JSON")
     args = ap.parse_args()
 
@@ -267,9 +267,11 @@ def main() -> int:
             print("NOTCHK %d 条未查成（帧数不足/解码为空）：%s"
                   % (len(notchecked), ", ".join(Path(p).name for p in notchecked)))
 
+    # --allow-decay 只豁免「衰减类」检查：创意上允许黑框自己出画。
+    # NOTCHK（帧数不足/解码为空）是「没查成」，不能当通过，任何 flag 下都阻断（exit 2）。
     if bad and not args.allow_decay:
         return 1
-    if notchecked and not args.allow_decay:
+    if notchecked:
         return 2
     return 0
 

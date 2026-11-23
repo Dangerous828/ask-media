@@ -46,7 +46,8 @@ REMOTE_SCRIPTS = os.environ.get("H3Q_SCRIPTS", "")
 REMOTE_PY = os.environ.get("H3Q_REMOTE_PY") or os.environ.get("H3Q_PY", "")
 REMOTE_TMP = os.environ.get("H3Q_TMP", "")
 REMOTE_OUT_DIR = os.environ.get("H3Q_OUT", "")
-LOCAL_OUT_DIR = os.environ.get("EXAMPLE_OUT", "./generated")
+# 本地产物目录：EXAMPLE_OUT 优先，GUGU_OUT 为改名前的兼容别名。
+LOCAL_OUT_DIR = os.environ.get("EXAMPLE_OUT") or os.environ.get("GUGU_OUT", "./generated")
 
 
 def _require_env() -> None:
@@ -65,7 +66,7 @@ def _require_env() -> None:
             "  export H3Q_REMOTE_PY=<渲染机 python 路径>  # 旧名 H3Q_PY 仍兼容\n"
             "  export H3Q_TMP=<渲染机临时目录>\n"
             "  export H3Q_OUT=<渲染机产物目录>\n"
-            "  export EXAMPLE_OUT=<本地产物目录>       # 可选，默认 ./generated"
+            "  export EXAMPLE_OUT=<本地产物目录>       # 可选，默认 ./generated（旧名 GUGU_OUT 仍兼容）"
         )
 
 
@@ -145,16 +146,17 @@ def _scp_down(remote_name: str, local: Path) -> None:
                    check=True, capture_output=True)
 
 
-# 默认画布与 h3-queue/SKILL.md 示例（1344x768）对齐；1376x768 是早期角色C实测用尺寸，
-# 同为 32 倍数，需要复现那批产物时显式传 --size 1376x768。
+# 默认画布与 label 沿用改名前的实测值（1376x768 / h3q/gugu），避免旧调用方
+# 静默跑在新默认值上；显式传 --size/--label 可覆盖。
 def render_via_h3q(prompt_text: str, ref_images: list[str], out_name: str,
-                   seed: int = 42, steps: int = 0, size: str = "1344x768",
-                   label: str = "h3q/example", timeout: int = 900,
+                   seed: int = 42, steps: int = 0, size: str = "1376x768",
+                   label: str = "h3q/gugu", timeout: int = 900,
                    dry_run: bool = False) -> dict:
     """通过 h3q **队列**出图。返回 {ok, out, raw}。
 
-    steps：0 = 队列默认（8 步 + Turbo LoRA）
-           >0 = 显式 --steps N --cfg 3.5（CFG 与 h3-queue/SKILL.md 默认档一致）
+    steps：0 = 队列默认（档位见 h3-queue/references/still-standard-tier-20261105.md，此处不复述数字）
+           8 = 与队列默认同档，等效于不传（不生成显式 --steps/--cfg，避免重复声明）
+           >0 且 !=8 = 显式 --steps N --cfg 3.5（CFG 与 h3-queue/SKILL.md 默认档一致）
     """
     if steps < 0:
         sys.exit("--steps 不能为负数: %d" % steps)
@@ -164,6 +166,11 @@ def render_via_h3q(prompt_text: str, ref_images: list[str], out_name: str,
         pf.write_text(prompt_text, encoding="utf-8")
         remote_prompt = _scp_up(pf)
 
+        # 参数白名单：值不进引号转义体系（PowerShell 拼接），禁止引号/分号/反引号
+        import re as _re
+        for _v in [out_name, label] + list(ref_images):
+            if _re.search(r"[\\'"'`;&|<>"]', str(_v)):
+                raise ValueError(f"参数含命令拼接字符，拒绝提交: {str(_v)[:60]}")
         refs = ",".join(ref_images) if ref_images else ""
         args = [
             "submit", "--kind image",
@@ -212,8 +219,8 @@ def main() -> int:
     ap.add_argument("--refs", default="")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--steps", type=int, default=0)
-    ap.add_argument("--size", default="1344x768", help="采样画布；默认对齐 h3-queue 示例，复现早期角色C产物传 1376x768")
-    ap.add_argument("--label", default="h3q/example")
+    ap.add_argument("--size", default="1376x768", help="采样画布；沿用改名前实测默认值")
+    ap.add_argument("--label", default="h3q/gugu")
     ap.add_argument("--dry-run", action="store_true", help="只打印远端命令，不提交")
     args = ap.parse_args()
 

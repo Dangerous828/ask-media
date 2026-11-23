@@ -177,5 +177,5 @@
 
 - 来源简报版本：【填写】
 - 本次相对变化：【填写】
-- 创作者状态：【草稿 / 待接受 / 已接受 / 需修订】
+- 创作者状态（中文说法 ↔ 文档字段取值，全仓统一，不混用）：草稿 `draft` / 待接受 `pending` / 已接受 `accepted` / 需修订 `update_needed`；候选映射另用 `candidate`（见 `adaptation-map.example.jsonl` 的 `status`）。
 - 创作者覆盖了哪些默认建议及理由：【填写】

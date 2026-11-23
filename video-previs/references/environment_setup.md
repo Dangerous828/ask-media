@@ -1,10 +1,12 @@
 # 环境配置（LLM / Vision / Blender / 深度模型）
 
 > **平台声明**：2D 渲染引擎（`dialogue_engine.py` / `previs_engine.py`）与 dashboard 启动脚本
-> 按 **Windows 优先** 编写：引擎在初始化时加载 `C:\Windows\Fonts\msyh.ttc`（无跨平台回退），
-> `launch.py` 用 `CREATE_NEW_CONSOLE`、`watch.py` 用 `pythonw.exe` + `DETACHED_PROCESS`。
-> macOS / Linux 下初始化引擎会 OSError，跨平台尚未验证。
-> 仅做拉片/台词提取/文档导出等离线步骤时不受字体限制。
+> 按 **Windows 优先** 编写：`launch.py` 用 `CREATE_NEW_CONSOLE`、
+> `watch.py` 用 `pythonw.exe` + `DETACHED_PROCESS`，dashboard 的 `.blend` 打开走 Windows
+> `os.startfile`。字体层已有跨平台回退（`load_font()` 依次尝试 Windows 雅黑 →
+> DejaVuSans → 系统字体 → PIL 默认字体），但渲染引擎整体仍按 Windows-only 对待：
+> macOS / Linux 下引擎初始化与上述启动方式尚未验证。
+> 仅做拉片/台词提取/文档导出等离线步骤时不受此限制。
 
 Skill 核心拉片/白模是离线的（opencv/rapidocr/faster-whisper/本地引擎），无需密钥。
 以下为可选的增强能力。

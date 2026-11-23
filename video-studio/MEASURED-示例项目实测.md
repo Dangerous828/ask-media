@@ -134,8 +134,8 @@ The scene is set in the cozy stylized 3D cartoon living room from <Picture 1>:
 cream TV cabinet on the right wall, polished pastel floor tiles...
 
 - On the right wall, the large TV screen is a brilliant swirling golden vortex portal.
-  The cute penguin girl (角色A, from image 2) is firmly holding the small hand of
-  the cute chubby toddler boy (角色C, from image 3).
+  The cute penguin girl (角色C, from image 2) is firmly holding the small hand of
+  the cute chubby toddler boy (角色D, from image 3).
 ```
 
 **特征**：

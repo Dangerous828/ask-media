@@ -10,8 +10,11 @@ Toonflow visualStyles.md 要的是「亮暗过渡柔和、暗部不死黑」，�
   灰度熵                     防平化护栏（为降暗部把画面写平，熵会掉）
 
 用法：
-    python3 qc_image.py <图片> [<图片>...]
-    python3 qc_image.py <目录> --json
+    python3 qc_image.py <图片> --qc-profile cartoon3d
+    python3 qc_image.py <目录> --qc-profile cartoon3d --baseline <基准目录> --json
+
+自测（档位必须显式给，--baseline 不替代 --qc-profile）：
+    python3 qc_image.py <图片> --baseline <基准目录> ; echo $?   # 期望退出码 2，列出 6 个档位
 
 退出码：
     0  全部通过
@@ -239,19 +242,22 @@ def main() -> int:
                          "实测比绝对档准（本片 9/9 vs 3/9）")
     args = ap.parse_args()
 
-    # 档位必须显式给，或由 --baseline 推导。**禁止静默套用某个题材的默认档**。
+    # 档位必须显式给；--baseline 只提供本片基准，不能替代档位，也不推导档位。
+    # **禁止静默套用某个题材的默认档**：给 --baseline 但不给 --qc-profile 时曾静默
+    # fallback 到 virtual-void，与「不再静默套默认档」矛盾，现改为显式报错。
     # 实测教训（2026-10-22）：原先 DEFAULT_PROFILE="virtual-void"（赛博发光虚空档，
     # 高光上限 12%）会静默套到 3D 卡通片上 —— 同一批 9 张图默认档只有 1/9 PASS，
     # 而正确档 3/9、人工目检 9/9 可用。静默误判比不跑更危险。
-    if args.qc_profile is None and args.baseline is None:
-        print("ERROR: 必须指定 --qc-profile <档> 或 --baseline <基准目录>。", file=sys.stderr)
+    if args.qc_profile is None:
+        print("ERROR: 必须显式指定 --qc-profile <档>；--baseline 只提供本片基准，"
+              "不能替代档位。", file=sys.stderr)
         print("       本脚本不再提供默认档：阈值与题材绑定，套错档会静默误判。", file=sys.stderr)
         print("       可用档: " + ", ".join(PROFILES), file=sys.stderr)
         print("       项目侧建议: <项目>/qc/profile.json 声明本片档位，"
               "<项目>/qc/baselines/<档>/ 放基准产物。", file=sys.stderr)
         return 2
 
-    profile = args.qc_profile or "virtual-void"
+    profile = args.qc_profile
 
     files = []
     for t in args.targets:

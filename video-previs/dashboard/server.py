@@ -17,7 +17,9 @@ def _find_projects():
         nd=os.path.dirname(d)
         if nd==d: break
         d=nd
-    return os.path.abspath(os.path.join(ROOT,"..","..","..",".."))
+    # 不再静默回落四级父目录：找不到含 projects/ 的目录就停在 dashboard 自身位置，
+    # 首页显示空项目引导（index.html 有新建引导），避免误扫无关目录。
+    return os.path.abspath(os.path.join(ROOT, ".."))
 VIDEO=_find_projects()
 # 脚本查找顺序：本 Skill 的 scripts（dashboard 在 <skill>/dashboard 时为 ../scripts）→ 工作区 previs_system。
 # 不再回退旧私有布局（.codex/skills/video-previs/scripts）；公开仓只认本 Skill 的相对位置。
@@ -334,6 +336,8 @@ class H(BaseHTTPRequestHandler):
                 if not under(VIDEO,p) or not os.path.isfile(p):
                     return self._send(400,"application/json",json.dumps({"ok":False,"err":"文件不存在"}).encode())
                 try:
+                    if not hasattr(os,"startfile"):
+                        return self._send(501,"application/json",json.dumps({"ok":False,"err":"打开 .blend 仅支持 Windows"}).encode())
                     os.startfile(p)
                     return self._send(200,"application/json; charset=utf-8",json.dumps({"ok":True,"opened":os.path.basename(p)},ensure_ascii=False).encode())
                 except Exception as e:

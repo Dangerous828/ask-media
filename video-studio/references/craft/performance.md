@@ -145,10 +145,10 @@ H3 官方 `base-en.txt` 要求 `integrated_multimodal_description` 描述
 ### 10 · 电梯合门（转场用）
 
 ```
-镜头俯拍路面，[电梯门缓缓合拢]，画面收窄至一条缝隙。
+镜头正对电梯门，[电梯门缓缓合拢]，画面收窄至一条缝隙。
 ```
 
-> OCR 此处残缺严重，仅保留能确证的「电梯合门」主题。
+> OCR 此处残缺严重，仅保留能确证的「电梯合门」主题；俯拍路面与电梯合门无法同框，故改为正对电梯门。
 
 ---
 
@@ -172,7 +172,7 @@ H3 官方 `base-en.txt` 要求 `integrated_multimodal_description` 描述
 ```text
 [Shot 2] At 00:03.500, the shot cuts to a close-up on <Subject 1>'s face.
 Her jaw is clenched tight, the rims of her eyes reddening as she forces
-the tears back, stubbornness and fragility surfacing on the same face.
+the tears back, her chin lifting a fraction while her gaze holds steady.
 ```
 
 要点：

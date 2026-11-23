@@ -527,9 +527,16 @@ def check(script_path: Path, shots_path: Path, visuals_path=None) -> dict:
             })
             continue
         # 跨语言：中文动作链 + 全英文提示词（用视觉代称写词）时，中文字面指纹无从比对。
-        # 这类情况由 §3 按事件对账（含视觉设定里的画面代称）判定，§1 不重复判负也不记 NOTCHK。
+        # 不得静默跳过（issue #32-4）：§1 无法定论就显式记 NOTCHK，交由 §3 事件对账兜底，
+        # 但最终状态不能假装「全部对齐」（PASS），否则整镜丢失会被这层静默放过。
         chain = " ".join(sh["action_chain"])
         if re.search(r"[一-鿿]", chain) and not prompt_has_zh:
+            findings.append({
+                "level": "notchk", "kind": "SHOT_FINGERPRINT_CROSS_LANG_NOTCHK",
+                "shot": sh["shot_id"],
+                "msg": (f"剧本 {sh['shot_id']}「{sh['title'][:26]}」是中文动作链、提示词全英文，"
+                        f"中文字面指纹无从比对；§1 整镜丢失检查未决，需 §3 事件对账或人工确认"),
+            })
             continue
         # IDF 式权重：只在 ≤半数镜出现的 token 才计区分力，公共词剔除；全公共则退化为全词。
         weights = [1.0 / (1.0 + doc_freq[t] / n_script_shots)

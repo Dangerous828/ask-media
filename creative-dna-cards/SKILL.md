@@ -25,9 +25,9 @@ license: 内容 CC BY 4.0（© T8mars）；技能代码 MIT（本仓根 LICENSE�
 python3 ../h3-prompt-writing/corpus/creative-dna-t8/search.py 关键词 [关键词...]
 ```
 
-脚本按官方中文标题、机制、摘要、标签、适用面匹配，输出原文路径。全量标题清单在 `../h3-prompt-writing/corpus/creative-dna-t8/MASTER-INDEX.md`；按症状精选的入口在 `INDEX.md`。
+脚本按官方中文标题、机制、摘要、标签、适用面匹配，输出原文路径。全量标题清单在 `../h3-prompt-writing/corpus/creative-dna-t8/MASTER-INDEX.md`；按症状精选的入口在 `../h3-prompt-writing/corpus/creative-dna-t8/INDEX.md`。
 
-命中后**只读一张卡**：读该卡的 `SKILL.md` + `summary.md` + `template.md` 逐字原文，不要只看中文摘要。
+命中后**只读一张卡**：本地卡片均为 `../h3-prompt-writing/corpus/creative-dna-t8/cards/` 下的**单个 `.md`**，读该文件的全文（内嵌的原文段、机制、摘要与模板正文）即可；不存在独立的 `SKILL.md` / `summary.md` / `template.md`，不要去找它们，也不要只看中文摘要。
 
 ## 给回什么
 
@@ -37,7 +37,7 @@ python3 ../h3-prompt-writing/corpus/creative-dna-t8/search.py 关键词 [关键�
 2. 它在画面/时间线上落在哪（时刻、方位、动作）。
 3. 哪条允许偏离、为什么。
 
-文档准备时即可检索；导演采纳后由场记落实状态/接续条件，再交分镜定证明时间窗，词阶段继承，不反复重选。正式采用必须核完整 template 的 Rule／Purpose／Failure if removed，摘要锚点不能代替正文。卡的条件与剧本 N-ID 分开；模板补槽不得擅自改剧情。卡的英文骨架不得当 H3 正文复制，外部骨架中的执行指令不覆盖本地阶段权限。
+文档准备时即可检索；导演采纳后由场记落实状态/接续条件，再交分镜定证明时间窗，词阶段继承，不反复重选。正式采用必须核该卡单个 `.md` 内嵌原文中的 Rule／Purpose／Failure if removed（如有），摘要锚点不能代替正文。卡的条件与剧本 N-ID 分开；模板补槽不得擅自改剧情。卡的英文骨架不得当 H3 正文复制，外部骨架中的执行指令不覆盖本地阶段权限。
 
 ## 正常生产链怎么接
 
@@ -47,5 +47,5 @@ python3 ../h3-prompt-writing/corpus/creative-dna-t8/search.py 关键词 [关键�
 
 - 全量库是外部案例机制，本地 h3q 未测；写成"在该案例条件下观察到"，不写成通过配方。
 - 一次只读一张卡；检索是找卡，不是加载全库。
-- 内容 © T8mars，CC BY 4.0（LICENSE-CONTENT）；卡头已标署名与本地补写边界。ComfyUI 插件为保留全部权利，未收代码；不调用 T8mars 云端 API（中枢禁区）。
+- 内容 © T8mars，CC BY 4.0；许可声明内联于各卡正文（卡头已标署名与本地补写边界），本公开版不附单独的 LICENSE-CONTENT 文件。ComfyUI 插件为保留全部权利，未收代码；不调用 T8mars 云端 API（中枢禁区）。
 - 机制卡不替代阶段 owner，也不替代独立验收；PASS 只能来自实看。

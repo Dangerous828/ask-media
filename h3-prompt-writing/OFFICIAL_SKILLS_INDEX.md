@@ -18,6 +18,6 @@
 
 ## 说明
 
-- 本仓只收录 H3 提示词写作与已吸收的语料；官方 8 个风格技能未随本仓发布，列表见官方仓库 `skills/README.md`。
+- 本仓只收录 H3 提示词写作与已吸收的语料；官方 8 个风格技能未随本仓发布，列表见[官方仓库 README](https://github.com/MiniMax-AI/MiniMax-H3)。
 - 安装本仓版本：`npx skills add Dangerous828/ask-media`，或手动链接本目录；不要安装官方仓库版本，二者写法已分叉。
 - 转载条款：MiniMax-H3 仓库根目录没有 LICENSE 文件，转载条款以官方仓库为准。
