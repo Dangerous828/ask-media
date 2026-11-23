@@ -15,7 +15,7 @@
 
 **代价要写进决策**：双窗 20 分钟以上（EP005 S-002 判废经过见 [incidents.md](incidents.md) §2026-11-19/20）；需要 `scene_video` 做场景锚，否则房间会被重画；静默窗有编台词风险。
 
-**选路硬依据（2026-11-21 实测）**：单镜 `first_frame`（锁首帧）与 `refs`（身份板）在 adapter 层**互斥**，同 job 不可兼得（直接报错）。所以**双人同场、既要锁起帧又要双身份板的连续段，只有 multishot 一条路**（两窗各挂各的身份板）——别再试「单镜带两人」绕路。context_pin 验证状态见本文「通道与参数」节的模板说明 2026-11-21 更新（0.45.3 已实测通过）。
+**选路硬依据（2026-11-21 实测）**：单镜 `first_frame`（锁首帧）与 `refs`（身份板）在 adapter 层**互斥**，同 job 不可兼得（直接报错）。所以**双人同场、既要锁起帧又要双身份板的连续段，只有 multishot 一条路**（两窗各挂各的身份板）——别再试「单镜带两人」绕路。context_pin 验证状态见 [incidents.md](incidents.md) §2026-11-21（0.45.3 实测通过；容器缝与词层缝分开）。
 
 **"同机位"本身不是用多窗的理由**——能拆就拆成单镜；多窗也管不了词层的相位断与情绪跳档，先在词层判型修词（判型顺序见 `../../drama-skills/skills/short-drama-video-prompts/references/seam-transition.md` §0.1 第 0 步，判据见 `../../h3-prompt-writing/references/failure-modes.md`）。两则反面教材（EP005 002 双窗 26 分钟判废、EP004 006+007 两轮词层缝）经过见 [incidents.md](incidents.md) §2026-11-19/20。
 

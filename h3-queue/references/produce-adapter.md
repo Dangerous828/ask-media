@@ -8,7 +8,7 @@
 - **上传先按 modality 分流**：
   - **`modality=image`：直接上传参考源文件字节，保留扩展名；上传名含唯一请求标识，按绑定顺序编号。** 不经过 `sips`、缩放或重编码。`resolution=0` 由模型按原参考尺寸编码并对齐 32，不代表源像素未经任何模型预处理；采样画布由 `size` 单独指定。
   - **`modality=video`：继续以下按角色分两档的上传策略**（2026-11-08 修订）；以下压缩开关和参考面积归一规则仅用于视频。
-  - **`first_frame` / `last_frame` 与 `may_control` 含"起始/首帧/构图/状态"的参考 → 原生尺寸 PNG，绝不重编码。** 这些就是交付像素本身；只在长边超过 `H3Q_REF_LONG_EDGE`（默认 2048，纯安全上限）时才缩。重编码经过见 [incidents.md](incidents.md) 对应节（sips/JPEG 缺陷已修）。
+  - **`first_frame` / `last_frame` 与 `may_control` 含"起始/首帧/构图/状态"的参考 → 原生尺寸 PNG，绝不重编码。** 这些就是交付像素本身；只在长边超过 `H3Q_REF_LONG_EDGE`（默认 2048，纯安全上限）时才缩。重编码经过见 [incidents.md](incidents.md) §2026-11-08 前（sips -Z 重编码首尾帧缺陷，已修）。
   - **身份／造型／道具／场景板 → 长边 768 + JPEG q80（保持实测口径，不动）。** `../../video-studio/SKILL.md` 与 `ref_guard.py` 记着：压完画面更干净，因为板卡噪点不再被放大。该实测出自 Qwen Image 2.1 Turbo 生图（8 步／CFG 1.0／1024×576，4–5 张参考），**H3 视频侧尚未两侧确认**，所以在 A/B 出结论前不因"看起来更保真"就抹掉它。
   - **做实验**：`H3Q_REF_LOSSLESS=all` 强制全 PNG，`=0` 强制全 JPEG。
   - 张数不再构成压缩理由：显存峰值与参考图张数无关（2/6 张同为 ~15.5 GiB 的实测见 [incidents.md](incidents.md) §2026-11-08），`ref_image_size: match` 本来就把每张归一到输出面积。

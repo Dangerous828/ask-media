@@ -4,7 +4,7 @@
 
 ## 为什么本仓保持平铺
 
-本仓是公开文档仓，技能以 `humanizer/` 目录平铺发布：`SKILL.md` 在目录根，引用 `references/`、`scripts/`、`../DETECT.md` 等相对路径（末项相对本文所在的 `references/`）。根级 [AGENTS.md](../../AGENTS.md) 的「文字创作与发布」路由表、`write-article` / `write-tweet` 的引用都指向 `humanizer/SKILL.md`。若把正文移进子目录，这些引用与仓库内相对路径都要改写，对读者与路由没有收益。
+本仓是公开文档仓，技能以 `humanizer/` 目录平铺发布：`SKILL.md` 在目录根，用 `references/…`、`scripts/…` 这类相对 `humanizer/` 的路径；`SKILL.md` 里写的是 `../DETECT.md`（相对 `humanizer/` 上一级）。本文件自己在 `humanizer/references/`，所以它引用同目录文件与引用技能根，前缀分别是同级文件名与 `..`。根级 [AGENTS.md](../../AGENTS.md) 的「文字创作与发布」路由表、`write-article` / `write-tweet` 的引用都指向 `humanizer/SKILL.md`。若把正文移进子目录，这些引用与仓库内相对路径都要改写，对读者与路由没有收益。
 
 ## 若上游合并后需要同步
 
