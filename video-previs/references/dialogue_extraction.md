@@ -25,6 +25,6 @@
 
 ## 命令
 ```
-python scripts/extract_subtitles.py <video> --start S --end E
-python scripts/extract_speech.py   <video> --start S --end E --model small --lang zh
+python ../scripts/extract_subtitles.py <video> --start S --end E
+python ../scripts/extract_speech.py   <video> --start S --end E --model small --lang zh
 ```

@@ -20,7 +20,7 @@ VHS_LoadVideo（原帧序，force_rate=0）
 - `H3LatentUpscaleLBH` 的 `width/height` 是**像素**目标，内部按 `VAE_DOWN=16` 换算 latent 尺寸；对齐 32 即可。
 - 权重取自 `models/latent_upscale_models/`：本链路节点 `H3LatentUpscaleLBH` 记录名为
   `minimax_h3_latent_upscaler_3d_bf16.safetensors`（690 MB）。注意本仓
-  `scripts/mkdraft.py` 的 `MinimaxH3LatentUpscaler3D` 节点写的是 `..._fp16.safetensors`；
+  `../scripts/mkdraft.py` 的 `MinimaxH3LatentUpscaler3D` 节点写的是 `..._fp16.safetensors`；
   两条链路节点不同（LBH vs 3D upscaler）、权重各按其节点记录，非同一权重的口径矛盾；部署机核对 `models/latent_upscale_models/` 下实际文件名，
   不符会报找不到权重。
 - 纯 video latent 输入也接受（`_streams()` 返回单流时直接放大）；AV latent 输入会原样带过音频流。

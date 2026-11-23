@@ -45,7 +45,7 @@
 ### 4 去 AI 味 → 投稿
 
 ```bash
-python3 scripts/detect.py 稿件.md --genre academic --json > /tmp/before.json
+python3 ../scripts/detect.py 稿件.md --genre academic --json > /tmp/before.json
 ```
 
 **完成判据**（全部满足才交稿）：

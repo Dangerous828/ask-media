@@ -50,13 +50,13 @@
   | `mkdraft.py`（本仓手建图 CLI，离线研究副本） | 照模板现有 `LoadImage` 槽位 | **仅 2 槽**：`--ref0/--ref1`，超过模板槽数直接报错 |
 
   **9 张只走渲染机侧 `pdd_render_ref.py` 渲染器路径**（动态槽位逻辑在该私有脚本内，未随公开版发布，以实际部署为准）。
-  本仓 `scripts/mkdraft.py` 是离线研究副本，没有 `--refs` / `grow_ref_slots` / `trim_ref_slots` / `bind_refs`，
+  本仓 `../scripts/mkdraft.py` 是离线研究副本，没有 `--refs` / `grow_ref_slots` / `trim_ref_slots` / `bind_refs`，
   也没有动态扩容；不要用 mkdraft 这条路去验证 9 图，最多 2 张。下方"显存与张数无关"的实测均出自渲染器路径。
 
   **节点真实上限是 9**（`MiniMaxH3ReferenceToVideo.ref_images` autogrow `min:0, max:9`），不是 h3q 也不是模型的 2 张限制。`h3_gate.py` 不限制数量，只核对 `<Picture N>` 编号 ≤ 实际上传数。
 
   **结论（2026-11-08 实测）：**
-  - 9 张参考图只走渲染机侧 `pdd_render_ref.py`（动态槽位逻辑在该私有脚本内，未随公开版发布）；本仓 `scripts/mkdraft.py` 离线副本最多 2 槽（`--ref0/--ref1`），不要拿它验证 9 图。节点真实上限 9 是 `MiniMaxH3ReferenceToVideo.ref_images` 的 autogrow `min:0,max:9`，`h3_gate.py` 不限制数量、只核对 `<Picture N>` 编号。
+  - 9 张参考图只走渲染机侧 `pdd_render_ref.py`（动态槽位逻辑在该私有脚本内，未随公开版发布）；本仓 `../scripts/mkdraft.py` 离线副本最多 2 槽（`--ref0/--ref1`），不要拿它验证 9 图。节点真实上限 9 是 `MiniMaxH3ReferenceToVideo.ref_images` 的 autogrow `min:0,max:9`，`h3_gate.py` 不限制数量、只核对 `<Picture N>` 编号。
   - 出片（final）实测通过 **2 张与 6 张**；**显存峰值与张数无关**，时间才是代价——**每张约 +13 秒**。实测数字见 [incidents.md](incidents.md) §2026-11-08。
   - 验构图（draft）最多 9 张；9 张那次 OOM 属 sticky context / 瞬时分配，不是容量问题，重跑即可、不要退回 2 张。逐帧数据、报错正文与推翻过程见 [incidents.md](incidents.md) §2026-11-08。
 
@@ -73,7 +73,7 @@
   这两个字段纠正过一次误判（`external work running=1` 被当成别人干扰的证据）；推翻经过与未归因结论见 [incidents.md](incidents.md) §2026-11-08。实测记录存项目内部档案（未随公开版发布）。
 
 - **第三条路线：HyperFlow H3 Flash —— 本机 16GB 跑不了，别装。**
-  先看归属：它是**第三方压缩模型**（Video-Rebirth 的 HyperFlow H3 Flash，13.7B），**不是 MiniMax 官方上游**。显存数字出自其仓库 Video-Rebirth/hyperflow-h3-flash 的 integrations/README.md（引用时点 2026-11-06，1344×768、6 步、2 张参考图口径，GGUF Q4_K_M / 该表未细分 INT8 档），本仓记录值为 RTX 4090 (24G) 22 GiB、RTX 5090 (32G) 30 GiB；上游现行表可能已更新，以引用时点为准。再看条件：官方补 16 GB 实测数据，或出现 16 GB 可跑的精简版；届时唯一看点是**音画同出**，不是速度。三条硬理由、显存表原文与来源链接见 [incidents.md](incidents.md) §2026-11-06。
+  先看归属：它是**第三方压缩模型**（Video-Rebirth 的 HyperFlow H3 Flash，13.7B），**不是 MiniMax 官方上游**。显存数字出自其仓库 Video-Rebirth/hyperflow-h3-flash 的 `<上游仓>/integrations/README.md`（上游仓路径，未随本仓发布；引用时点 2026-11-06，1344×768、6 步、2 张参考图口径，GGUF Q4_K_M / 该表未细分 INT8 档），本仓记录值为 RTX 4090 (24G) 22 GiB、RTX 5090 (32G) 30 GiB；上游现行表可能已更新，以引用时点为准。再看条件：官方补 16 GB 实测数据，或出现 16 GB 可跑的精简版；届时唯一看点是**音画同出**，不是速度。三条硬理由、显存表原文与来源链接见 [incidents.md](incidents.md) §2026-11-06。
 
 - **视频档位 `parameters.tier`（adapter 代码强制，不靠提示）：**
 
@@ -111,5 +111,5 @@
 }
 ```
 
-修改 adapter 后至少运行 `py_compile` 和 `python3 scripts/test_short_drama_h3q_adapter.py` 的 submit/reference/collect 契约测试；离线测试不证明远端生成质量。
+修改 adapter 后至少运行 `py_compile` 和 `python3 ../scripts/test_short_drama_h3q_adapter.py` 的 submit/reference/collect 契约测试；离线测试不证明远端生成质量。
 

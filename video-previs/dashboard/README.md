@@ -39,7 +39,7 @@ python launch.py 11872
 媒体支持：mp4/mov/mkv（Range 拖动）、jpg/png、wav/m4a/mp3、md/txt/srt/json/py 文本预览、blend/xlsx 下载
 
 ## ⑦ 分镜 JSON → Blender 3D 一键生成
-- 工具：`scripts/blender_previs.py <storyboard.json>`（消费 dialogue 引擎契约：set/actors/shots 的 pos/look/fov），位于本 Skill 的 `scripts/`
+- 工具：`../scripts/blender_previs.py <storyboard.json>`（消费 dialogue 引擎契约：set/actors/shots 的 pos/look/fov），位于本 Skill 的 `scripts/`
 - 产物：`projects/<项目>/白模3D/gen_<slug>.py` + `gen_<slug>.blend`（脚本发到 MCP 后自动存盘）
 - 工作台 ⑥ 页签按钮：「✨ 从分镜JSON 一键生成 3D 场景」= 生成脚本 → 自动发送 Blender MCP(9876) 构建；之后可点「Blender CLI 后台渲染」出帧
 - 支持：tatami 和室预设（榻榻米/障子/矮桌碟碗/坐姿）与 generic 通用房间预设；机位/fov/切点全部来自分镜 JSON

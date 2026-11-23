@@ -82,7 +82,7 @@
 projects/<剧名>/style.txt   内容就一行：3d_anime
 ```
 
-可选的自用拼装由 `scripts/build_prompt.py` 做，实际顺序：
+可选的自用拼装由 `../scripts/build_prompt.py` 做，实际顺序：
 
 ```
 profile【正向锚词】 → 镜头层

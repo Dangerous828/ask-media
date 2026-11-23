@@ -403,7 +403,7 @@ agent 在这里明确犹豫过。界线现在写清楚：分界是「本集之�
 固定长相和本集不变的造型时写一个 `身份` 槽位并把 `本集造型` 列进 `控制`；本集之内会改变的换装、湿透、
 破损才另开 `造型状态`。判断依据永远是槽位自己写下的 `控制`，不是用途名称的字面意思。
 
-**`assets/video-prompts.md` 属于哪条管线。** 它是结构化管线（`motion-specs.jsonl` 一路）的输出模板，
+**`skills/short-drama-video-prompts/assets/video-prompts.md` 属于哪条管线。** 它是结构化管线（`motion-specs.jsonl` 一路）的输出模板，
 字段与 creator-first 的《视频提示词.md》骨架并不相同，实跑的 agent 一度不确定该跟哪一份。文件开头
 现在直接写明这一点，并列出 creator-first 的字段顺序。
 
@@ -797,7 +797,7 @@ JSON/JSONL、索引、指纹、覆盖表或 QA 记录。用户点名整集或整
 ### 新增
 
 **`short-drama-storyboard` 新增漫剧关键帧视觉词表**（`taste_option`）。
-`references/comic-keyframe-lexicon.md` 把漫剧 / 二维漫画形态下的项目级共享画风与镜头级
+`skills/short-drama-storyboard/references/comic-keyframe-lexicon.md` 把漫剧 / 二维漫画形态下的项目级共享画风与镜头级
 可读性约束整理成"场景/主体事实 → 视觉语言投影 → 可读性/风险约束"三层结构，并给出
 叙事关键帧、对话镜头、动作特效帧的选词入口、组合方法与完整示例。选项本身不设质量门槛，
 被创作者接受进视觉方向后才成为必须投影的形态约束；身份、地理与边界事实的优先级不变。
@@ -1048,7 +1048,7 @@ v0.4.2 是一次校准版本，有两个来源。一是和竞品的端到端对�
   出去的压力、兑现依赖已建立的事实（`STY-09`）、每集都有局部结果（`STY-13`）——因为
   别处失手观众只是走神，这里失手观众直接离开。位置、比例与是否设门槛全部由创作者决定；
   套件不提供默认值，不假定任何平台规则，也不把门槛位置当作质量判据。
-- **新增破镜重圆题材卡**。`genre-cards/破镜重圆.md`，置信度中。核心是"你在我不在的时候
+- **新增破镜重圆题材卡**。`skills/short-drama-develop/references/genre-cards/破镜重圆.md`，置信度中。核心是"你在我不在的时候
   还爱不爱我"这一问题的反复证明——分离是证明的条件而非障碍；按误会归属分四支
   （无过失、一方误会、双向误会、一方不知道对方是谁），并写明"此刻不能立刻说清的理由"
   是最容易漏掉也最致命的一件。卡片仍是可被创作者一句话覆盖的 `craft_default`。
@@ -1191,7 +1191,7 @@ v0.4.2 是一次校准版本，有两个来源。一是和竞品的端到端对�
 
   **工具自己维护的那一层保留**：生命周期状态（`update_needed` 靠它）、交付包
   `checksums.sha256`（`verify` 靠它）、生产任务指纹。它们不写进产物，也不靠人维护。
-- **删除 `short-drama/references/routing-examples.md`**。全仓扫描显示它没有被任何技能引用，
+- **删除 `routing-examples.md`**（原在 short-drama/references 下，该历史文件未随公开版发布）。全仓扫描显示它没有被任何技能引用，
   其意图路由表已被 `SKILL.md` 的「意图路由」覆盖，且是中文技能里唯一的英文文件。文件里
   两条其他地方没有的规则已并入 `SKILL.md` 正文（产物可以直接入场、请求含糊时先展示状态
   并给出不超过三个动作），因此没有丢失行为规范。
@@ -1372,7 +1372,7 @@ VID-04 非法数值、跨平台路径唯一性、旧事务安全阻断及 Window
   「绑定不等于听过」，没有创作者说明或授权试听记录就保持 `unverified`。
   文字负责参考音频承担不了的两件事：选型与验收判据（每条带反例）、以及专名发音
   （只能有一种拼法，`AST-10` 结构性阻断）。新增 `AST-08`–`AST-12`、
-  `references/voice-direction.md` 与派生的 `设定集/voice-casting.md`（缓存，非权威）。
+  `skills/short-drama-assets/references/voice-direction.md` 与派生的 `设定集/voice-casting.md`（缓存，非权威）。
   参考音频本身留在 `输入/`，不进 设定集，也不进交付包。
   **仍不生成音频，也不调用任何语音、合成或克隆服务**。
 - **`$short-drama-novel-analyze`：长篇原著分析技能**。把小说、连载或多集散稿拆成可追溯的
@@ -1386,7 +1386,7 @@ VID-04 非法数值、跨平台路径唯一性、旧事务安全阻断及 Window
   所以抽样横跨整本书而不是只读开头——开头慢而爽点密的书能改，开头漂亮而后段全是内心戏的
   书不能改，只读开头这两类都会看反。快评第一行写覆盖率，结论限于抽样范围；
   S5 完成后回填对照，写清哪几条判断被推翻。
-- **`scripts/novel_index.py`：唯一切片真源**。章节边界只算一次并绑定 `content_sha256`，
+- **`skills/short-drama-novel-analyze/scripts/novel_index.py`：唯一切片真源**。章节边界只算一次并绑定 `content_sha256`，
   供后续每个阶段共用；识别中文数字章号（含 千 / 两，覆盖千章以上连载），
   只认一种编号单位（章/回/节里出现最多的那个），剔除开头目录块，按卷分段校验编号，
   并提供 `verify`、`sample`、`coverage` 三个确定性检查。
@@ -1816,7 +1816,7 @@ image-prompts / storyboard / video-prompts / review。
 ### 变更
 
 - **每个技能自包含**：子技能不再读取彼此或核心的文件；共享内容按阶段切片内联到各自的
-  `references/stage-contract.md`，核心索引改为按技能名路由。代价是 `CON-*` 在三处各存
+  各技能的 `skills/*/references/stage-contract.md`（如 `skills/short-drama-write/references/stage-contract.md`），核心索引改为按技能名路由。代价是 `CON-*` 在三处各存
   一份，由测试强制正文一致。
 - **创作者决定与审查证据按产物分文件**（`creator-decisions/<artifact-id>.json`）。
   此前默认的单一追加式 `creator-decisions.jsonl` 与整文件 hash 绑定不兼容：接受第二个

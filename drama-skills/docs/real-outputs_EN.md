@@ -9,7 +9,7 @@ omitted field lines are not marked.
 
 ## One shot through four documents: the storyboard traces back to the script, the look stays locked
 
-Origin: the [public sample `examples/creator-first/EP001`](../examples/creator-first/EP001/), arranged by hand to the
+Origin: the sample project `examples/creator-first/EP001` (local-only, not included in the public release), arranged by hand to the
 current document contract; it passes `creator_markdown_check.py`. The same shot,
 `SHOT-EP001-002`, is owned one layer at a time. The script only says what happens (translated):
 
@@ -80,10 +80,7 @@ you can verify (translated; the prompt is quoted as written):
 > the young man remaining at the right edge. …
 ```
 
-The four originals: [`剧本.md`](../examples/creator-first/EP001/剧本.md) ·
-[`视觉设定.md`](../examples/creator-first/EP001/视觉设定.md) ·
-[`分镜.md`](../examples/creator-first/EP001/分镜.md) ·
-[`视频提示词.md`](../examples/creator-first/EP001/视频提示词.md). The three mechanisms are explained in
+The four originals (sample project, local-only, not included in the public release): `剧本.md` · `视觉设定.md` · `分镜.md` · `视频提示词.md`. The three mechanisms are explained in
 [Cross-shot consistency](character-consistency-across-shots.md) (Chinese).
 
 ## What the checker catches: break the sample in two places on purpose

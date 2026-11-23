@@ -26,7 +26,7 @@
 `detect.py` 的 `--genre academic` 落实上表：把 6 条与学术语体冲突的规则从 A/B 降到 C（只报告，不改），并追加「论文核查」清单。默认 `--genre general` 与上游完全一致。
 
 ```bash
-python3 scripts/detect.py 论文.md --genre academic --json > /tmp/before.json
+python3 ../scripts/detect.py 论文.md --genre academic --json > /tmp/before.json
 ```
 
 **降级是工程判读，不是实测标定**：上游两轮语料不含学位论文 / 期刊稿，降级后显示的「人类≈x/千字」仍是新闻自媒体语料的参考值，**在论文里没有统计意义**，报告里只作命中计数用。不要把它当成论文语料的显著性依据。

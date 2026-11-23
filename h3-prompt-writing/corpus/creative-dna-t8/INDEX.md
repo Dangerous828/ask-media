@@ -2,6 +2,8 @@
 
 **这不是死仓。** 这里收录 T8 案例库的可检索原文：**624 条可检索条目 = 613 条案例原文 + 9 个官方 Skill + 2 个社区 Skill**；`catalog.json` / [MASTER-INDEX.md](MASTER-INDEX.md) / [search.py](search.py) 均以这 624 条为准。另有 **273 张正式模板卡**仅存在于上游 `catalog-index-source.json` 的 `recommendationEntities`，**未入本地检索索引、search.py 搜不到**（如需检索须先按上游来源补建条目）。本地 `cards/` 目录共 284 个文件（= 9 官方 Skill + 2 社区 Skill + 273 模板卡原文），其中 273 张模板卡原文落在 `cards/` 但不在可检索的 624 条内。验证状态统一为**外部案例机制，本地 h3q 未测**。
 
+> **指纹口径**：`catalog-index-source.json` 的 `indexSha256` 是上游索引源在 `catalogGeneratedAt`（2026-10-06T00:00:00+08:00）生成时的指纹，对象是该索引源本身，**不是**本仓当前 `catalog.json` 的校验值；两者条数与生成时点不同，不可用该字段校验 `catalog.json`。如需对齐须按上游生成流程重算并回填，本公开版未随附生成脚本。
+
 ## 三条进来路径
 
 1. **从阶段链进来**：文档准备／`ask-media` 第 ④ 导演就按需检索；⑤ 场记落实，⑥ 分镜和⑧ 视频词继承已选条款。按 `ask-media/references/route-table.md` → 本索引 → 症状表或检索；不是直到写词才首次用卡。

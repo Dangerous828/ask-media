@@ -185,7 +185,7 @@ observations) is in [Excerpts of real output](docs/real-outputs_EN.md).
 
 ### What an episode looks like
 
-In the public sample [*Let You Run the Account*, EP001](examples/creator-first/EP001/), the same shot is owned one layer at a
+In the sample project *Let You Run the Account*, EP001 (local-only, not included in the public release), the same shot is owned one layer at a
 time across four documents. The script only says what happens (translated):
 
 ```markdown
@@ -234,10 +234,7 @@ generation tool as one block:
 > the young man remaining at the right edge. …
 ```
 
-The four originals: [`剧本.md`](examples/creator-first/EP001/剧本.md) ·
-[`视觉设定.md`](examples/creator-first/EP001/视觉设定.md) ·
-[`分镜.md`](examples/creator-first/EP001/分镜.md) ·
-[`视频提示词.md`](examples/creator-first/EP001/视频提示词.md).
+The four originals (sample project, local-only, not included in the public release): `剧本.md` · `视觉设定.md` · `分镜.md` · `视频提示词.md`.
 
 ### Omissions get pointed out
 
@@ -397,7 +394,7 @@ ID and reason, and a range such as "001 to 009" is no longer accepted.
 
 ## Further reading
 
-- Samples: [examples/](examples/); the public creator-first sample is [*Let You Run the Account*, EP001](examples/creator-first/EP001/). The other example directories are validator-regression fixtures.
+- The creator-first sample *Let You Run the Account*, EP001 is local-only (not included in the public release); the validator-regression fixtures are likewise not included.
 - [Excerpts of real output](docs/real-outputs_EN.md): one shot through four documents, checker errors, the cut list and its measurements, the source triage backfill, the adaptation contract, model observations.
 - [Evaluations](evaluations/README.md) (Chinese): the complete output of one run made by following the docs, the pre-release regression gate, and how a main-workflow run is done.
 - [An open-source AI short-drama pipeline](docs/open-source-short-drama-pipeline.md): what the pack does, stage by stage.

@@ -85,9 +85,9 @@ runner：`../templates/video_motion_drive_runner.py`。它提交一次、轮询 
 
 要点：
 
-- **runner 必须脱离 SSH 会话**。EP003 实测 runner 进程随 SSH 子进程回收而退出（`status` 停在 submitted），产物不丢（ComfyUI 仍在跑），但回收要改由 Mac 侧轮询。用模板脚本启动（下文命令里的 `templates/...` 相对 `h3-queue/` 技能根；正文里的 `../templates/...` 相对本文件所在的 `references/`，两者指向同一文件）：
+- **runner 必须脱离 SSH 会话**。EP003 实测 runner 进程随 SSH 子进程回收而退出（`status` 停在 submitted），产物不丢（ComfyUI 仍在跑），但回收要改由 Mac 侧轮询。用模板脚本启动（下文命令路径相对本文件所在的 `references/`）：
   ```
-  scp templates/launch_detached.ps1 templates/video_motion_drive_runner.py <渲染主机SSH别名>:/path/to/motion_drive_delivery/
+  scp ../templates/launch_detached.ps1 ../templates/video_motion_drive_runner.py <渲染主机SSH别名>:/path/to/motion_drive_delivery/
   ssh <渲染主机SSH别名> 'powershell -NoProfile -ExecutionPolicy Bypass -File <ComfyUI根目录>\motion_drive_delivery\launch_detached.ps1 -Script <ComfyUI根目录>\motion_drive_delivery\video_motion_drive_runner.py -WorkDir <ComfyUI根目录>\motion_drive_delivery -Log <ComfyUI根目录>\motion_drive_delivery\runner.log'
   ```
   目录 `<ComfyUI根目录>\motion_drive_delivery\` 先建好，把填好占位符的图存成同目录 `graph.json`（runner 读 `GRAPH`）。回收时仍以 Mac 侧 SSH 查 `/history` 为准。

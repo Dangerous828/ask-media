@@ -40,4 +40,4 @@ description: 仅当创作者点名某种导演风格或风格预设（港式警�
 2. 读对应 reference，按"写法"交给 owner：剧本层给 `short-drama-write` / `short-drama-develop`，分镜层给 `short-drama-storyboard`（短剧项目）或 `storyboard-30s`（独立短片），生图层给 `doc-still-prompt`。
 3. 风格与项目事实冲突时列出冲突点，由创作者裁决，不自行改资产。
 
-来源：内部工作台的 workbench/skills/hk-crime.md、workbench/skills/realism-cold.md、workbench/skills/wes-symmetry.md、workbench/skills/zhangyimou-color.md、workbench/skills/cinematic-real.md、workbench/skills/cyber-neon.md、workbench/skills/ghibli-soft.md、workbench/skills/gongbi-guofeng.md、workbench/skills/ink-wash.md、workbench/skills/three-act.md、workbench/skills/shortdrama-hook.md（原卡保持不动，内部工作台运行时仍加载原卡）
+来源：本仓卡片 `references/hk-crime.md`、`references/realism-cold.md`、`references/wes-symmetry.md`、`references/zhangyimou-color.md`、`references/cinematic-real.md`、`references/cyber-neon.md`、`references/ghibli-soft.md`、`references/gongbi-guofeng.md`、`references/ink-wash.md`、`references/three-act.md`、`references/shortdrama-hook.md`。原卡在内部工作台的 workbench/skills 目录下（同名 .md 文件），内部工作台运行时仍加载原卡；该内部工作台路径未随公开版发布。

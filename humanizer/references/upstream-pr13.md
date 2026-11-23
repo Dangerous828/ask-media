@@ -4,24 +4,24 @@
 
 ## 为什么本仓保持平铺
 
-本仓是公开文档仓，技能以 `humanizer/` 目录平铺发布：`SKILL.md` 在目录根，引用 `./references/`、`./scripts/`、`./DETECT.md` 等相对路径。根级 [AGENTS.md](../../AGENTS.md) 的「文字创作与发布」路由表、`write-article` / `write-tweet` 的引用都指向 `humanizer/SKILL.md`。若把正文移进子目录，这些引用与仓库内相对路径都要改写，对读者与路由没有收益。
+本仓是公开文档仓，技能以 `humanizer/` 目录平铺发布：`SKILL.md` 在目录根，引用 `references/`、`scripts/`、`../DETECT.md` 等相对路径（末项相对本文所在的 `references/`）。根级 [AGENTS.md](../../AGENTS.md) 的「文字创作与发布」路由表、`write-article` / `write-tweet` 的引用都指向 `humanizer/SKILL.md`。若把正文移进子目录，这些引用与仓库内相对路径都要改写，对读者与路由没有收益。
 
 ## 若上游合并后需要同步
 
-只同步**规则正文与脚本的行为变化**，不照搬目录布局。按下列清单逐项 diff，确认哪些重放到本仓的平铺文件：
+只同步**规则正文与脚本的行为变化**，不照搬目录布局。下列清单路径均指上游仓 PR #13 的文件结构（`<上游仓>/...`，未随本仓发布），括号内给出本仓平铺结构的对应文件；按清单逐项 diff，确认哪些重放到本仓：
 
-- `scripts/detect.py`：`ACADEMIC_DEMOTE` / `ACADEMIC_PAPER_CHECKS` / `effective_levels()` / `--genre` / `fmt_report` 分档 / UTF-8 输出补丁
-- `scripts/report.py`：`levels_of()` / `paper_check_section*` / 两处分级循环
-- `tests/test_academic_genre.py`：回归测试
-- `references/academic-paper.md`、`references/research-pipeline.md`：本仓自有文档，以上游为参考，不整目录覆盖
+- `<上游仓>/scripts/detect.py`（本仓 `../scripts/detect.py`）：`ACADEMIC_DEMOTE` / `ACADEMIC_PAPER_CHECKS` / `effective_levels()` / `--genre` / `fmt_report` 分档 / UTF-8 输出补丁
+- `<上游仓>/scripts/report.py`（本仓 `../scripts/report.py`）：`levels_of()` / `paper_check_section*` / 两处分级循环
+- `<上游仓>/tests/test_academic_genre.py`（本仓 `../tests/test_academic_genre.py`）：回归测试
+- `<上游仓>/references/academic-paper.md`、`<上游仓>/references/research-pipeline.md`（本仓 `academic-paper.md`、`research-pipeline.md`）：本仓自有文档，以上游为参考，不整目录覆盖
 - `SKILL.md` frontmatter（version / description 指针）与「第一步」「第四步」命令示例
 - `CHANGELOG.md`、根级 `AGENTS.md` 的文字创作表
 
-同步后重跑：
+同步后重跑（命令从本仓根执行；上游仓对应 `<上游仓>/tests/test_academic_genre.py`）：
 
 ```bash
-python3 tests/test_academic_genre.py   # 13 项须全绿
-python3 scripts/check_references.py    # 从仓库根运行，断链应为 0
+python3 humanizer/tests/test_academic_genre.py   # 13 项须全绿
+python3 scripts/check_references.py              # 从仓库根运行，断链应为 0
 ```
 
 ## 其他开放 PR

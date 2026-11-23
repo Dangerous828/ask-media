@@ -80,4 +80,4 @@ description: 任何时长的独立短片在大纲、分镜或拆场次阶段核"
 - [ ] 每次生成任务拆分都有接缝的起止状态，不因拆分而重置人物或空间？
 - [ ] 每个转折有可见动作？信息差账至少揭示一层？
 
-来源：内部工作台的 workbench/skills/scene-spatial-design.md、workbench/skills/scene-progression.md、workbench/skills/continuity-gap.md、workbench/skills/suspense-timeline.md（原卡保持不动，内部工作台运行时仍加载原卡）
+来源：内部工作台卡片 scene-spatial-design / scene-progression / continuity-gap / suspense-timeline；这四张原卡未随公开版发布，内部工作台运行时仍加载原卡（其内部路径为 workbench/skills 下的同名文件）。本仓未收录对应文件，不指向上述内部路径。

@@ -72,4 +72,4 @@ description: 已有分镜后，为每一镜写演员表演节拍（意图 / 手�
 - [ ] 动画轨有态度钩子；真人轨有中间态与拮抗证据？
 - [ ] 爽点镜 ≤3 拍，揭露前留了反应空白？
 
-来源：内部工作台的 workbench/skills/acting-dual-track.md、workbench/skills/actor-neutral.md、workbench/skills/actor-controlled.md（原卡保持不动，内部工作台运行时仍加载原卡）
+来源：内部工作台卡片 acting-dual-track / actor-neutral / actor-controlled；这三张原卡未随公开版发布，内部工作台运行时仍加载原卡（其内部路径为 workbench/skills 下的同名文件）。本仓公开的是本 SKILL.md 与 `references/` 下的材料，不指向上述内部路径。

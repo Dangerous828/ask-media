@@ -42,8 +42,9 @@ git clone https://github.com/Dangerous828/ask-media.git && cd ask-media
 mkdir -p "$HOME/.claude/skills"
 
 # 顶层技能：只链含 SKILL.md 的目录，排除 scripts/ 与 drama-skills/ 容器
+# "$skill" 是 shell 变量（示例写法），不是仓库里的固定路径
 for skill in */; do
-  [ -f "$skill/SKILL.md" ] || continue
+  [ -f "$skill"/SKILL.md ] || continue
   ln -s "$PWD/$skill" "$HOME/.claude/skills/$skill"
 done
 

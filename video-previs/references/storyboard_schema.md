@@ -49,5 +49,5 @@
 顶部=镜号+运镜；右上=●动作 + ●提示词；底部=有 speaker 时【角色名】台词，无台词有 action 时显示（action）。
 
 ## 校验
-- 对白用：scripts/validate_dialogue.py <json>
-- 走位/动作白模（previs_engine，含 path 走位/pitch 姿态）用：scripts/validate_storyboard.py <json>
+- 对白用：../scripts/validate_dialogue.py <json>
+- 走位/动作白模（previs_engine，含 path 走位/pitch 姿态）用：../scripts/validate_storyboard.py <json>

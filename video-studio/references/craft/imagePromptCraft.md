@@ -124,4 +124,4 @@ v1.1.8 通用提示词技巧提供 Seedream 中文段落与 Nanobanana/Gemini �
 
 在“图像转换检查”记录逐项结果和未解决项，回读生成节点 prompt 与引用。生成成功后还要实际看图，确认身份、手部、接触关系、位置朝向及关键文字，不能以提示词检查替代图片验收。没有图像查看能力时保留待用户预览状态。
 
-依据 v1.1.8（cd3e7c4）的 production_skills/storyboard_prompt_techniques.md 与 production_execution_storyboard_panel.md。景别术语和反射关系按实际构图校正；旧模型模板、旧引用字样及光影字段冲突按上述边界迁移。
+依据 v1.1.8（cd3e7c4）的 `<内部工作台>/production_skills/storyboard_prompt_techniques.md` 与 `<内部工作台>/production_execution_storyboard_panel.md`（均为上游内部工作台路径，未随公开版发布）。景别术语和反射关系按实际构图校正；旧模型模板、旧引用字样及光影字段冲突按上述边界迁移。

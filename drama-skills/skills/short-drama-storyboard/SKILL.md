@@ -185,7 +185,7 @@ license: MIT
 
 ### 连续段案例的适用范围
 
-七组渲染的比较结果与证据 caveat 见 `$h3-prompt-writing` 的 `references/case-notes.md` §D；本阶段仍按完整动作、观看职责与可信状态设计切点，不因来源案例强制停姿或换机位。
+七组渲染的比较结果与证据 caveat 见 `$h3-prompt-writing` 的 `h3-prompt-writing/references/case-notes.md`（仓库根相对）§D；本阶段仍按完整动作、观看职责与可信状态设计切点，不因来源案例强制停姿或换机位。
 
 ## 视觉依据与图片
 

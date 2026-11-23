@@ -170,7 +170,7 @@ previs 产物（白模、2D 灰盒、贴图粗糙的 animatic、接触印片）*
 - **LLM/Vision（智谱 GLM，可选）**：设环境变量 GLM_API_KEY（或 ZHIPUAI_API_KEY）后启用：
   - scripts/fill_descriptions.py 用 vision 给接触印片/分镜补描述；
   - scripts/explain_storyboard.py 生成关键镜头讲解（叙事/潜台词/镜头语言）；
-  - draft_storyboard.py/lapian_docs.py 由接触印片+切点草拟分镜文档。
+  - `scripts/draft_storyboard.py`、`scripts/lapian_docs.py` 由接触印片+切点草拟分镜文档。
   - 未配置 key 时这些脚本跳过/报错，不影响离线拉片与白模。
 - 完整 ENV（GLM key/model、Blender、离线依赖、ffmpeg）见 references/environment_setup.md。
 

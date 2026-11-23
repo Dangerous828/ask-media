@@ -52,7 +52,7 @@ Skill 核心拉片/白模是离线的（opencv/rapidocr/faster-whisper/本地引
 
 ## 4. 云端 ASR（`extract_speech.py --engine cloud`，可选，配置不在本仓）
 脚本支持云端引擎，但**配置源与豆包适配脚本均不在本仓库**，本仓只保留本地 faster-whisper 链路可开箱即用：
-- 配置源：工作区的 workbench/providers.json（不在本仓；含 vendors 的 `base_url` / `api_key` / `enabled`，豆包另需 `extra.speech_api_key`）。
-- 豆包适配：workbench/tools/doubao_plan_asr.py（不在本仓；Agent Plan SAUC WebSocket 实现，需 `base_url=https://ark.cn-beijing.volces.com/api/plan/v3`）。
+- 配置源：工作区的 `<内部工作台>/workbench/providers.json`（内部工作台路径，未随公开版发布；含 vendors 的 `base_url` / `api_key` / `enabled`，豆包另需 `extra.speech_api_key`）。
+- 豆包适配：`<内部工作台>/workbench/tools/doubao_plan_asr.py`（内部工作台路径，未随公开版发布；Agent Plan SAUC WebSocket 实现，需 `base_url=https://ark.cn-beijing.volces.com/api/plan/v3`）。
 - 通用 OpenAI 兼容链路走 `POST {base_url}/audio/transcriptions`，厂商需支持 `response_format=srt`。
-- 没有上述文件与配置时请用默认 `--engine local`；报错“找不到 workbench/providers.json”即指此可选链路未配置，与本地 ASR 无关。
+- 没有上述文件与配置时请用默认 `--engine local`；报错“找不到 `<内部工作台>/workbench/providers.json`”即指此可选链路未配置，与本地 ASR 无关。

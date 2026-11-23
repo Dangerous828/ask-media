@@ -4,7 +4,7 @@
 
 检测分三层分工：数得出符号的归脚本（detect.py），要理解句意的归语义层（本文件，由本会话模型逐条判断），机器间共识不够的归人审（比喻贴切度，见 SKILL.md 人审区）。
 
-用法：先跑 `python3 scripts/detect.py <文件> --candidates --out <候选.json>`，对候选里的每一条按对应判据给出封闭标签（只能从判据列出的标签中选）+ 置信度（高/中/低）+ 一句话理由。判断完把 `label`/`confidence`/`reason` 三个字段写回该条候选，供 report.py 汇总。
+用法：先跑 `python3 ../scripts/detect.py <文件> --candidates --out <候选.json>`，对候选里的每一条按对应判据给出封闭标签（只能从判据列出的标签中选）+ 置信度（高/中/低）+ 一句话理由。判断完把 `label`/`confidence`/`reason` 三个字段写回该条候选，供 report.py 汇总。
 
 **判断纪律**（来自 43 万次打标的教训）：
 - 只按判据判，不按「像不像 AI」的整体感觉判——整体印象会被文风糊弄

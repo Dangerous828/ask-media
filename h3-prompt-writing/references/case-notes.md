@@ -317,7 +317,7 @@ A second, complementary prompt architecture. Where the official six-section form
 *fields*, Creative DNA fixes *causal mechanism*. Use it when a brief describes a repeatable
 beat pattern (a greeting, a reveal, a chase payoff) rather than a one-off scene.
 
-Each DNA case is a folder with SKILL.md plus its references/summary.md and references/template.md:
+Each DNA case is a folder with SKILL.md plus a summary and a template kept in its own references subfolder (both belong to the original T8 corpus card's internal structure and were not included with this collection):
 
 - **Mechanism** — one sentence naming the reusable causal chain (e.g. "five small state
   changes: side orientation → direct gaze → downward pause → peak smile → open recovery").
@@ -505,7 +505,7 @@ on-brand color palette
 
 **两条不同性质的事实（按模型实际能看见什么判断）：**
 
-1. **采样器负向槽不起作用。** `BasicGuider` 在 cfg 1 下运行、没有负向分支（`comfy-docs/minimax-h3-prompt-guide.md:39`）；ComfyUI 源码佐证：`samplers.py:610` 在 cfg≈1.0 时丢弃 `uncond`，`_calc_cond_batch:240` 跳过它，因此 conditioning 根本到不了模型。把约束放进 `negative_prompt` 节点或字段是死配置：不被遵守，甚至不会运行。
+1. **采样器负向槽不起作用。** `BasicGuider` 在 cfg 1 下运行、没有负向分支（上游 ComfyUI 文档 `minimax-h3-prompt-guide.md` 第 39 行；该文档未随本仓发布）；ComfyUI 源码佐证：`samplers.py:610` 在 cfg≈1.0 时丢弃 `uncond`，`_calc_cond_batch:240` 跳过它，因此 conditioning 根本到不了模型。把约束放进 `negative_prompt` 节点或字段是死配置：不被遵守，甚至不会运行。
 2. **正文 ban list 是 prompt-guide §8 真正警告的形式**（"Ban lists add unwanted concepts"）。cfg 1 下没有独立负向通道，任何 不要/no/not 列表只能存在于**正文**里——即进入正向 conditioning，可能把要禁的概念拉进来。官方指南因此推荐 `State what should appear`，加上 R2V `fully_preserved` / `partially_preserved`。
 
 **⚠️ 两个官方来源之间的未决冲突。** 官方 3D 动画技能把六项正文 ban list 当作默认 style lock：
@@ -515,7 +515,7 @@ on-brand color palette
 不要真实解剖僵硬感、不要无生命表情
 ```
 
-出处 `infinite-canvas-stack/upstream/service/skills/h3-3d-animation-short-generator.md:31`，正是 prompt-guide §8 警告的形式。两个来源都没有限定对方；同一技能也带正向句，所以官方实践并不裁定哪种形式承载观感。**不要把该 style lock 当作"正文 ban list 在 H3 上安全"的证据。** 未测量前优先正向句。
+出处：上游 `infinite-canvas-stack` 仓的技能文件 `h3-3d-animation-short-generator.md` 第 31 行（未随本仓发布），正是 prompt-guide §8 警告的形式。两个来源都没有限定对方；同一技能也带正向句，所以官方实践并不裁定哪种形式承载观感。**不要把该 style lock 当作"正文 ban list 在 H3 上安全"的证据。** 未测量前优先正向句。
 
 **参考锚子字段（官方 STEP 5）**：每张镜头表行带 `fixed_landmark`（场景卡里的具名地标＋画面位置，如 `door-frame: right third`）、`subject_position`（每个角色相对画面位置、朝向、起始姿态）、`exiting_subject_state`（上一镜在场本镜缺席的角色：去哪了、为什么）、`lighting_baseline`（继承场景卡的 key/fill/rim 方向＋本镜调整）。它们是**分镜表字段**，改写成 H3 正文时折进场景句，**不要**输出成显式 `reference_anchors:` 块——实测该字面块扰乱了陈设（凭空出现落地灯和边柜），却没有改善运动。
 

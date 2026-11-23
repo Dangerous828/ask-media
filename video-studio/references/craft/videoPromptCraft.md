@@ -172,4 +172,4 @@ Shot [next original number]: [Next confirmed shot with matching continuity].
 
 验收时看实际媒体的身份、动作/道具接触、人物左右与视线、镜头顺序、对白完整性、声音来源与口型、末尾是否截断，以及前后片段的实际交界状态。逐项写明已查看的证据与问题位置。当前工具无法播放/理解视频或读取音轨时，由用户预览回报，记录“待用户核验”；文件路径与成功状态不能冒充已经看过、听过。用户采用前，成功视频仍是候选。
 
-依据 v1.1.8（cd3e7c4）中 data/modelPrompt/video/seedance2Multi-parameterMode.md、wan2.6Single-imageFirstFrameMode.md、universalFirstAndLastFrameMode.md、universalMulti-parameterMode.md，以及 src/routes/production/workbench/generateVideoPrompt.ts。旧模板描述的语法和效果不是对当前模型的实测承诺。
+依据 v1.1.8（cd3e7c4）中 `<内部工作台>/data/modelPrompt/video/seedance2Multi-parameterMode.md`、`wan2.6Single-imageFirstFrameMode.md`、`universalFirstAndLastFrameMode.md`、`universalMulti-parameterMode.md`，以及 `<内部工作台>/src/routes/production/workbench/generateVideoPrompt.ts`（均为上游内部工作台路径，未随公开版发布）。旧模板描述的语法和效果不是对当前模型的实测承诺。

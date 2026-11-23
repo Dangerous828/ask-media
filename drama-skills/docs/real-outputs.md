@@ -7,7 +7,7 @@
 
 ## 一镜穿过四份文档：分镜追得回剧本，造型锁得住
 
-出处：[公开样例 `examples/creator-first/EP001`](../examples/creator-first/EP001/)，按当前文档契约整理，`creator_markdown_check.py` 通过。同一个镜头 `SHOT-EP001-002`，
+出处：示例项目 `examples/creator-first/EP001`（local-only，未随公开版发布），按当前文档契约整理，`creator_markdown_check.py` 通过。同一个镜头 `SHOT-EP001-002`，
 在四份文档里各管一层。剧本只写发生了什么：
 
 ```markdown
@@ -70,11 +70,7 @@
 > the young man remaining at the right edge. ……
 ```
 
-五份原文：[`剧本.md`](../examples/creator-first/EP001/剧本.md) ·
-[`视觉设定.md`](../examples/creator-first/EP001/视觉设定.md) ·
-[`导演.md`](../examples/creator-first/EP001/导演.md) ·
-[`分镜.md`](../examples/creator-first/EP001/分镜.md) ·
-[`视频提示词.md`](../examples/creator-first/EP001/视频提示词.md)。三层机制的说明见
+五份原文（示例项目 local-only，未随公开版发布）：`剧本.md` · `视觉设定.md` · `导演.md` · `分镜.md` · `视频提示词.md`。三层机制的说明见
 [跨镜一致性怎么做](character-consistency-across-shots.md)。
 
 ## 检查器抓什么：把样例故意改坏两处

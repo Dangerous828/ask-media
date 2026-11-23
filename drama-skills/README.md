@@ -164,7 +164,7 @@ done
 
 ### 一集写出来是什么样
 
-公开样例 [《让你管账号》EP001](examples/creator-first/EP001/) 里，同一个镜头在四份文档里各管一层。剧本只写发生了什么：
+示例项目《让你管账号》EP001（local-only，未随公开版发布）里，同一个镜头在四份文档里各管一层。剧本只写发生了什么：
 
 ```markdown
 [OS] 其他军团的人：火箭军？四个号，加起来四个粉吧。
@@ -207,10 +207,7 @@ done
 > the young man remaining at the right edge. ……
 ```
 
-四份原文：[`剧本.md`](examples/creator-first/EP001/剧本.md) ·
-[`视觉设定.md`](examples/creator-first/EP001/视觉设定.md) ·
-[`分镜.md`](examples/creator-first/EP001/分镜.md) ·
-[`视频提示词.md`](examples/creator-first/EP001/视频提示词.md)。
+四份原文（示例项目 local-only，未随公开版发布）：`剧本.md` · `视觉设定.md` · `分镜.md` · `视频提示词.md`。
 
 ### 写漏了会被指出来
 
@@ -341,7 +338,7 @@ macOS、Linux、WSL 与 Windows 原生都可运行。创作台以 `--detach` 独
 
 ## 延伸阅读
 
-- 示例：[examples/](examples/)，公开完整样例是 [《让你管账号》EP001](examples/creator-first/EP001/)；其余目录是仓库校验器的回归夹具。
+- 示例项目《让你管账号》EP001 为 local-only，未随公开版发布；仓库校验器的回归夹具同样未随公开版发布。
 - [真实产出节选](docs/real-outputs.md)：一镜穿过四份文档、检查器报错、剪辑单与实测、原著快评回填、改编契约、模型行为观察。
 - [评估](evaluations/README.md)：按文档实跑一次的完整产物、发布前的回归闸门与主工作流实跑方法。
 - [漫剧创作全流程指引](docs/comic-drama-workflow.md)：把十二个技能按漫剧产线从头串一遍，每步命令、产物与卡点。

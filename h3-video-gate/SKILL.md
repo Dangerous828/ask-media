@@ -56,11 +56,11 @@ python3 scripts/h3_gate.py FILE [FILE...] [--mode auto|ref|base|multishot]
 常用:
 
 ```
-python3 scripts/h3_gate.py prompts/s1_v5_141f.txt --refs 3
-python3 scripts/h3_gate.py prompts/s3.txt --frames 107 -v
-python3 scripts/h3_gate.py s1_v5_141f.txt s2_141f.txt s3_107f.txt s4_141f.txt s5_158f.txt s6_141f.txt \
+python3 scripts/h3_gate.py tests/fixtures/s1_v5_141f.txt --refs 3
+python3 scripts/h3_gate.py tests/fixtures/s3_107f.txt --frames 107 -v
+python3 scripts/h3_gate.py tests/fixtures/s1_v5_141f.txt tests/fixtures/s2_141f.txt tests/fixtures/s3_107f.txt tests/fixtures/s4_141f.txt tests/fixtures/s5_158f.txt tests/fixtures/s6_141f.txt \
         --series-config references/series-config.example.json
-python3 scripts/h3_gate.py prompts/s2_141f.txt --rate 4.8 --json
+python3 scripts/h3_gate.py tests/fixtures/s2_141f.txt --rate 4.8 --json
 ```
 
 Windows 用 `python` 或 `py -3` 代替 `python3`;脚本只用标准库,Python 3.9+。
