@@ -1,12 +1,13 @@
 # 生图标准档实测：40 步 / CFG 3.5（2026-11-05）
 
-> **本文性质**：2026-11-05 的档位实测快照，解释「为什么默认档如此」（40 步 / CFG 3.5 的 A/B 依据、
+> **本文性质**：2026-11-05 的档位实测快照，解释「为什么出图默认档如此」（40 步 / CFG 3.5 的 A/B 依据、
 > CFG 与负向通道的关系、Turbo 蒸馏档退役记录）。它**不是运行时口径**——档位现状以实现实读为准：
 > `h3qc submit --help`（渲染机）、MCP `h3_generate_image` schema、部署覆盖键
 > `H3Q_IMAGE_CFG/_STEPS/_LORAS/_RESOLUTION/_SIZE`（见 [still-api-params.md](still-api-params.md)）。
-> 实测时点的缺省 = 基础模型 `qwen_image_2.1_int8_convrot`、CFG 3.5、`steps=0`（按是否带参考选 40/45 步）、无 LoRA；
+> 出图默认档在实测时点的缺省 = 基础模型 `qwen_image_2.1_int8_convrot`、CFG 3.5、`steps=0`（按是否带参考选 40/45 步）、无 LoRA；
 > Turbo 蒸馏档已退役（见 §三），不存在"现行缺省 Turbo 8 步"。
-> `cfg=1` 无负向通道，排除项须写正文正向或用 `cfg>1` 的 `--negative`，否则会被静默丢弃。
+> 线性 CFG 档（`cfg>1`）与蒸馏 / 低 CFG 档（`cfg=1`）的负向通道差异、以及负向丢弃发生在哪一层，
+> 见 [still-api-params.md](still-api-params.md) 术语节；排除项须写正文正向或用 `cfg>1` 的 `--negative`。
 
 本机 <渲染主机SSH别名>（RTX 5070 Ti 16GB），Qwen Image 2.1 `qwen_image_2.1_int8_convrot`，
 ComfyUI 8199，无 LoRA。用于核对"标准档为什么是 40 步 / CFG 3.5"，
@@ -34,22 +35,15 @@ ComfyUI 8199，无 LoRA。用于核对"标准档为什么是 40 步 / CFG 3.5"�
 
 ## 二、CFG 1.0 不是"保守"，是关掉了负向通道
 
-渲染器原文（`h3q_img.py`）：
+线性 CFG 档（`cfg>1`）采样负向槽，蒸馏 / 低 CFG 档（`cfg=1`）guidance 关闭、负向被丢弃；
+负向丢弃发生在哪一层的定义见 [still-api-params.md](still-api-params.md) 术语节，本快照不重复。
+因此"CFG 1.0 但想靠 negative 排除文字/水印"这种组合不成立：要排除项须用 `cfg>1` 的 `--negative`；
+要极快，就用 `cfg=1` 并接受画面更平、且不再有排除能力。
 
-```python
-"negative_prompt": negative if cfg > 1.0 else "",
-```
+## 三、蒸馏（Turbo）档已退役
 
-也就是说：
-
-- `cfg > 1`（现行标准档 3.5）：`--negative` 写进采样，负向槽**真实参与**。
-- `cfg = 1`：negative 被**静默丢弃**，写什么都等于没写。
-
-因此"CFG 1.0 但想靠 negative 排除文字/水印"这种组合不成立。要排除项，必须
-`cfg > 1` 并且把清单交给 `--negative`；要极快，就用 `cfg 1.0` 并接受画面更平、
-且不再有排除能力。
-
-## 三、蒸馏（Turbo / 草稿）档已退役
+旧 Turbo 蒸馏档的缺省为 **8 步 / CFG 1**；该组数值的唯一佐证在 `video-studio/scripts/example_h3q.py`
+的 `steps==8` 分支，此处仅注明来源，不作本仓实测结论。
 
 `models/loras/qwen_image_2.1_turbo_lora_avg_rank_178_bf16.safetensors`（871 MB）与
 `models/diffusion_models/qwen_image_2.1_turbo_int8_convrot.safetensors`（6.9 GB）

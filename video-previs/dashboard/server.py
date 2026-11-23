@@ -96,8 +96,9 @@ def find_blender():
     cands=[]
     env=os.environ.get("BLENDER_EXE","").strip()
     if env: cands.append(env)
-    # 安装盘符与版本按部署实际情况配置：<Blender安装路径>\blender.exe。
-    # 自定义安装目录写成 <Blender安装根目录> 下的子目录，用环境变量补充，不写死盘符/版本。
+    # 查找优先级：BLENDER_EXE（完整路径）→ BLENDER_SEARCH_DIRS（自定义目录及其下
+    # Blender * 子目录）→ 默认安装盘符 C: 下的 Blender Foundation 路径兜底。
+    # C: 仅作兜底值；非 Windows 或自定义安装请用前两者覆盖，无需改这里的盘符/版本。
     for root in os.environ.get("BLENDER_SEARCH_DIRS", "").split(os.pathsep):
         root=root.strip()
         if not root: continue

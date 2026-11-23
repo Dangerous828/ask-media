@@ -39,11 +39,13 @@ import tempfile
 from pathlib import Path
 
 # 远端环境全部走环境变量。主名 H3Q_SSH_HOST / H3Q_REMOTE_PY（与 transcard、adapter 一致），
-# 旧名 H3Q_HOST / H3Q_PY 仍作兼容别名：读取顺序 新名 → 旧名。
+# 旧名 H3Q_HOST / H3Q_REMOTE_PYTHON / H3Q_PY 仍作兼容别名：
+# python 读取顺序与 adapter 完全一致 H3Q_REMOTE_PY → H3Q_REMOTE_PYTHON → H3Q_PY（新名 → 旧名）。
 # 未配置时在提交入口报错，不内置任何默认主机。
 HOST = os.environ.get("H3Q_SSH_HOST") or os.environ.get("H3Q_HOST", "")
 REMOTE_SCRIPTS = os.environ.get("H3Q_SCRIPTS", "")
-REMOTE_PY = os.environ.get("H3Q_REMOTE_PY") or os.environ.get("H3Q_PY", "")
+REMOTE_PY = (os.environ.get("H3Q_REMOTE_PY") or os.environ.get("H3Q_REMOTE_PYTHON")
+             or os.environ.get("H3Q_PY", ""))
 REMOTE_TMP = os.environ.get("H3Q_TMP", "")
 REMOTE_OUT_DIR = os.environ.get("H3Q_OUT", "")
 # 本地产物目录：EXAMPLE_OUT 优先，GUGU_OUT 为改名前的兼容别名。
@@ -51,10 +53,11 @@ LOCAL_OUT_DIR = os.environ.get("EXAMPLE_OUT") or os.environ.get("GUGU_OUT", "./g
 
 
 def _require_env() -> None:
-    """检查远端环境变量。主名 H3Q_SSH_HOST/H3Q_REMOTE_PY，旧名 H3Q_HOST/H3Q_PY 兼容。"""
+    """检查远端环境变量。主名 H3Q_SSH_HOST/H3Q_REMOTE_PY，
+    旧名 H3Q_HOST/H3Q_REMOTE_PYTHON/H3Q_PY 兼容。"""
     missing = [k for k, v in [
         ("H3Q_SSH_HOST/H3Q_HOST", HOST), ("H3Q_SCRIPTS", REMOTE_SCRIPTS),
-        ("H3Q_REMOTE_PY/H3Q_PY", REMOTE_PY), ("H3Q_TMP", REMOTE_TMP),
+        ("H3Q_REMOTE_PY/H3Q_REMOTE_PYTHON/H3Q_PY", REMOTE_PY), ("H3Q_TMP", REMOTE_TMP),
         ("H3Q_OUT", REMOTE_OUT_DIR),
     ] if not v]
     if missing:
@@ -63,7 +66,7 @@ def _require_env() -> None:
             "请先设置渲染机的 SSH 主机与目录，例如:\n"
             "  export H3Q_SSH_HOST=<渲染主机>          # ssh 可达的渲染机（旧名 H3Q_HOST 仍兼容）\n"
             "  export H3Q_SCRIPTS=<渲染机脚本目录>   # 含 h3qc.py\n"
-            "  export H3Q_REMOTE_PY=<渲染机 python 路径>  # 旧名 H3Q_PY 仍兼容\n"
+            "  export H3Q_REMOTE_PY=<渲染机 python 路径>  # 旧名 H3Q_REMOTE_PYTHON / H3Q_PY 仍兼容\n"
             "  export H3Q_TMP=<渲染机临时目录>\n"
             "  export H3Q_OUT=<渲染机产物目录>\n"
             "  export EXAMPLE_OUT=<本地产物目录>       # 可选，默认 ./generated（旧名 GUGU_OUT 仍兼容）"

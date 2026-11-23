@@ -86,7 +86,7 @@ pdd 的 `draft → final` 是两次完整采样，**没有 pass-1 latent 接续*
 
 没有 `reference_video` / `reference_audio` 或无图文生入口。**要让角色学一段参考视频的动作（含参考音轨）走另一条通道，不经 h3q**：见 [references/video-motion-drive.md](references/video-motion-drive.md)。原生视频上下文续接要求实际视频输入，不能用一张尾帧冒充。若只需要继承可见状态，上游可明确选择单帧视觉接力；需要精确两端时可选首尾帧，不预设每一刀都走同一路线。
 
-**首帧/首尾帧一律走默认分支，不走 pdd 草稿档**：`pdd_lu` 调的 `pdd_render_ref.py` 没有 `--first-frame`/`--last-frame`；2026-11-22 实测同一对首尾帧、同 107f、同 seed，pdd_lu 产物首帧与指定首帧 MAD **43.0**，默认分支 **3.86**。现在按输入自动分流：`h3_generate_video` / 项目 adapter 只要带 `first_frame` 就落到 `h3_render_ref.py`（单首帧→i2va，首尾帧→fl2va），不再拼 `--workflow pdd_lu`；只挂 `refs` 的全参考组任务照旧走 pdd draft/final。两帧按渲染器语义传 ComfyUI `input/` 里的**裸文件名**；经 h3q 提交时 `sol_profile` 缺省落 `off`。**转场卡直接用 `scripts/transcard.py`，别手搓命令**——见 references/transcard.md。项目内的活（produce 那条路）还要先把两端帧过参考准入（`look_check` assess→review→approve --use reference），`ref_gate` 会把未批准的帧挡成 `reference_not_accepted`；`transcard.py` 是通道级工具，不替你走这道准入。
+**首帧/首尾帧一律走非 pdd 分支，不走 pdd draft（视频）档**：`pdd_lu` 调的 `pdd_render_ref.py` 没有 `--first-frame`/`--last-frame`；2026-11-22 实测同一对首尾帧、同 107f、同 seed，pdd_lu 产物首帧与指定首帧 MAD **43.0**，非 pdd 分支 **3.86**。现在按输入自动分流：`h3_generate_video` / 项目 adapter 只要带 `first_frame` 就落到 `h3_render_ref.py`（单首帧→i2va，首尾帧→fl2va），不再拼 `--workflow pdd_lu`；只挂 `refs` 的全参考组任务照旧走 pdd draft/final。两帧按渲染器语义传 ComfyUI `input/` 里的**裸文件名**；经 h3q 提交时 `sol_profile` 缺省落 `off`。**转场卡直接用 `scripts/transcard.py`，别手搓命令**——见 references/transcard.md。项目内的活（produce 那条路）还要先把两端帧过参考准入（`look_check` assess→review→approve --use reference），`ref_gate` 会把未批准的帧挡成 `reference_not_accepted`；`transcard.py` 是通道级工具，不替你走这道准入。
 
 `draft → final` 查§2.8：pdd 两档各自完整采样，`final` 会产出新 take，不依赖同 seed、也没有 latent 可续；交付前须对 final 本身重新验收。图像精修不保证对白、口型或声线正确。
 
@@ -107,6 +107,8 @@ CLI='<渲染机脚本目录>\h3qc.py'
 
 ### 出图（Qwen Image 2.1）
 
+下面的尺寸与种子均为**示例，非缺省**；缺省以实现实读为准。
+
 ```bash
 $PY -s $CLI submit --kind image \
   --prompt-file '<渲染机提示词目录>\s1.txt' \
@@ -121,7 +123,7 @@ $PY -s $CLI submit --kind image \
 - 缺省值由渲染机/MCP 部署定义，**以实现实读为准**（`h3qc submit --help` / MCP schema / 覆盖键 `H3Q_IMAGE_*`，见 [still-api-params.md](references/still-api-params.md)）；实测时点（2026-11-05）为 CFG 3.5、无 LoRA、`steps=0` 按参考选 40/45 步，仅作该日快照。可显式设置 `cfg`、`steps`、`loras`、`resolution`，不自动叠加 Turbo LoRA。
 - 图片分支会丢弃 `out_width` / `out_height`（视频尺寸）；`refine_denoise` / `refine_steps` 可透传给图片二采，见下方「出图（MiniMax H3-Image）」。
 - 带参考图：`--refs a.png,b.png`（CLI 文件须已在 ComfyUI 的 `input/`；MCP 上传本地源文件，见 §2.8）。`resolution=0` 默认按原参考尺寸编码，模型仍对齐 32；它控制参考编码，不替代 `size` 指定的采样画布。
-- **负向仅在 `cfg>1` 生效**（`negative_prompt: negative if cfg > 1.0 else ""`）。显式 `cfg=1` 仍受尊重，此时 MCP 对非空 negative 返回无效提示。
+- **负向仅在 `cfg>1` 生效**；阈值定义与负向丢弃的分层见 [still-api-params](references/still-api-params.md) 术语节，此处不重复。显式 `cfg=1` 仍受尊重。
 - `seed=0` 是有效种子，保留原值。同秒同 label/seed 的独立 MCP 调用各用唯一请求目录和输出名；仅显式复用 `idem_key` 才复用队列任务。
 
 ### 出图（MiniMax H3-Image）
@@ -130,7 +132,7 @@ $PY -s $CLI submit --kind image \
 现役只保留 W4A8 一档（社区量化 Q4_K_M 已从脚本移除）。用
 `qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors` 文本编码器与
 `minimax_h3_image_vae_fp16.safetensors`，`MiniMaxH3ImageConditioning` + Euler/simple，
-6 步、CFG 1.0。
+实测时点（2026-11-05）为 6 步 / CFG 1.0；档位现状以实现实读为准（见 [still-api-params](references/still-api-params.md)）。
 
 | engine | 权重 | loader |
 |---|---|---|
@@ -142,6 +144,7 @@ $PY -s $CLI submit --kind image --engine h3-image-w4a8 \
   --out '<渲染机产物目录>\poster-w4a8.png' \
   --size 1536x1024 --seed 42 --steps 6 \
   --idem-key 'poster-w4a8-seed42'
+# 上面 --steps 6（示例，非缺省）
 
 # 可选第二次采样：VAE 回编码 → 第二个 KSampler（seed+1）→ 解码
 $PY -s $CLI submit --kind image --engine h3-image-w4a8 \
@@ -150,9 +153,10 @@ $PY -s $CLI submit --kind image --engine h3-image-w4a8 \
   --size 1536x1024 --seed 42 --steps 6 \
   --refine-denoise 0.30 --refine-steps 6 \
   --idem-key 'poster-w4a8-refine-seed42'
+# 上面 --steps 6 / --refine-denoise 0.30 --refine-steps 6（示例，非缺省）
 ```
 
-- `--refine-denoise` 缺省 0 = 单次采样；大于 0 才追加二采节点，`--refine-steps 0` 用渲染器默认步数。二采保构图与文字，纹理区会重绘；实测同 seed 下几何/文字类 PSNR 27–32 dB，高纹理类 17–19 dB。
+- `--refine-denoise` 缺省 0 = 单次采样；大于 0 才追加二采节点，`--refine-steps 0` 用渲染器默认步数（具体值以实现实读为准）。二采保构图与文字，纹理区会重绘；实测同 seed 下几何/文字类 PSNR 27–32 dB，高纹理类 17–19 dB。
 - `--refs` 透传到 conditioning 节点的 `images.image_N`；命令行文件名须已在 ComfyUI `input/`。`--checkpoint`、`--loras`、`--alpha`、输出尺寸覆盖不适用于该引擎。
 - **参考图实测边界（2026-11-15，7 素材 × 忠实重绘/只改冷光）**：W4A8 的 `--refs` 全批通过。原社区量化 Q4_K_M 在 1152×768 带参考图时卡死（GPU 100%、显存占满、渲染器 903s 超时），已从脚本移除，不再作为可选档。
 - 同批对照结论：**参考图编辑维度 Qwen 2.1 比 H3 W4A8 更忠实**（7 例里 6 例结构保真更高），H3 W4A8 改光时常连主体、机位一起重绘并顺手抬曝光。纯文生复杂规格仍是 H3 更强；两者按任务类型分开选。实测记录存内部工程档案（未随公开版发布）。
@@ -162,17 +166,17 @@ $PY -s $CLI submit --kind image --engine h3-image-w4a8 \
 
 | 调用方式 | 步数 | LoRA | 说明 |
 |---|---|---|---|
-| 默认值以实现实读为准（覆盖键 `H3Q_IMAGE_*`） | 实测时点：纯文生 40 / 带参考 45 步 | 实测时点：无（`none`） | 负向仅 `cfg>1` 生效；耗时按实际尺寸、参考和排队情况判断 |
+| 默认值以实现实读为准（覆盖键 `H3Q_IMAGE_*`） | 实测时点（2026-11-05）：纯文生 40 / 带参考 45 步 | 实测时点（2026-11-05）：无（`none`） | 负向仅 `cfg>1` 生效（阈值定义见 [still-api-params](references/still-api-params.md) 术语节）；耗时按实际尺寸、参考和排队情况判断 |
 | `--loras 'X:1.0'` | 显式设置或按默认选择 | 指定的 X | 按该 LoRA 的推荐参数设置 steps/CFG |
 | `--alpha 1` | 按默认选择 | 无 | 走 `SaveImageWithAlpha`（拆 alpha 再存） |
 
 底模**不用换**：`qwen_image_2.1_int8_convrot` 保持不变。
-文本编码器可选档：`qwen3vl_8b_int8_convrot`（9.35 GB，INT8 快路）、`qwen3vl_8b_w4a8`（6.31 GB，最小）。
+文本编码器可选档：`qwen3vl_8b_int8_convrot`（INT8 快路）、`qwen3vl_8b_w4a8`（最小）；容量以实现实读为准。
 
-**原生 2K 画布**（模型按这些尺寸训练，细节来自真实推理而非放大）：
-`2k-1x1=2048x2048`、`2k-3x4=1792x2400`、`2k-4x3=2400x1792`、`2k-2x3=1696x2528`、
-`2k-3x2=2528x1696`、`2k-9x16=1536x2752`、`2k-16x9=2752x1536`。
-`--size` 可直接给预设名。显存与耗时随尺寸增大；视频首帧按项目目标画布显式选择尺寸。
+**原生 2K 画布预设**（模型按这些尺寸训练，细节来自真实推理而非放大）：
+`2k-1x1`、`2k-3x4`、`2k-4x3`、`2k-2x3`、`2k-3x2`、`2k-9x16`、`2k-16x9`。
+像素值以实现实读为准；历史值见 [still-standard-tier-20261105.md](references/still-standard-tier-20261105.md) §四（2026-11-05 快照）。
+`--size` 直接给预设名即可，不要写死像素。显存与耗时随尺寸增大；视频首帧按项目目标画布显式选择尺寸。
 
 用 `qwen-image-2.1-fix-1.0` 那种画质修正 LoRA 时，按它自己的推荐参数给 `--steps 20 --cfg 3`，
 不要叠加本档默认。
@@ -334,7 +338,7 @@ Python 客户端可直接 `urllib` 打这些端点；也可以复用渲染机上
 - 队列数据：`<渲染机根目录>\queue\h3q.db`（SQLite）、`queue\h3q.log`、`queue\logs\`
 - 本仓库 `scripts/` 只保留离线研究副本（见下方），与渲染机线上脚本**不是同源**，不要拿它当线上代码或据此推断服务端行为
 
-**草稿超分档（见 §2.5）**
+**pdd draft（视频）档（见 §2.5）**
 
 | 文件 | 作用 |
 |---|---|

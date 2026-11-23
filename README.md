@@ -47,7 +47,7 @@ for skill in */; do
   ln -s "$PWD/$skill" "$HOME/.claude/skills/$skill"
 done
 
-# 嵌套技能：drama-skills 的 12 个 short-drama-* 单独一轮，否则链路 1-10 阶段会缺 owner
+# 嵌套技能：drama-skills 的 12 个 short-drama-* 单独一轮；11 个阶段每段都有一个 short-drama-* owner，漏装则每段都缺
 for skill in drama-skills/skills/*/; do ln -s "$PWD/$skill" "$HOME/.claude/skills/$(basename "$skill")"; done
 ```
 
@@ -70,7 +70,7 @@ for skill in drama-skills/skills/*/; do ln -s "$PWD/$skill" "$HOME/.claude/skill
 
 - **Agent 运行**：桌面 Agent（Alma）经本地聚合网关路由多家模型——日常对话、文档写作与路由判读用 flash 档快模型，跨文档联动与双轴审查等重活用旗舰档。
 - **视频生成**：MiniMax H3（H3-Video）。本地 ComfyUI 经 h3q 队列串行提交，模式含 Ref2VA（参考图）、I2VA（首帧）、FL2VA（首尾帧）、Multishot（多窗一次生成），档位与帧网格见 `h3-queue/`。
-- **图像生成**：本地 Qwen Image 2.1 为主（Qwen Research License，仅限研究与评估，商用需另行向 Qwen 申请许可）；H3-Image 作二次采样（MiniMax-H3-Image Community License）；云端混元（OpenAI-compatible 接口）作无 GPU 时的补充通道。参数档位见下方「出图口径」。
+- **图像生成**：本地 Qwen Image 2.1 为主（Qwen Research License，仅限研究与评估，商用需另行向 Qwen 申请许可）；H3-Image 作独立出图引擎（`--refine-denoise > 0` 时追加二次采样；MiniMax-H3-Image Community License）；云端混元（OpenAI-compatible 接口）作无 GPU 时的补充通道。参数档位见下方「出图口径」。
 - **画质增强**：SeedVR2 事后超分与 latent 放大（`h3_upscale_video`，成品帧回编码、不重采样）。
 - **语音转写**：本地 whisper-large-v3（Apple Silicon 权重），全程离线零上传。
 

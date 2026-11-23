@@ -31,15 +31,22 @@ EXTS = {'.md', '.py', '.json', '.txt', '.sh', '.ps1', '.yml', '.yaml', '.jsonl'}
 SKIP_DIR = {'.git', '__pycache__', '.pytest_cache', 'node_modules'}
 
 # 项目产物 / 现场生成文件：不检查
-# 历史实测/交接/变更记录：引用以记录原貌保留，不作现行断链判定
+# 历史档（MEASURED- / HANDOFF- / CHANGELOG.md / 结论-）：整体豁免链接检查。
+# 理由：这些档保留当时的仓外/私有路径原貌（/tmp/*、ep01_v4/*、创作者决策/* 等），
+# 随文档改写会破坏史料；实测移除该豁免会新增 22 处此类断链，故不收窄。
 ARCHIVE_DOC = re.compile(r'(MEASURED-|HANDOFF-|CHANGELOG\.md$|结论-)')
 # 上游 vendored 仓库有意未收录的夹具目录（引用有效于上游、本仓豁免）
 UPSTREAM_FITTURE = re.compile(
     r'^(\.\./)*(examples|evaluations|tests|tools|\.clawhub|\.agents|\.config|\.short-drama|'
     r'\.release|Delivery|delivery)/'
 )
-# T8 语料卡：上游原文逐字收录（卡片头注明来源），其内部路径属上游结构
+# T8 语料卡：上游原文逐字收录（卡片头注明来源），其内部路径属上游结构。
 T8_CORPUS = re.compile(r'h3-prompt-writing.corpus.creative-dna-t8.(cards|cards-community|cases)/')
+# 根级豁免：除逐字收录的语料卡，此正则实际也命中本地检索台账 INDEX.md /
+# MASTER-INDEX.md / PRODUCTION-INTEGRATION.md。三者由本仓维护，正文按上游原文列出
+# 其声明为死链的路径作阅读说明（references/summary.md、references/template.md、
+# ../creative-dna.json），属文档内容而非待解析引用；移出豁免实测新增 3 处此类误报，
+# 故一并覆盖。
 T8_ROOT_CARDS = re.compile(r'h3-prompt-writing.corpus.creative-dna-t8.[^.]+\.md$')
 
 PROJECT_ARTIFACT = re.compile(

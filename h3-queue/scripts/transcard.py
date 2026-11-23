@@ -28,13 +28,14 @@ import sys
 import time
 from pathlib import Path
 
-# 主名 H3Q_SSH_HOST / H3Q_REMOTE_PY，旧名 H3Q_HOST / H3Q_PY 作兼容别名（新名优先）。
+# 主名 H3Q_SSH_HOST / H3Q_REMOTE_PY，旧名 H3Q_HOST / H3Q_REMOTE_PYTHON / H3Q_PY 作兼容别名（新名优先）。
 HOST = os.environ.get("H3Q_SSH_HOST") or os.environ.get("H3Q_HOST", "")
 
 
 def _require_host():
     missing = [k for k, v in [
-        ("H3Q_SSH_HOST/H3Q_HOST", HOST), ("H3Q_REMOTE_PY/H3Q_PY", REMOTE_PY),
+        ("H3Q_SSH_HOST/H3Q_HOST", HOST),
+        ("H3Q_REMOTE_PY/H3Q_REMOTE_PYTHON/H3Q_PY", REMOTE_PY),
         ("H3Q_REMOTE_CLI", REMOTE_CLI), ("H3Q_COMFY_INPUT", COMFY_INPUT),
         ("H3Q_REMOTE_ROOT", REMOTE_ROOT),
     ] if not v]
@@ -43,7 +44,9 @@ def _require_host():
             "缺少远端环境变量: " + ", ".join(missing) + "。"
             "渲染机的路径全部由环境变量提供，本脚本不内置默认机器。"
         )
-REMOTE_PY = os.environ.get("H3Q_REMOTE_PY") or os.environ.get("H3Q_PY", "")
+REMOTE_PY = (os.environ.get("H3Q_REMOTE_PY")
+             or os.environ.get("H3Q_REMOTE_PYTHON")
+             or os.environ.get("H3Q_PY", ""))
 REMOTE_CLI = os.environ.get("H3Q_REMOTE_CLI", "")
 COMFY_INPUT = os.environ.get("H3Q_COMFY_INPUT", "")
 REMOTE_ROOT = os.environ.get("H3Q_REMOTE_ROOT", "")

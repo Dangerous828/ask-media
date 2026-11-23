@@ -53,7 +53,7 @@ PROFILES = {
         "highlight_min": 5.0,
         "highlight_max": 12.0,
     },
-    "cartoon3d": {             # 3D 卡通 / 暖柔光（角色C档）
+    "cartoon3d": {             # 3D 卡通 / 暖柔光（示例项目 3D 卡通画风档）
         "dead_black_max": 5.0,
         "dark_gray_max": 15.0,
         "midtone_min": 55.0,   # 角色C P50 74.1，留余量
