@@ -76,7 +76,7 @@ for skill in drama-skills/skills/*/; do ln -s "$PWD/$skill" "$HOME/.claude/skill
 
 ## 出图口径
 
-档位事实的权威是**渲染机实现**（h3q/h3qc/MCP server），文档只写实读方法（`h3qc submit --help` / MCP schema / 部署覆盖键 `H3Q_IMAGE_*`，见 [`still-api-params.md`](h3-queue/references/still-api-params.md)）。[`still-standard-tier-20261105.md`](h3-queue/references/still-standard-tier-20261105.md) 是带日期的档位实测快照（解释档位为什么如此、含退役档记录）；[`delivery-specs.md`](h3-queue/references/delivery-specs.md) 是交付规格与画质路线定版（2026-11-14），不持档位口径。其余各处只引用读法，不另写数字。
+档位事实的权威是**渲染机实现**（h3q/h3qc/MCP server），文档只写实读方法（`h3qc submit --help` / MCP schema / 部署覆盖键 `H3Q_IMAGE_*`，见 [`still-api-params.md`](h3-queue/references/still-api-params.md)）。[`still-standard-tier-20261105.md`](h3-queue/references/still-standard-tier-20261105.md) 是带日期的档位实测快照（解释档位为什么如此、含退役档记录）；[`delivery-specs.md`](h3-queue/references/delivery-specs.md) 是交付规格与画质路线定版（2026-11-14），不持档位口径。其余各处只引用读法，不另写数字（「不写数字」的边界——缺省值不写、机制阈值与哨兵值除外——见 [AGENTS.md](AGENTS.md) 的「档位事实的权威链」段）。
 
 ## 说明
 

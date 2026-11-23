@@ -123,7 +123,7 @@ $PY -s $CLI submit --kind image \
 - 缺省值由渲染机/MCP 部署定义，**以实现实读为准**（`h3qc submit --help` / MCP schema / 覆盖键 `H3Q_IMAGE_*`，见 [still-api-params.md](references/still-api-params.md)）；实测时点（2026-11-05）为 CFG 3.5、无 LoRA、`steps=0` 按参考选 40/45 步，仅作该日快照。可显式设置 `cfg`、`steps`、`loras`、`resolution`，不自动叠加 Turbo LoRA。
 - 图片分支会丢弃 `out_width` / `out_height`（视频尺寸）；`refine_denoise` / `refine_steps` 可透传给图片二采，见下方「出图（MiniMax H3-Image）」。
 - 带参考图：`--refs a.png,b.png`（CLI 文件须已在 ComfyUI 的 `input/`；MCP 上传本地源文件，见 §2.8）。`resolution=0` 默认按原参考尺寸编码，模型仍对齐 32；它控制参考编码，不替代 `size` 指定的采样画布。
-- **负向仅在 `cfg>1` 生效**；阈值定义与负向丢弃的分层见 [still-api-params](references/still-api-params.md) 术语节，此处不重复。显式 `cfg=1` 仍受尊重。
+- **负向仅在 `cfg>1` 生效**；阈值定义与负向丢弃的分层见 [still-api-params](references/still-api-params.md)「术语与分层」节，此处不重复。显式 `cfg=1` 仍受尊重。
 - `seed=0` 是有效种子，保留原值。同秒同 label/seed 的独立 MCP 调用各用唯一请求目录和输出名；仅显式复用 `idem_key` 才复用队列任务。
 
 ### 出图（MiniMax H3-Image）
@@ -166,7 +166,7 @@ $PY -s $CLI submit --kind image --engine h3-image-w4a8 \
 
 | 调用方式 | 步数 | LoRA | 说明 |
 |---|---|---|---|
-| 默认值以实现实读为准（覆盖键 `H3Q_IMAGE_*`） | 实测时点（2026-11-05）：纯文生 40 / 带参考 45 步 | 实测时点（2026-11-05）：无（`none`） | 负向仅 `cfg>1` 生效（阈值定义见 [still-api-params](references/still-api-params.md) 术语节）；耗时按实际尺寸、参考和排队情况判断 |
+| 默认值以实现实读为准（覆盖键 `H3Q_IMAGE_*`） | 实测时点（2026-11-05）：纯文生 40 / 带参考 45 步 | 实测时点（2026-11-05）：无（`none`） | 负向仅 `cfg>1` 生效（阈值定义见 [still-api-params](references/still-api-params.md)「术语与分层」节）；耗时按实际尺寸、参考和排队情况判断 |
 | `--loras 'X:1.0'` | 显式设置或按默认选择 | 指定的 X | 按该 LoRA 的推荐参数设置 steps/CFG |
 | `--alpha 1` | 按默认选择 | 无 | 走 `SaveImageWithAlpha`（拆 alpha 再存） |
 

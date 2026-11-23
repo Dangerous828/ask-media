@@ -110,9 +110,10 @@ description: 短剧/动画出图的验收与工程检查工具箱。当明确用
 ### R1b profile 的【规避】不进词流，只进拦截表
 
 **本节记录 Qwen 静帧拼词实验：把【规避】清单拼入正向会引入被排除的概念——清单一入正向，模型就照着画。**
-（实验当时与（现已退役的）Turbo 档同为 `cfg=1.0`、无独立负向分支，CLI 直投渲染器层把 `--negative` 静默丢弃。
-**现行口径（2026-11-23 创作者确认）**：图片的负向通道仅 `cfg>1` 生效（档位现状以 MCP/h3qc 实读为准，查法见 [still-api-params.md](../h3-queue/references/still-api-params.md)）；
-cfg=1 档位无负向槽，【规避】只能以「拦截规则」存在于脚本/审查层：MCP 层对非空 negative 返回无效提示，CLI 直投渲染器层静默丢弃（分层见 [still-api-params.md](../h3-queue/references/still-api-params.md)「术语与分层」节）。
+（实验当时与（现已退役的）Turbo 档同为 `cfg=1.0`、无独立负向分支，`--negative` 不生效。
+**现行口径（2026-11-23 创作者确认）**：图片的负向通道仅 `cfg>1` 生效（档位现状以 MCP/h3qc 实读为准）；
+cfg=1 档位无负向槽，【规避】只能以「拦截规则」存在于脚本/审查层。哪个档算线性 CFG 档、负向在哪一层被丢弃，
+见 [still-api-params.md](../h3-queue/references/still-api-params.md)「术语与分层」节（本节不重复）。
 无论哪个档位，【规避】都不能拼进正向词流。）
 H3 的 negative 槽与正文否定须分开判断：单句否定与成串禁词的 H3 A/B 尚未完成，不能从该图像实验推断“所有 H3 正文否定都会反向生效”；见 [H3 剧本适配参考](references/craft/h3-script-fit.md) §5。
 
@@ -385,7 +386,7 @@ python h3qc.py submit --kind image \
 ```
 
 - 出图默认档按实读方法查 [still-api-params.md](../h3-queue/references/still-api-params.md) 与 [h3-queue 出图章节](../h3-queue/SKILL.md)，此处不复述数字；为什么如此见 [档位实测快照](../h3-queue/references/still-standard-tier-20261105.md)（2026-11-05）
-- **负向仅 `cfg>1` 档位生效**（档位现状以 `h3qc`/MCP 实读为准，查法见 [still-api-params.md](../h3-queue/references/still-api-params.md)）：cfg=1 档位 `--negative` 在 MCP 层返回无效提示、CLI 直投渲染器层静默丢弃（分层见 [still-api-params.md](../h3-queue/references/still-api-params.md)「术语与分层」节），排除项写进正文正向、不依赖 negative；
+- **负向仅 `cfg>1` 档位生效**（档位现状以 `h3qc`/MCP 实读为准，查法见 [still-api-params.md](../h3-queue/references/still-api-params.md)）：cfg=1 档位 `--negative` 无效（分层见 [still-api-params.md](../h3-queue/references/still-api-params.md)「术语与分层」节，此处不重复），排除项写进正文正向、不依赖 negative；
   `--fast` 仍被接受但被忽略。档位配置与退役档记录详见 `h3-queue` §2.7 与上述档位实测文档
 - **身份板、资产板**参考图按项目侧预处理约定（非通道限制）压到长边 768 + JPEG q80；**首帧、起始状态与构图参考**按目标画布无损 PNG 上传，不要压（short-drama adapter 已自动区分）
 - **要挂参考图就走 `h3qg.py`**（= h3qc + 提交前闸门）：`python h3qg.py submit ...`

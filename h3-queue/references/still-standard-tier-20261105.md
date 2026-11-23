@@ -7,7 +7,7 @@
 > 出图默认档在实测时点的缺省 = 基础模型 `qwen_image_2.1_int8_convrot`、CFG 3.5、`steps=0`（按是否带参考选 40/45 步）、无 LoRA；
 > Turbo 蒸馏档已退役（见 §三），不存在"现行缺省 Turbo 8 步"。
 > 线性 CFG 档（`cfg>1`）与蒸馏 / 低 CFG 档（`cfg=1`）的负向通道差异、以及负向丢弃发生在哪一层，
-> 见 [still-api-params.md](still-api-params.md) 术语节；排除项须写正文正向或用 `cfg>1` 的 `--negative`。
+> 见 [still-api-params.md](still-api-params.md)「术语与分层」节；排除项须写正文正向或用 `cfg>1` 的 `--negative`。
 
 本机 <渲染主机SSH别名>（RTX 5070 Ti 16GB），Qwen Image 2.1 `qwen_image_2.1_int8_convrot`，
 ComfyUI 8199，无 LoRA。用于核对"标准档为什么是 40 步 / CFG 3.5"，
@@ -35,15 +35,16 @@ ComfyUI 8199，无 LoRA。用于核对"标准档为什么是 40 步 / CFG 3.5"�
 
 ## 二、CFG 1.0 不是"保守"，是关掉了负向通道
 
-线性 CFG 档（`cfg>1`）采样负向槽，蒸馏 / 低 CFG 档（`cfg=1`）guidance 关闭、负向被丢弃；
-负向丢弃发生在哪一层的定义见 [still-api-params.md](still-api-params.md) 术语节，本快照不重复。
+线性 CFG 档采样负向槽，蒸馏 / 低 CFG 档的负向被丢弃；两档的判定与丢弃分层见
+[still-api-params.md](still-api-params.md)「术语与分层」节，本快照不重复。
 因此"CFG 1.0 但想靠 negative 排除文字/水印"这种组合不成立：要排除项须用 `cfg>1` 的 `--negative`；
 要极快，就用 `cfg=1` 并接受画面更平、且不再有排除能力。
 
 ## 三、蒸馏（Turbo）档已退役
 
-旧 Turbo 蒸馏档的缺省为 **8 步 / CFG 1**；该组数值的唯一佐证在 `video-studio/scripts/example_h3q.py`
-的 `steps==8` 分支，此处仅注明来源，不作本仓实测结论。
+旧 Turbo 蒸馏档的缺省为 **8 步 / CFG 1**：代码侧见 `video-studio/scripts/example_h3q.py` 的 `steps==8`
+分支；该档的 8 步 vs 45 步对照实测记在 [示例项目实测](../video-studio/MEASURED-示例项目实测.md) §二。
+此处只注明来源，不重复测量结论。
 
 `models/loras/qwen_image_2.1_turbo_lora_avg_rank_178_bf16.safetensors`（871 MB）与
 `models/diffusion_models/qwen_image_2.1_turbo_int8_convrot.safetensors`（6.9 GB）
