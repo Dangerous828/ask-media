@@ -235,7 +235,7 @@ Qwen 官方澄清「输出物不属于授权材料、用户保留生成图的权
 ### Z-Image 的 LoRA 生态
 
 **本场景不上 LoRA；先补族群标记**（结论见上文「族群标记才是主因」）。
-社区现状（未在本机验证）：无官方 LoRA；Civitai 有第三方整理 80+ 条；Turbo 直接训会破坏蒸馏，需 de-distillation adapter 才能短练。
+社区现状（未在本机验证，2025-12 整理页时点）：无官方 LoRA；Civitai 有第三方整理 80+ 条；Turbo 直接训会破坏蒸馏，需 de-distillation adapter 才能短练。
 
 ### 结论
 

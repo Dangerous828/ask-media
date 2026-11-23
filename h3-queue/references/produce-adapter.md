@@ -23,7 +23,7 @@
 
   | engine | 用途 | 默认 |
   |---|---|---|
-  | `pdd`（**缺省**） | 官方 Alibaba PAI PDD 8 步蒸馏，首采 1024×576（模板锁定）。**唯一能让空间/透视关系成立的组合**；耗时按档位比（同素材同 seed 同 362f 实测）：draft 285.8s、二采 832.3s，对已退役的 lu2 legacy 20 步（~1440s）约快 5 倍 | ✅ 新项目一律用它 |
+  | `pdd`（**缺省**） | 官方 Alibaba PAI PDD 8 步蒸馏，首采 1024×576（模板锁定）。**唯一能让空间/透视关系成立的组合**；耗时按档位比（同素材同 seed 同 362f 实测）：draft 285.8s、二采 832.3s，对已退役的 lu2 legacy 20 步（~1440s）约快 5 倍；但**同档草稿之间是对调的**——pdd draft 285.8s 反而比已退役的 lu2 draft（896×512 4 步，~120s）慢一倍多，快省在最终档与不用重跑 | ✅ 新项目一律用它 |
   | `lu2` | 旧两段式 turbo 4 步。544p 蒸馏跑 768p，**画面空间结构会崩**（实测对照见下表） | **2026-11-15 已下线，不再可选**（仅留作历史对照） |
 
   **口径（2026-11-23 时点）**：上表步数、尺寸与耗时为实测快照，现行 engine 可选集与缺省以运行时实读为准（渲染机 `h3qc submit --help` / adapter `parameters.engine` 校验）。
@@ -79,7 +79,7 @@
 
   | engine | tier | 实际参数 | 用途 | 约束 |
   |---|---|---|---|---|
-  | `pdd` | `draft`（**缺省**） | `--workflow pdd_lu --no-upscale --sol-profile off`，首采 1024×576 | 验构图/运动/身份。362 帧约 285s（2026-11-19 时点实测，本机 16G 卡） | 步数由档位模板固定（8 步）；adapter 会把 `parameters.steps` / `parameters.cfg` 透传到 h3qc 命令行，服务端是否接受以实际部署为准，不要指望靠透传步数改变该档 |
+  | `pdd` | `draft`（**缺省**） | `--workflow pdd_lu --no-upscale --sol-profile off`，首采 1024×576 | 验构图/运动/身份。362 帧（片长约 15 秒）渲染约 285 秒（2026-11-19 时点实测，本机 16G 卡） | 步数由档位模板固定（8 步）；adapter 会把 `parameters.steps` / `parameters.cfg` 透传到 h3qc 命令行，服务端是否接受以实际部署为准，不要指望靠透传步数改变该档 |
   | `pdd` | `final` | `--out-width/--out-height` 二采，`--sol-profile off` | 出成片。362 帧到 1536×864 约 832s | **16GB 面积上限 1536×864（1,327,104 px）；竖屏 832×1440 在内**（实测峰值 15.55/15.92 GiB）；超过直接拒绝 |
 
   > **2026-11-15 起引擎只保留 `pdd`，`lu2`/`legacy` 全部下线**（操作者指令）。`VIDEO_ENGINES=("pdd",)`、`VIDEO_TIERS=("draft","final")`；adapter/server 两条校验路径都会拒 `engine=lu2` / `tier=legacy`，底层 `--workflow lu2|legacy` 变不可达死代码。多窗另走 `multishot`（v2，见 §2.14，不占 engine/tier）。lu2 的历史实测数据仅留作对照，不再是可选档位。
