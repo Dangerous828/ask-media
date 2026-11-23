@@ -45,7 +45,7 @@ warn 逐条说明处理理由；退出码不作为能否继续的依据。会硬
 还必须逐张填写 `reference_bindings` 的槽位、顺序、路径、中文名、role 以及允许/禁止控制范围；
 源文档的 `用途` 与 job 的 provider role 分别核对，内置视频 adapter 只接受它公布的 role 取值
 （MiniMax 为 `first_frame`/`last_frame`/`reference_image`/`reference_video`/`reference_audio`，
-Seedance 为三个 `reference_*`）；带参考图却没有绑定的 job 会直接失败，不替它猜一个 role。
+Seedance 为三个 `reference_*`）；带参考图却没有绑定的 job 会直接失败，不替它猜一个 role。走 Magpie MCP（`h3_generate_project_image` / `h3_generate_project_video`）同样适用：调用前先查本镜有没有参考图，有就必须按该工具的 schema 把参考图传过去；只传 `parameters` 不代表可以不传参考图。确实无参考时才走纯文生，并在调用记录里写明。
 `用途：起始帧` 只对应 `role:first_frame`，`用途：结束帧` 只对应 `role:last_frame`；
 反向冲突或端点 role 缺少对应用途同样会在 prepare 失败，adapter 不自行改判。
 本地图片由内置 adapter 按 base64 data URI 直接送出，不需要自建上传服务。

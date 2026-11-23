@@ -103,6 +103,8 @@ PY='<渲染机python>'
 CLI='<渲染机脚本目录>\h3qc.py'
 ```
 
+**出图必带参考图（所有通道，Qwen 2.1 与 H3-Image 都适用）：** 提交 `--kind image` 之前，必须先查本镜有没有参考图——来源是 doc-still-prompt 的绑定、分镜的 `SHOT-...#KF-...`、项目资产板/角色卡，或对话里刚给的图。有参考图就必须带上：CLI 用 `--refs`、adapter 用 `reference_bindings`、MCP（`h3_generate_image` / `h3_generate_project_image`）按该工具的 schema 传参考图；带参考的提交走 `h3qg.py`。**没有参考图就按纯文生图跑，是提交时就要明确说出来的决定，不是默认状态**：确实无参考（首次造身份板、纯文生探索）才可以不带，并在提交记录里写明"本次纯文生图，无参考图"。有参考图却没带的提交一律视为漏提交——发现后不要直接认产物，先补参考重投。参考图文件须已在 ComfyUI 的 `input/`（MCP 由调用方上传），否则执行器收不到图，等同没带。
+
 ### 出图（Qwen Image 2.1）
 
 ```bash
