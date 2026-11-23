@@ -2,7 +2,7 @@
 
 用户给出一条已有短视频，要求“复刻”“照着做一版”“翻拍成 AI 版”时，原片不再只是学习机制的参考作品，
 而是**本项目的验收基准**：镜头节奏、景别、画风、人物关系和关键道具都要能和它逐镜对照。
-这与 `short-drama-develop` 的「创作参考作品的安全摄取」（`references/creative-reference-intake.md`）
+这与 `short-drama-develop` 的「创作参考作品的安全摄取」（`../../short-drama-develop/references/creative-reference-intake.md`）
 “学机制不照搬”是两种不同授权。只有用户明确说要复刻、并确认对原片拥有使用权或只做内部练习时才进入
 本模式；否则仍按参考摄取处理。
 
@@ -23,7 +23,7 @@
 `原片拆解.md` 是**证据层**，不是准备文档的全部。用 `$video-shot-reverse` 为原片重建九份
 `RR-*` 准备文档，落在 `项目开发/原片还原/`（可选分析工作区，不进 `剧集/<EP>/`）：
 清单、落盘路径与回填对账见
-逆推准备文档体系（详见 `video-shot-reverse/references/reverse-documents.md`），
+逆推准备文档体系（详见 `../../../../video-shot-reverse/references/reverse-documents.md`），
 文档级结构见 [六文档契约](document-contract.md)。
 
 `RR-MAP` 负责三条 ID 的对账：`SRC-<镜号>`（本文件每镜一节）／`RR-*` 镜号／`SHOT-...`（正式分镜）

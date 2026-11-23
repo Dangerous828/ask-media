@@ -6,7 +6,7 @@ description: 三层去 AI 味（v2，源自 lieflat-less-ai-tone）：脚本检�
 
 # 去AI味 v2
 
-> **来源**：本技能 v2 整体取自 [lieflat-less-ai-tone](https://lieflat.work/skills/less-ai-tone/) 公开版，目录名沿用 `humanizer` 以保持 `AGENTS.md` 与 write-article / write-tweet 的既有路由不断。v1.1.0 旧版备份在 `~/.skills/backups/humanizer-v1.1.0-20261112/`。
+> **来源**：本技能 v2 整体取自 [lieflat-less-ai-tone](https://lieflat.work/skills/less-ai-tone/) 公开版，目录名沿用 `humanizer` 以保持 `../AGENTS.md` 与 write-article / write-tweet 的既有路由不断。v1.1.0 旧版备份在 `~/.skills/backups/humanizer-v1.1.0-20261112/`。
 
 ## 商业授权提示
 

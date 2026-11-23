@@ -34,7 +34,7 @@
 
 ## 3. 画面文字
 
-**执行**：本技能 `scripts/overlay_text.py`；排版规则见 `layout.md`。
+**执行**：本技能 `../scripts/overlay_text.py`；排版规则见 `layout.md`。
 
 **优势**：不受发声窗口约束，一条长文案可以铺满整镜。
 

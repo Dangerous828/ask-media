@@ -8,3 +8,6 @@ __pycache__/
 # video-studio：只收代码/文档/官方参考，过程实验图（98M）不入仓
 # 需要图片时按 MANIFEST/sha256 复现，或从 NAS 归档取
 video-studio/projects/
+
+# video-previs dashboard：API Key 明文存本地配置，绝不入仓
+llm_config.json

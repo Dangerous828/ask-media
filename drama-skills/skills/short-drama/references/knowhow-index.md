@@ -82,7 +82,7 @@
 | 模板感诊断 | `$short-drama-review` | 至少两个位置出现同构机制或表达损失 | 不用禁词或单次类型惯例定罪 |
 
 关键帧的七项镜头语言锚点与镜头类型配方，完整正文在
-`$short-drama-storyboard` 的 `references/keyframe-camera-language.md`。
+`$short-drama-storyboard` 的 `../../short-drama-storyboard/references/keyframe-camera-language.md`。
 
 ## 规则分级
 
@@ -109,4 +109,4 @@
 
 ## 修复他人文档
 
-接手其他 agent 的文档、批量修复报错或重做互相矛盾的分镜与提示词时，读 [文档修复与复核](document-repair-lessons.md)。格式定位见套件 `docs/ep002-document-pitfalls.md`。
+接手其他 agent 的文档、批量修复报错或重做互相矛盾的分镜与提示词时，读 [文档修复与复核](document-repair-lessons.md)。格式定位见套件 `../../../docs/ep002-document-pitfalls.md`。

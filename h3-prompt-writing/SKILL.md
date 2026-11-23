@@ -25,7 +25,7 @@ compatibility: Portable to any agent that can read local files — no external A
 2. For base text/keyframe modes, read `references/base-en.txt` and follow its final prompt structure.
 3. For full-reference mode, read `references/ref-en.txt` and follow its six-section rewrite format.
 4. Preserve the exact field names, section order, labels, and timing notation from the selected guide.
-5. 动笔前先读三样东西：**真正的首帧（或构图锚点图及其对应时刻）**、本镜场记卡、本镜分镜的 reads 时间窗。先继承导演已采纳的完整模板条款、场记状态/接续条件和分镜证明时间窗，按 [语料机制与剪辑准备](../drama-skills/skills/short-drama/references/mechanism-preparation.md) 翻译成可见动作；缺必要决定先回对应 owner，不在正文阶段重选机制或补戏。同类场景在 [语料库](corpus/README.md) 有已验证条目时按需查：取其结构（身份锁段、设备缺陷枚举、每拍一动作带因果），不照抄格式——本地提交必须仍是六段/三段方言并补声景。**镜头涉及双人一问一答／停顿、情绪压抑到哭、身份漂移、产品功能演示且已有条件不足、确需补查时，直接读 `~/.skills/hub/creative-dna-cards/SKILL.md` 按镜头机制查 [Creative DNA 机制卡索引](corpus/creative-dna-t8/INDEX.md)（全量库：`corpus/creative-dna-t8/search.py 关键词`），一次只读一张，把不变量翻译成可见证据并写进本镜验收清单；卡的英文骨架不得当 H3 正文复制。链上引入点见 [PRODUCTION-INTEGRATION.md](corpus/creative-dna-t8/PRODUCTION-INTEGRATION.md)。** 写完按下面的 *Body Consistency Rules* 逐条读一遍。
+5. 动笔前先读三样东西：**真正的首帧（或构图锚点图及其对应时刻）**、本镜场记卡、本镜分镜的 reads 时间窗。先继承导演已采纳的完整模板条款、场记状态/接续条件和分镜证明时间窗，按 [语料机制与剪辑准备](../drama-skills/skills/short-drama/references/mechanism-preparation.md) 翻译成可见动作；缺必要决定先回对应 owner，不在正文阶段重选机制或补戏。同类场景在 [语料库](corpus/README.md) 有已验证条目时按需查：取其结构（身份锁段、设备缺陷枚举、每拍一动作带因果），不照抄格式——本地提交必须仍是六段/三段方言并补声景。**镜头涉及双人一问一答／停顿、情绪压抑到哭、身份漂移、产品功能演示且已有条件不足、确需补查时，直接读 `../creative-dna-cards/SKILL.md` 按镜头机制查 [Creative DNA 机制卡索引](corpus/creative-dna-t8/INDEX.md)（全量库：`corpus/creative-dna-t8/search.py 关键词`），一次只读一张，把不变量翻译成可见证据并写进本镜验收清单；卡的英文骨架不得当 H3 正文复制。链上引入点见 [PRODUCTION-INTEGRATION.md](corpus/creative-dna-t8/PRODUCTION-INTEGRATION.md)。** 写完按下面的 *Body Consistency Rules* 逐条读一遍。
 
 ## Base Modes
 
@@ -156,8 +156,8 @@ H3 把写下的时间线读得很字面，所以代价最大的失败是提示�
 
 ## Style Anchors from the Official 3D-Animation Skill
 
-From `MiniMax-AI/MiniMax-H3/skills/3d-animation-short-generator/SKILL.cn.md` (bundled in the
-official H3 repo). Use when the brief asks for Pixar-style / Q-version / stylized 3D animation.
+From the official H3 repository (MiniMax-AI/MiniMax-H3), skill 3d-animation-short-generator,
+file SKILL.cn.md (bundled upstream, not in this repo). Use when the brief asks for Pixar-style / Q-version / stylized 3D animation.
 
 **H3 prompt suffix** (official STEP 7) — use only when the brief asks to *change* the look to a
 Pixar-like stylized 3D, and the project has no accepted look baseline yet. For a project whose 3D look is already
@@ -299,7 +299,7 @@ G36 只提醒回读语义。不要为消除 warn 改掉已确认的声音/行为
 **具体的遮挡物**（红裙、红绸、肩膀、人群，不写 blur/wipe）/ **来向与去向** / **遮挡程度**（`swallow the frame`、`fills most of the picture`）/ **露出什么**，
 再加一句镜头没停：`the camera travels on through that sweep, one unbroken move, as <遮挡物> clears`。
 遮挡转场里不写 `cut` 词，也不写 `without cutting`（带 cut 的词是正向条件）。
-完整句式、自检、失败模式在 `references/case-notes.md` §C；段间手法的整体选择和本通道实测见 `short-drama-video-prompts/references/seam-transition.md`。
+完整句式、自检、失败模式在 `references/case-notes.md` §C；段间手法的整体选择和本通道实测见 `../drama-skills/skills/short-drama-video-prompts/references/seam-transition.md`。
 
 两段独立生成的视频，拼接处必然有纹理与运动模式的突变：叠化遇到有人物的帧会重影，硬拼会"顿一下"。所以成片上的长运动不在剪辑层拆段；必须拆时接缝只落在全屏遮挡帧或全屏色块帧上，或走生成层接力（见下）。实测数据在 `references/case-notes.md` §D。
 
@@ -369,8 +369,8 @@ G36 只提醒回读语义。不要为消除 warn 改掉已确认的声音/行为
 ### 本地 h3q 约束
 
 - adapter 走 I2VA（单首帧）/ FL2VA（首尾帧）/ Ref2VA（参考图组），**不支持纯文生**。
-- **多窗容器已接入 V2**（选路先读 `h3-queue/SKILL.md` §2.14：默认单镜 pdd，能拆就拆，只有同机位同场景且接缝必须无缝才用多窗）：`workflow=multishot` 走 `multishot_render_ref.py` → `H3MultishotMemorySampler`
-  （模板 `config/multishot-v2.json`，`context_pin`、`pin_frames=22`、`seed_per_shot=True`、
+- **多窗容器已接入 V2**（选路先读 `../h3-queue/SKILL.md` §2.14：默认单镜 pdd，能拆就拆，只有同机位同场景且接缝必须无缝才用多窗）：`workflow=multishot` 走 `multishot_render_ref.py` → `H3MultishotMemorySampler`
+  （模板 `<渲染机根目录>\config\multishot-v2.json`，`context_pin`、`pin_frames=22`、`seed_per_shot=True`、
   `self_anchor_voice` 默认开；渲染器另有 `--no-voice-anchor` 开关，但 **h3q 队列链路不转发它**，
   走队列时改不了）。两窗之间用单独一行 `---` 分隔，接缝由模型在 latent 层处理。
 - 因此本地**有** `context_pin` 生成层接力；`flf_chain` 不在当前 V2 模板里，需要时单独部署
@@ -423,7 +423,7 @@ G36 只提醒回读语义。不要为消除 warn 改掉已确认的声音/行为
 
 ## Generation-Layer Relay vs Edit-Layer Splice
 
-判型与选路的唯一权威源是 `drama-skills/skills/short-drama-video-prompts/references/seam-transition.md` §0.1（含"创作者反馈还有硬切"的三分支判型）；本表只做词侧速览，与它冲突时以它为准。
+判型与选路的唯一权威源是 `../drama-skills/skills/short-drama-video-prompts/references/seam-transition.md` §0.1（含"创作者反馈还有硬切"的三分支判型）；本表只做词侧速览，与它冲突时以它为准。
 
 | 方案 | 接缝两侧是什么 | 适用 | 代价 |
 |---|---|---|---|
@@ -470,11 +470,11 @@ that inherits it gets worse.
 
 ## Production Presets (measured 2026-10-18 on RTX 5070 Ti 16GB; engine 更新 2026-11-15)
 
-This table records the historical lu2/Sol presets (full basis in `prod1017/生产定稿_20261018.md`). **Current channel (2026-11-15): only `pdd`** — `draft` runs the PDD 8-step first pass at 1024×576 (`--no-upscale`); `final` adds a second pass up to 1536×864. `lu2` / `legacy` / `tier: legacy` are retired and rejected by both adapter and MCP, so the three-tier rows below are **pre-2026-11-15 lu2 measurements kept for comparison only**. pdd `draft → final` has no latent continuation (`draft_job_id` / `draft_accepted` are no longer read). Multi-window containers use `workflow=multishot` (V2 sampler), which is not an engine/tier. Current contract: `h3-queue/SKILL.md` §2.8（PDD 档位）与 §2.14（multishot）。
+This table records the historical lu2/Sol presets (full basis in the internal production-freeze record, not published in this repo). **Current channel (2026-11-15): only `pdd`** — `draft` runs the PDD 8-step first pass at 1024×576 (`--no-upscale`); `final` adds a second pass up to 1536×864. `lu2` / `legacy` / `tier: legacy` are retired and rejected by both adapter and MCP, so the three-tier rows below are **pre-2026-11-15 lu2 measurements kept for comparison only**. pdd `draft → final` has no latent continuation (`draft_job_id` / `draft_accepted` are no longer read). Multi-window containers use `workflow=multishot` (V2 sampler), which is not an engine/tier. Current contract: `../h3-queue/SKILL.md` §2.8（PDD 档位）与 §2.14（multishot）。
 
 - **历史 lu2 draft（896×512，4 步 Turbo LoRA）**：46s–3m05s/段（311–362 帧）。画质软（放大 1.5× 有糊感）。
 - **历史 lu2 final（latent 放大二采）**：2026-11-04 起 >300 帧不再受限。二采引擎默认 `split`（MMH3 Ultimate Upscale 时间分块，chunk 136 / overlap 17），实测 311 帧与 362 帧 → 1920×1088 全部通过，单段 16–19 分钟。`--refine-denoise` 默认 0.30（保形点）；`--tile-size` 必须为 0（空间分块会产生镜像伪影）。
-- **历史 lu2 legacy（原生 1344×768，20 步 + `spark_mode speed`）**：实测 350 帧 12m32s、311 帧 ~15min。渲染完成后 scp 中断可从 `E:\H3-Studio\renders\<slug>_<run>_<frames>frames.mp4` 手动拉回。
+- **历史 lu2 legacy（原生 1344×768，20 步 + `spark_mode speed`）**：实测 350 帧 12m32s、311 帧 ~15min。渲染完成后 scp 中断可从 `<渲染机产物目录>\<slug>_<run>_<frames>frames.mp4` 手动拉回。
 - **Offline finding**: audio is weakest at 8 steps and usable from 12 up. Judge each take's audio in review instead of refusing the only available path.
 
 ## Continuous-Relay: Facts That Carry Over

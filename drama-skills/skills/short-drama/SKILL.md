@@ -1,5 +1,6 @@
 ---
 name: short-drama
+version: 1.0.0
 description: 基于文件系统初始化和继续短剧或漫剧项目，提供 creator-first 六文档路由（剧本/视觉设定/导演/分镜/图片提示词/视频提示词）、场记账（一部戏一本的 `设定集/场记.md`）、本地 Dashboard、制作形态与 Look Development 决策。用户提出“复刻/翻拍一条已有短视频”“创建/继续短剧项目”“看进度/下一步”“做导演方案”“做场记/建连续性账”“打开 dashboard/短剧创作台”“导出制作资料”，或任务跨多个创作阶段时使用；明确的专项请求由对应子 skill 直接处理。
 license: MIT
 ---
@@ -42,20 +43,20 @@ warn 逐条说明处理理由；退出码不作为能否继续的依据。会硬
 | 用户要做什么 | owner / 行为 |
 |---|---|
 | 复刻/翻拍一条已有短视频 | 先按 [视频复刻模式](references/video-remake.md) 拆原片为 `项目开发/原片拆解.md`，用 `video-shot-reverse` 重建九份 `RR-*` 准备文档落 `项目开发/原片还原/`，按 `1.1` 节回填后再进入 develop/write |
-| 开发点子、系列承诺、改编和分集地图 | `~/.skills/hub/drama-skills/skills/short-drama-develop/SKILL.md`，仅在用户需要时 |
-| 已有多集完整剧本/散稿识别分集 | `~/.skills/hub/drama-skills/skills/short-drama-develop/SKILL.md` 按实际边界建立临时索引 |
-| 分析长篇原著 | `~/.skills/hub/drama-skills/skills/short-drama-novel-analyze/SKILL.md`，仅在用户需要时 |
-| 写或改单集剧本 | `~/.skills/hub/drama-skills/skills/short-drama-write/SKILL.md` → `剧本.md` |
-| 拆人物、造型、地点、道具 | `~/.skills/hub/drama-skills/skills/short-drama-assets/SKILL.md` → `视觉设定.md` |
+| 开发点子、系列承诺、改编和分集地图 | `../short-drama-develop/SKILL.md`，仅在用户需要时 |
+| 已有多集完整剧本/散稿识别分集 | `../short-drama-develop/SKILL.md` 按实际边界建立临时索引 |
+| 分析长篇原著 | `../short-drama-novel-analyze/SKILL.md`，仅在用户需要时 |
+| 写或改单集剧本 | `../short-drama-write/SKILL.md` → `剧本.md` |
+| 拆人物、造型、地点、道具 | `../short-drama-assets/SKILL.md` → `视觉设定.md` |
 | 建场记账、核对机位/光位/站位/道具/时间线 | 本技能 → `设定集/场记.md`（一部戏一本） |
-| 做导演方案、观看与空间设计、修复分镜注意力 | `~/.skills/hub/drama-skills/skills/short-drama-direct/SKILL.md` → `导演.md` |
-| 写资产图片提示词 | `~/.skills/hub/drama-skills/skills/short-drama-image-prompts/SKILL.md` → `图片提示词.md` |
-| 做镜头和冻结关键帧（含七项镜头语言锚点） | `~/.skills/hub/drama-skills/skills/short-drama-storyboard/SKILL.md` → `分镜.md` |
-| 写视频/时间线音乐提示词 | `~/.skills/hub/drama-skills/skills/short-drama-video-prompts/SKILL.md` → `视频提示词.md` |
-| 实际生成媒体 | `~/.skills/hub/drama-skills/skills/short-drama-produce/SKILL.md`，先预览，再显式确认，最后运行 |
-| 验收生成的图片和视频 | `~/.skills/hub/drama-skills/skills/short-drama-review/SKILL.md` 的媒体验收：先画风（对照「画风基准」）后剧情；每条生成物在被复用、剪辑或交付前必经 |
-| 把已生产的素材剪成成片 | `~/.skills/hub/drama-skills/skills/short-drama-edit/SKILL.md` → `剪辑单.md` 与 `制作成果/成片/`，只用已验收素材 |
-| 审稿或校验文档 | `~/.skills/hub/drama-skills/skills/short-drama-review/SKILL.md`，仅在用户点名时 |
+| 做导演方案、观看与空间设计、修复分镜注意力 | `../short-drama-direct/SKILL.md` → `导演.md` |
+| 写资产图片提示词 | `../short-drama-image-prompts/SKILL.md` → `图片提示词.md` |
+| 做镜头和冻结关键帧（含七项镜头语言锚点） | `../short-drama-storyboard/SKILL.md` → `分镜.md` |
+| 写视频/时间线音乐提示词 | `../short-drama-video-prompts/SKILL.md` → `视频提示词.md` |
+| 实际生成媒体 | `../short-drama-produce/SKILL.md`，先预览，再显式确认，最后运行 |
+| 验收生成的图片和视频 | `../short-drama-review/SKILL.md` 的媒体验收：先画风（对照「画风基准」）后剧情；每条生成物在被复用、剪辑或交付前必经 |
+| 把已生产的素材剪成成片 | `../short-drama-edit/SKILL.md` → `剪辑单.md` 与 `制作成果/成片/`，只用已验收素材 |
+| 审稿或校验文档 | `../short-drama-review/SKILL.md`，仅在用户点名时 |
 | 初始化、Dashboard、归档点名文档 | 本技能 |
 
 `项目开发/` 中的长材料分析与分集索引是可选分析工作区，不参与单集布局判定；写任何一集仍只维护
@@ -129,7 +130,7 @@ warn 逐条说明处理理由；退出码不作为能否继续的依据。会硬
    再继续下游阶段。会话里的一句点名不落到档案上，下一轮就会退回通用路径，方言和时长要重猜。
    档案描述的是**实际出片通道**的能力：本机经 h3q 出 H3 时用 H3 方言里的「本地 h3q 通道档案」
    （只有 `first_frame` 与 `reference`），不要写云端档案再在投产时临时降级。
-9. 任何媒体生产开始前，确认《视觉设定.md》已登记「## 画风基准」（见 `~/.skills/hub/drama-skills/skills/short-drama-assets/SKILL.md`）。没有时先
+9. 任何媒体生产开始前，确认《视觉设定.md》已登记「## 画风基准」（见 `../short-drama-assets/SKILL.md`）。没有时先
    停下补登记；没有基准就无法判断生成物是否退化，后续验收全部只能是 PROVISIONAL。
 10. 生产是“生成一条 → 验收一条 → 才决定下一条用什么输入”的循环，不是一次跑完再统一审。
     被拒素材的派生产物（从它抽的帧、以它为参考的后段）随它作废；剪辑与交付只读已验收素材。
@@ -172,7 +173,7 @@ python3 {技能目录}/scripts/project_tool.py set-authority <project> \
   --decision-ref "创作者决策/production-profile.jsonl#CD-H3"
 ``
 
-各字段取值由命中的模型方言给出：`~/.skills/hub/drama-skills/skills/short-drama-video-prompts/SKILL.md` 的 MiniMax H3 / Seedance / Wan 3.0 方言文件都写了
+各字段取值由命中的模型方言给出：`../short-drama-video-prompts/SKILL.md` 的 MiniMax H3 / Seedance / Wan 3.0 方言文件都写了
 推荐档案。写完用 `status` 复核 `video_model_profile` 是否已经出现。
 
 项目定位与安全写入见 [运行预检](references/runtime-preflight.md)。用户明确要求 Dashboard 时运行：
@@ -207,7 +208,7 @@ Look Development 是可选分支，不是进入图片提示词或分镜的固定
 登记在《视觉设定.md》「## 画风基准」。
 
 节奏数值（首钩秒数、情绪触点间隔、反转次数、VO 占比、平均镜长等）住在
-`creator_authority.rhythm_profile`。字段与默认值由 `~/.skills/hub/drama-skills/skills/short-drama-develop/SKILL.md` 按制作形态提出，
+`creator_authority.rhythm_profile`。字段与默认值由 `../short-drama-develop/SKILL.md` 按制作形态提出，
 创作者接受或改写后，按上文三步写入：决策的 `accepted_value` 是完整档案对象，`--field`
 写 `/creator_authority/rhythm_profile`；档案已接受后，单改一个值时 `--field` 指向该字段。
 `set-authority` 只校验类型与范围，缺字段、越界或多出未知字段都拒绝写入。下游只按 `status` 为 `accepted` 的档案做算术核对，缺失、`unset` 或

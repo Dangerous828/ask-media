@@ -32,10 +32,10 @@ grab -o ~/Documents/文章 <url>  # 换目录
 grab --stdout <url>             # 正文打到 stdout
 grab -p <url>                   # 只在终端看
 
-python3 ~/.skills/hub/grab-article/scripts/grab.py <url>
+python3 scripts/grab.py <url>
 # 依赖不足时：
 # uv tool install --with beautifulsoup4 --with lxml --with trafilatura \
-#   --from ~/.skills/hub/grab-article/scripts/grab.py grab
+#   --from scripts/grab.py grab
 ```
 
 多链接默认间隔 2 秒（`--delay` 可调）。

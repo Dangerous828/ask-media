@@ -6,7 +6,7 @@
 > | 用户的意思 | 是什么 | 在哪 |
 > |---|---|---|
 > | 把参考视频**当输入喂给模型**，让角色照着做（本文） | 视频动作驱动：参考视频 + 参考音轨进 `ref_videos` / `ref_video_audios` | 本文 |
-> | 把参考视频的动作**拆成文字**，写成带时码的英文状态链 `MOTION-...` 再生成 | 文字复刻：`video-shot-reverse` 逆推 + `short-drama-video-prompts` 写 MOTION 词，走 h3q | `video-shot-reverse/SKILL.md`、`drama-skills/skills/short-drama-video-prompts/SKILL.md` |
+> | 把参考视频的动作**拆成文字**，写成带时码的英文状态链 `MOTION-...` 再生成 | 文字复刻：`video-shot-reverse` 逆推 + `short-drama-video-prompts` 写 MOTION 词，走 h3q | `../../video-shot-reverse/SKILL.md`、`../../drama-skills/skills/short-drama-video-prompts/SKILL.md` |
 >
 > 判别：用户说“学这个动作”“照着做”“动作参考视频”“极乐净土那种”“音频也加进去”→ 本文；说“拆镜”“反推分镜表”“写 MOTION 提示词”→ 文字复刻。拿不准时问一句：“是把视频直接喂给模型，还是把动作拆成文字写进词里？”
 >
@@ -28,14 +28,14 @@
 | 创作者要的是 | 走哪条 |
 |---|---|
 | 角色**照着一段真实视频的动作/节奏做**（手型精细：比心、托腮、拢衣领；舞蹈翻跳） | **本通道** |
-| 动作能用文字写清（走位、对白、普通表演） | 文字编排，走 h3q 队列（`h3-queue/SKILL.md`） |
+| 动作能用文字写清（走位、对白、普通表演） | 文字编排，走 h3q 队列（`../SKILL.md`） |
 | 只要锁同场连续镜头的构图、机位、色温 | h3q 的 `scene_video`（场景锚，不是动作驱动，音频不接） |
 
 动作视频只当**动作源**。人物与画风永远来自已验收的身份板与视觉设定，参考视频里的人物、服装、水印不进成片（EP003 源视频是金发猫耳女仆，成片零污染，29 帧 OCR 与目视确认）。
 
 ## 2. 本通道不走 h3q 队列
 
-**这条通道没有标准入口，必须按本文手搓图直投。** MCP `h3_generate_video` 只有三种输入模式（`refs` / `first_frame` / `first_frame+last_frame`），没有视频动作参考；h3q 队列也没有；`scene_video` 是锁场景构图的场景锚（`H3ReferenceVideo`），不是动作驱动。让它看起来像"能走队列"是这一条最容易犯的误用。（`h3-queue/SKILL.md` §0 已写明）。本通道直接向 Windows ComfyUI `127.0.0.1:8199` 提交 API 图。这是 h3-queue「三条硬纪律」第 1 条的明文例外，条件如下：
+**这条通道没有标准入口，必须按本文手搓图直投。** MCP `h3_generate_video` 只有三种输入模式（`refs` / `first_frame` / `first_frame+last_frame`），没有视频动作参考；h3q 队列也没有；`scene_video` 是锁场景构图的场景锚（`H3ReferenceVideo`），不是动作驱动。让它看起来像"能走队列"是这一条最容易犯的误用。（`../SKILL.md` §0 已写明）。本通道直接向 Windows ComfyUI `127.0.0.1:8199` 提交 API 图。这是 h3-queue「三条硬纪律」第 1 条的明文例外，条件如下：
 
 1. **提交前必须确认 GPU 空闲**：`h3qc queue` 无 running/waiting，且 `curl 127.0.0.1:8199/queue` 的 `queue_running`、`queue_pending` 都为空。有任务就停下汇报，不抢卡、不重启 ComfyUI。
 2. 单次提交，不重试。提交响应不明时先查 `/history/<prompt_id>` 与 `/queue`，确认是否其实已在跑。
@@ -44,7 +44,7 @@
 
 ## 3. 图模板与占位符
 
-模板：`~/.skills/hub/h3-queue/templates/video_motion_drive_graph.json`（`graph` 字段即可直接 POST `/prompt`）。
+模板：`../templates/video_motion_drive_graph.json`（`graph` 字段即可直接 POST `/prompt`）。
 
 | 占位符 | 节点 | 填什么 |
 |---|---|---|
@@ -80,16 +80,16 @@
 
 ## 5. 一次性 runner 与后台投递
 
-runner：`~/.skills/hub/h3-queue/templates/video_motion_drive_runner.py`。它提交一次、轮询 `/history`、按 SaveVideo 节点（`SAVE_NODE = "11"`）取回产物，并写 `status.json` 与 `.meta.json`（耗时、峰值显存、prompt_id）。
+runner：`../templates/video_motion_drive_runner.py`。它提交一次、轮询 `/history`、按 SaveVideo 节点（`SAVE_NODE = "11"`）取回产物，并写 `status.json` 与 `.meta.json`（耗时、峰值显存、prompt_id）。
 
 要点：
 
 - **runner 必须脱离 SSH 会话**。EP003 实测 runner 进程随 SSH 子进程回收而退出（`status` 停在 submitted），产物不丢（ComfyUI 仍在跑），但回收要改由 Mac 侧轮询。用 `../templates/launch_detached.ps1`（路径相对本文件所在的 `references/`；下同）启动（2026-11-22 实测：SSH 退出后进程继续运行到结束）：
   ```
-  scp templates/launch_detached.ps1 templates/video_motion_drive_runner.py h3-win:E:/ComfyUI/motion_drive_delivery/
-  ssh h3-win 'powershell -NoProfile -ExecutionPolicy Bypass -File E:\ComfyUI\motion_drive_delivery\launch_detached.ps1 -Script E:\ComfyUI\motion_drive_delivery\video_motion_drive_runner.py -WorkDir E:\ComfyUI\motion_drive_delivery -Log E:\ComfyUI\motion_drive_delivery\runner.log'
+  scp templates/launch_detached.ps1 templates/video_motion_drive_runner.py <渲染主机SSH别名>:/path/to/motion_drive_delivery/
+  ssh <渲染主机SSH别名> 'powershell -NoProfile -ExecutionPolicy Bypass -File <ComfyUI根目录>\motion_drive_delivery\launch_detached.ps1 -Script <ComfyUI根目录>\motion_drive_delivery\video_motion_drive_runner.py -WorkDir <ComfyUI根目录>\motion_drive_delivery -Log <ComfyUI根目录>\motion_drive_delivery\runner.log'
   ```
-  目录 `E:\ComfyUI\motion_drive_delivery\` 先建好，把填好占位符的图存成同目录 `graph.json`（runner 读 `GRAPH`）。回收时仍以 Mac 侧 SSH 查 `/history` 为准。
+  目录 `<ComfyUI根目录>\motion_drive_delivery\` 先建好，把填好占位符的图存成同目录 `graph.json`（runner 读 `GRAPH`）。回收时仍以 Mac 侧 SSH 查 `/history` 为准。
 - **产物定位只认 `/history` 的 outputs 字段（subfolder + type=output）**，不能靠 `.mp4` 后缀猜：`LoadVideo` 会把输入视频也列进 images，旧 runner 栽过这个坑。
 - 同一条不重试。超时先查 `/history` 和 `/queue`。
 - 回收后本机 `ffprobe` 核对帧数、时长、分辨率、音轨。
@@ -98,7 +98,7 @@ runner：`~/.skills/hub/h3-queue/templates/video_motion_drive_runner.py`。它�
 
 - 实测：345 帧 + 视频动作 + 音频参考 + Motion_Repair，**7000 秒（116.7 分钟）**，峰值显存 15.55GiB，20GB 模型全程 offload，**采样 20 步，每步约 5m42s**。
 - 之前 243 帧单视频参考那次 3323 秒。**帧数每多 42%，耗时翻倍以上**，预估别按线性算。
-- **看进度**：ComfyUI 的采样进度条写在 `E:\H3-Studio\logs\serve.log`，读最后一行 `NN%|…| step/total [已用<剩余, N s/it]`。h3q 队列的 `progress` 字段不覆盖这条通道（它不经过 h3q），要自己读 serve.log。
+- **看进度**：ComfyUI 的采样进度条写在 `<渲染机根目录>\logs\serve.log`，读最后一行 `NN%|…| step/total [已用<剩余, N s/it]`。h3q 队列的 `progress` 字段不覆盖这条通道（它不经过 h3q），要自己读 serve.log。
 - **判断是不是卡死**：看 serve.log 最后写入时间与 GPU 功耗（`nvidia-smi`，满载推理约 270W，卡死会掉）。CPU 主进程不动是正常的（GPU-bound）。EP003 当时因为只看 CPU 与日志停写，两度怀疑卡死，其实一直在算。
 
 ## 7. 验收
@@ -121,4 +121,4 @@ runner：`~/.skills/hub/h3-queue/templates/video_motion_drive_runner.py`。它�
 - 本通道产物 512×896，没有 pdd 的超分链。要交付分辨率走 `h3-queue` §2.11 的 latent 放大（成品帧回编码，不重采样），放大前确认 GPU 空闲。
 - 参考音轨是「参考节奏与质感」，不是 1:1 复制原声。要原声得外部混流。
 - 单次提交就占满 16G 卡一两个小时，期间 h3q 里排的任务会 `occluded` 等卡。开跑前确认队列里没有更急的活。
-- Windows 机器要在线。`ssh h3-win` 偶发 mDNS 解析失败，重试即可。
+- Windows 机器要在线。`ssh <渲染主机SSH别名>` 偶发解析失败，重试即可。

@@ -14,7 +14,7 @@ the draft is what the upscale refines. Rendering straight at 1344x768 gives a
 *different* frame (measured: same seed, different background/mountains), so a
 draft at another resolution would not preview the master.
 
-Usage (on the Windows box, from E:\\H3-Studio\\prod1017):
+Usage (on the render box, from its workflow directory):
   python -s mkdraft.py --out <graph.json> --prompt-file <p.txt>
                        [--ref0 a.png] [--ref1 b.png]
                        [--seed 1017] [--frames 243] [--tag myshot]
@@ -24,7 +24,7 @@ import argparse
 import json
 import os
 
-TEMPLATE = r"E:\H3-Studio\prod1017\eval\graphs\03_submit_pdd_xiuxian_draft.json"
+TEMPLATE = os.environ.get("H3Q_TEMPLATE", "03_submit_pdd_xiuxian_draft.json")
 
 W1, H1 = 1024, 576          # locked draft tier
 W2, H2 = 1536, 864          # 1.5x upscale target, both /32

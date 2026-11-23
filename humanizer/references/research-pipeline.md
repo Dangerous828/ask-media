@@ -11,7 +11,7 @@
 | 3 成稿 | `write-article` / 作者本人 | 在场 |
 | 4 去 AI 味 | `humanizer --genre academic` | 在场，本档随附 |
 
-移除提交 `90309ad`（2026-11-15 22:20）。**本档不依赖 1/2 是否安装**：没有它们时，1/2 由作者用自己的文献管理工具完成，只要交出同形状的交接物即可接上 3/4。需要恢复时把备份目录复制回 `~/.skills/hub/` 并跑 `sync-skills.sh`。
+移除提交 `90309ad`（2026-11-15 22:20）。**本档不依赖 1/2 是否安装**：没有它们时，1/2 由作者用自己的文献管理工具完成，只要交出同形状的交接物即可接上 3/4。需要恢复时把备份目录复制回技能安装根目录并跑 sync-skills.sh。
 
 ## 四道手
 
@@ -34,7 +34,7 @@
 
 **完成判据**：正文里每一个数字、每一个引语都能在证据包里指到页；AI 生成的 outline / note 明确标为「derived，需核对」，不作证明。没有 PDF 时写明「artifact-based」并列出哪些主张无法核实。
 
-有 `tensorreading-deep-read` 时：`python scripts/deep_read.py bundle "<id>" --out evidence.json`，按 `references/evidence-policy.md` 的证据等级判读。没有时：作者按同一形状手写证据包。
+有 `tensorreading-deep-read` 时：python scripts/deep_read.py bundle "<id>" --out evidence.json（证据策略与判读等级见上游仓库的 evidence-policy 文档）。没有时：作者按同一形状手写证据包。
 
 ### 3 成稿 → 4 去 AI 味
 

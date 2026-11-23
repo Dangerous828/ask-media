@@ -27,15 +27,24 @@ import sys
 import time
 from pathlib import Path
 
-HOST = os.environ.get("H3Q_SSH_HOST", "win-desktop")
-REMOTE_PY = os.environ.get(
-    "H3Q_REMOTE_PY",
-    r"E:\ComfyUI\ComfyUI_windows_portable\python_embeded\python.exe")
-REMOTE_CLI = os.environ.get("H3Q_REMOTE_CLI", r"E:\H3-Studio\scripts\h3qc.py")
-COMFY_INPUT = os.environ.get(
-    "H3Q_COMFY_INPUT",
-    r"E:\ComfyUI\ComfyUI_windows_portable\ComfyUI\input")
-REMOTE_ROOT = os.environ.get("H3Q_REMOTE_ROOT", r"E:\H3-Studio\transcard")
+HOST = os.environ.get("H3Q_SSH_HOST", "")
+
+
+def _require_host():
+    missing = [k for k, v in [
+        ("H3Q_SSH_HOST", HOST), ("H3Q_REMOTE_PY", REMOTE_PY),
+        ("H3Q_REMOTE_CLI", REMOTE_CLI), ("H3Q_COMFY_INPUT", COMFY_INPUT),
+        ("H3Q_REMOTE_ROOT", REMOTE_ROOT),
+    ] if not v]
+    if missing:
+        raise SystemExit(
+            "缺少远端环境变量: " + ", ".join(missing) + "。"
+            "渲染机的路径全部由环境变量提供，本脚本不内置默认机器。"
+        )
+REMOTE_PY = os.environ.get("H3Q_REMOTE_PY", "")
+REMOTE_CLI = os.environ.get("H3Q_REMOTE_CLI", "")
+COMFY_INPUT = os.environ.get("H3Q_COMFY_INPUT", "")
+REMOTE_ROOT = os.environ.get("H3Q_REMOTE_ROOT", "")
 GATE = os.environ.get(
     "H3Q_GATE",
     str(Path.home() / ".skills/hub/h3-video-gate/scripts/h3_gate.py"))
@@ -55,6 +64,7 @@ def run(argv, check=True, timeout=None, capture=True):
 
 
 def ssh(cmd: str, timeout=None, check=True):
+    _require_host()
     return run(["ssh", HOST, cmd], timeout=timeout, check=check)
 
 

@@ -187,8 +187,8 @@ the tears back, stubbornness and fragility surfacing on the same face.
 | 文件 | 负责 |
 |---|---|
 | `profiles/<画风>.md` | **画风**：媒介、色盘、光影、材质、锚词 |
-| `references/craft/performance.md`（本文） | **表演**：情绪 → 可见动作 |
+| `performance.md`（本文） | **表演**：情绪 → 可见动作 |
 | `references/official/base-en.txt` | **H3 结构**：字段名、段序、时序记号 |
-| `references/craft/imagePromptCraft.md` | **生图**：分镜行 → 单帧提示词的字段映射 |
+| `imagePromptCraft.md` | **生图**：分镜行 → 单帧提示词的字段映射 |
 
 **冲突时官方线（base-en.txt）赢。** 本文只提供「怎么写动作」，不改变 H3 结构。

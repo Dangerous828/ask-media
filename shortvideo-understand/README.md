@@ -81,7 +81,7 @@ shortvideo-understand/
 
 B站/抖音转录链路基于 [chubbyguan/chubbyskills](https://github.com/chubbyguan/chubbyskills) v0.15.0（MIT，`LICENSE` 随包保留）的 `bilibili-transcribe` / `douyin-transcribe`。字幕双扩展名扫描、零配置 cookie 探测、可插拔 ASR 后端、抖音 Cookie 头拼装、可执行文件绝对路径解析，以及画面层 `look.py` 与编排层 `understand.py`，行为定义全部见上文「关键实现说明」。
 
-回流上游 PR 时，可在任意位置 `git clone` 上游 v0.15.0 作对照；本机另存有派生仓 `~/Code/vendor/chubbyskills/`（含 `.patch-backup/` 改动前原文件），非运行依赖。
+回流上游 PR 时，可在任意位置 `git clone` 上游 v0.15.0 作对照；本机另存有派生仓 `~/projects/vendor/chubbyskills/`（含 `.patch-backup/` 改动前原文件），非运行依赖。
 
 ## 已知边界
 

@@ -1,3 +1,0 @@
-integrated_multimodal_description: [Shot 1] A quiet laundry room at dusk; a young woman presses a claim ticket into her palm. [Shot 2] At 00:03.000, the shopkeeper behind the counter studies the ticket's torn edge. [Shot 3] the woman's fingers tighten around a blue thread snagged on the ticket's back.
-overall_soundscape: A tumble dryer hums through the whole take; a wooden stool scrapes once at the moment the shopkeeper leans in.
-non_diegetic_music: N/A

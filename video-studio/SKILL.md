@@ -12,7 +12,7 @@ description: 短剧/动画出图的验收与工程检查工具箱。当明确用
 
 ## 短剧项目协作（命中即读，保留本职）
 
-本技能继续做工程检查、适配判断和问题定位，并提供测量（四件套、介质信号）。**短剧生成图片与视频是否可用，由 [short-drama-review](../drama-skills/skills/short-drama-review/SKILL.md) 的「媒体验收」裁决**：它用 `scripts/look_check.py` 对照《视觉设定.md》「画风基准」先审画风，再审剧情；本技能的测量作为证据附上，不单独放行。涉及连续段时读 [short-drama-storyboard](../drama-skills/skills/short-drama-storyboard/SKILL.md) 的事件边界。规则见 [协作契约](../SHORT-DRAMA-ROUTING.md)。已读上下文复用；只有跨阶段、状态或初始化才读取short-drama主路由。
+本技能继续做工程检查、适配判断和问题定位，并提供测量（四件套、介质信号）。**短剧生成图片与视频是否可用，由 [short-drama-review](../drama-skills/skills/short-drama-review/SKILL.md) 的「媒体验收」裁决**：它用 `../drama-skills/skills/short-drama-review/scripts/look_check.py` 对照《视觉设定.md》「画风基准」先审画风，再审剧情；本技能的测量作为证据附上，不单独放行。涉及连续段时读 [short-drama-storyboard](../drama-skills/skills/short-drama-storyboard/SKILL.md) 的事件边界。规则见 [协作契约](../SHORT-DRAMA-ROUTING.md)。已读上下文复用；只有跨阶段、状态或初始化才读取short-drama主路由。
 
 > ## ⚠️ 定位（2026-10-22 实测修正）
 >
@@ -76,11 +76,11 @@ description: 短剧/动画出图的验收与工程检查工具箱。当明确用
 
 | 你手上 / 想做什么 | 阶段 | 读 |
 |---|---|---|
-| 一个点子、梗概、或要改编的小说 | 剧本 | `references/formats/script.md` |
+| 一个点子、梗概、或要改编的小说 | 剧本 | `references/formats/script.md`（待补） |
 | 明确用 H3 起草剧本、现成剧本进入 H3 制作、选画风或询问 H3 适不适合 | 剧本适配 | **先读 [H3 剧本适配参考](references/craft/h3-script-fit.md)**；逐场定位实际风险，按证据等级提出保留剧情作用的拍法；作者原文与剧情分叉按参考中的规则处理 |
 | 剧本有了，要拆成镜头／反馈拆太散或拼接生硬 | 分镜与连续段 | **开工前必读** [连续段规划](references/craft/sequence-planning.md)；独立短片同时核 `short-film-scene-continuity` 场景账。再交 `short-drama-storyboard`（独立时间区间表用 `storyboard-30s`） |
-| 分镜有了，要拆角色/场景/道具 | 资产 | `references/formats/assets.md` |
-| 要写某张图 / 某个资产板的提示词 | 图片提示词 | `references/formats/assets.md` + `profiles/<画风>.md` |
+| 分镜有了，要拆角色/场景/道具 | 资产 | `references/formats/assets.md`（待补） |
+| 要写某张图 / 某个资产板的提示词 | 图片提示词 | `references/formats/assets.md`（待补） + `profiles/<画风>.md` |
 | 要写视频提示词 | 视频提示词 | **`references/official/ref-en.txt`**（Ref2VA）或 **`base-en.txt`**（T2VA/I2VA/FL2VA/L2VA） |
 | 要选/换画风 | 风格 | `references/craft/visualStyles.md` → 落到 `profiles/` |
 | 要把分镜行翻译成单帧提示词 | 单帧 | `references/craft/imagePromptCraft.md` |
@@ -241,7 +241,7 @@ python3 scripts/qc_signals.py <图片或目录> --baseline <项目>/qc/baselines
 **分工**：四带判「这张图像不像话」（同题材同构图横向比 + 灾难线）；
 「词写进去了没有」要看**具体物件是否出现**（光柱、地平线、姿态、道具）。
 不要把四带当提示词好坏的判据。详见
-`~/Code/kTool/h3-demo-repro/wordlen_lab/RESULTS.md`。
+`~/projects/h3-demo-repro/wordlen_lab/RESULTS.md`。
 
 参照：官方 Gemini 基准 = 死黑 0.0% / 中间调 84.8% / 熵 7.67。
 
@@ -355,7 +355,7 @@ A/B 两版同 PASS，真真切镜就这样漏过了闸门。现在 `check_fl2va_
 > 抢卡、不与队列互斥、看不到排队位次，也拿不到队列那道 VRAM 保护。
 > `h3q_img.py` 自己的 docstring 就写着「never by hand; direct only to debug one still」。
 >
-> SSH 通道按 `h3-queue` §2 选择（同网段优先 `win-desktop`，远程走 `win-desktop-cf` 等），以当时实测可连为准。
+> SSH 通道按 `h3-queue` §2 选择（同网段优先 `<渲染主机SSH别名>`，远程走 `<渲染主机SSH别名>` 等），以当时实测可连为准。
 > 队列端口 8200 **只在 Windows 本机监听**，Mac 上查不到。
 
 ### 4.1 出图
@@ -363,7 +363,7 @@ A/B 两版同 PASS，真真切镜就这样漏过了闸门。现在 `check_fl2va_
 ```bash
 # 在 Windows 上跑（h3qc 与队列同机）
 python h3qc.py submit --kind image \
-  --prompt-file p.txt --out E:\H3-Studio\renders\o.png \
+  --prompt-file p.txt --out <渲染机产物目录>\o.png \
   --size 1344x768 --seed 42 --label my-shot \
   --idem-key my-shot-s42 --wait
 ```
@@ -419,7 +419,7 @@ H3 帧网格是 `17k + 5`（24 fps）：
 | 远景人物脸糊 | 景别越远，文字越锁不住身份 | 身份交给参考图，别加堆词。**［社区二手，本机未测，且社区本身有争议：1376×768/24 步救不了 vs 1.0MP+Turbo 是甜点位。不作绝对阈值］** |
 | 屏幕小字 / logo 逐帧漂 | 帧级一致性要求超出模型稳态 | **［社区二手］** 但另一条社区案例说大字卡反而稳（片假名标题渲染正确）。两条判据分开，不要笼统说「文字能力」。**本机未测** |
 | 剧烈动作 + 复杂运镜复刻源片时溶解崩坏 | 运动幅度与运镜复杂度同时拉满 | 换舞蹈类 / 无运镜片源，或拆成段。**［社区二手，本机未测］** |
-| 想用超分救画质 | latent upscaler 毁细节并破坏时序；EasyCache 降质 | **［本机一手实测 2026-11-15 已推翻旧二手结论］** `h3_upscale_video(width=1536, aspect="16:9")` 纯 latent 放大相对 lanczos 插值基线 lap_var **+34.17%**、只加细节不重绘，是有效成品超分；前提是装配层不缩回 1024（缩回再放大 −20.73%），且**只加细节救不了台词/口型/结构问题**——结构坏了仍按 R6 改输入。像素超分 SeedVR2 才是真毁细节（过锐化 FAIL）。详见 `h3-queue/SKILL.md` §2.15 |
+| 想用超分救画质 | latent upscaler 毁细节并破坏时序；EasyCache 降质 | **［本机一手实测 2026-11-15 已推翻旧二手结论］** `h3_upscale_video(width=1536, aspect="16:9")` 纯 latent 放大相对 lanczos 插值基线 lap_var **+34.17%**、只加细节不重绘，是有效成品超分；前提是装配层不缩回 1024（缩回再放大 −20.73%），且**只加细节救不了台词/口型/结构问题**——结构坏了仍按 R6 改输入。像素超分 SeedVR2 才是真毁细节（过锐化 FAIL）。详见 `../h3-queue/SKILL.md` §2.15 |
 | 风格 LoRA 抢走参考图身份 | 风格 LoRA 与参考图竞争注意力 | adherence 优先时强度压到 ~0.5。**［官方原文，本地可核：`h3-demo-repro/official/comfy-docs/minimax-h3-native.md:239` 第 13 条］** |
 | **段子内部黑框自己消失** | **同一次空间穿越被相邻两镜重复承担** | **跑 `segment_guard.py` 确认；修法是从结构上删掉重复的那一镜** |
 
@@ -501,9 +501,9 @@ projects/<剧名>/
 
 | 项 | 为什么重要 |
 |---|---|
-| `references/formats/shots.md` | 五槽填写规范散在散文里，脚本无法校验必填槽 |
+| `references/formats/shots.md`（待补） | 五槽填写规范散在散文里，脚本无法校验必填槽 |
 | `references/formats/` 资产三类 | character/scene/prop 规范还没抄进来 |
-| `references/backends/qwen-2.1.md` | 后端标定数据未落文档 |
+| `references/backends/qwen-2.1.md`（待补） | 后端标定数据未落文档 |
 | profile 删「叙事世界」槽 | 现在写着「当代温暖都市」，是题材不是画风，做古装要新建 profile |
 | profile 加「构图与运动」 | 【景别机位】无画风依据（扁平风禁虚化、真人给 24/35/50/85mm 语义） |
 | 第二个 profile | 只有 3d_anime，且只在赛博题材上跑过 |
@@ -529,6 +529,6 @@ projects/<剧名>/
 1. 9 格 × 3 seed = 27 张，四件套通过 ≥7/9，且无灾难格（死黑 >40%）
 2. 产物带 manifest
 3. ≥2 个 profile，其中 1 个在非赛博题材上跑过
-4. `formats/shots.md` 存在且脚本校验必填槽
+4. `formats/shots.md`（待补）存在且脚本校验必填槽
 
 **当前 4 项均未满足**（第 2 项已实现脚本但未全面应用）。

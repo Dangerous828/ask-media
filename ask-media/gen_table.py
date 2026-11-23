@@ -32,7 +32,7 @@ def render(chain):
     return "\n".join(rows)
 
 
-HUB = os.path.dirname(HERE)   # ~/.skills/hub（HERE 是 ask-media 本身）
+HUB = os.path.dirname(HERE)   # 仓库根（HERE 是 ask-media 本身）
 
 
 def skill_exists(name):

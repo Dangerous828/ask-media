@@ -242,8 +242,8 @@ A 版重渲一次**完全复现**（切点帧号与 top5 完全一致）⇒ 确�
 
 ## 十、相关文件索引
 
-> 下表相对路径以本 skill 目录（`~/.skills/hub/video-studio/`）为基准；
-> `example-project/...` 开头的以 `~/Code/kTool/` 为基准。
+> 下表相对路径以本 skill 目录（`video-studio/`）为基准；
+> `example-project/...` 开头的以 `~/projects/` 为基准。
 
 | 文件 | 内容 |
 |---|---|

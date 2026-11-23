@@ -128,7 +128,7 @@ S05(相邻镜 Subject 数 / 道具)规格里标为不做,脚本没有实现。�
 ## 6. 过闸后的提交与验收
 
 **唯一提交入口是 h3q 队列（127.0.0.1:8200，经 `h3qc.py`／带参考图时 `h3qg.py`），操作见 `h3-queue` 技能。**
-短剧项目经 `short-drama-produce` 调用 `h3-queue/scripts/short_drama_h3q_adapter.py`。禁止用
+短剧项目经 `short-drama-produce` 调用 `../h3-queue/scripts/short_drama_h3q_adapter.py`。禁止用
 `h3_submit_ref.ps1`、计划任务、`Start-Process` 或任何脚本直连 ComfyUI 8199 提交——那会绕过 GPU 串行与
 显存看门狗。下面只保留与提示词正确性有关的事实：
 
@@ -160,7 +160,7 @@ SHA 的 `manifest.json`（含 `checker_source`、argv、context、`exit_code`）
 - **`sol-profile` 默认 `off`**：Sol 加速档比 off 慢 3.5% 且构图会跑掉，一律不要开。
 - **`pdd_lu` 二采**：转发 `--out-width/--out-height`，362 帧到 1536×864 约 832 秒。
 - **`--tile-size` 必须为 0**：空间分块让每个 tile 各自重想内容，产生镜像/重复纹样（实测判废）。
-- **带首帧/首尾帧的任务不走 `pdd_lu`，因此没有二采**：`pdd_render_ref.py` 没有 `--first-frame`/`--last-frame`。`h3_generate_video` 与项目 adapter 现在按输入分流——带 `first_frame` 就落默认分支 `h3_render_ref.py`（单首帧 i2va、首尾帧 fl2va），只有挂 `refs` 的全参考组任务才走 pdd draft/final。默认分支没有二采档，要升分辨率走 `h3_upscale_video` 后处理放大（纯 latent 放大、无第二遍扩散、构图与音轨原样保留）。转场卡做法见 `h3-queue/references/transcard.md`。
+- **带首帧/首尾帧的任务不走 `pdd_lu`，因此没有二采**：`pdd_render_ref.py` 没有 `--first-frame`/`--last-frame`。`h3_generate_video` 与项目 adapter 现在按输入分流——带 `first_frame` 就落默认分支 `h3_render_ref.py`（单首帧 i2va、首尾帧 fl2va），只有挂 `refs` 的全参考组任务才走 pdd draft/final。默认分支没有二采档，要升分辨率走 `h3_upscale_video` 后处理放大（纯 latent 放大、无第二遍扩散、构图与音轨原样保留）。转场卡做法见 `../h3-queue/references/transcard.md`。
 - **多窗容器总帧数上限约 450 帧**：这是显存物理上限；adapter 对显式 `workflow=multishot` 只告警不拦截，超限 OOM 风险自负。
 - **切点时长**：本地安全档 4–15 秒（16G 容量/训练范围）；15 秒经 24fps/17k+5 向上吸附为 362 物理帧（15.083 秒）。节点 length 可到 5–3600 帧，超 362f 属容量/质量风险而非字段违规。
 

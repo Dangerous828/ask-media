@@ -5,7 +5,7 @@ Skill 核心拉片/白模是离线的（opencv/rapidocr/faster-whisper/本地引
 
 ## 1. LLM + Vision（智谱 GLM，可选）
 用于：自动补分镜描述、生成关键镜头讲解/潜台词、对接触印片做语义分析。
-- 客户端：`scripts/glm_client.py`（标准库实现，无第三方依赖）。
+- 客户端：`../scripts/glm_client.py`（标准库实现，无第三方依赖）。
 - 配置环境变量（二选一设 key）：
   - `ZHIPUAI_API_KEY` 或 `GLM_API_KEY`（智谱开放平台 key，必填）
   - `GLM_BASE`（默认 https://open.bigmodel.cn/api/paas/v4）
@@ -23,7 +23,7 @@ Skill 核心拉片/白模是离线的（opencv/rapidocr/faster-whisper/本地引
 - 未配置 key 时这些脚本报“未配置 GLM_API_KEY”，不影响离线流程。
 
 ## 2. Blender 3D 白模（可选，需要 Blender）
-- 脚本：`scripts/blender_previs.py`。
+- 脚本：`../scripts/blender_previs.py`。
 - 输入 storyboard JSON，输出 `projects/<项目>/白模3D/gen_<slug>.py`（Blender Python 构建脚本）。
 - 通过 Blender MCP 或在 Blender 内执行该脚本，生成 3D 场景/走位。
 - 坐标约定：JSON (x横,y上,z深) → Blender (x, z, -y)。

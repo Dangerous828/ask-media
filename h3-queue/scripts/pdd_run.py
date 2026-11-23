@@ -17,7 +17,7 @@ import urllib.error
 import urllib.request
 
 BASE = "http://127.0.0.1:8199"
-COMFY_OUT = r"E:\ComfyUI\ComfyUI_windows_portable\ComfyUI\output"
+COMFY_OUT = os.environ.get("COMFYUI_OUTPUT", "ComfyUI/output")
 
 
 def api(path, payload=None, timeout=60):

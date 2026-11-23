@@ -75,7 +75,7 @@ python3 scripts/look.py /path/to/video.mp4 --frames 8
 
 参数：`--no-subtitle` 强制转录；`--max-minutes N` 超过 N 分钟时在 `notes` 里提示分段；`--frames`/`--timestamps` 控制画面层；`--height` 画面层下载视频轨最大高度（默认 480；小字、OCR 密集的画面提到 720）；`--keep-video DIR` 显式下载并保留最高可用画质的完整音视频，JSON/Markdown 的 `video_path` 给出实际路径；`-o` 落文件。
 
-复刻/翻拍按 `short-drama` 的 `references/video-remake.md` 衔接：把 `video_path` 交给 `video-previs` 的 `extract_shots.py --rep-frames ...` 生成切点与代表帧。`--look` 的压缩识图副本只用于读画面，不能登记为 `SRC-xx.jpg`；本技能只负责链接取证与原片保留，项目编排归 `short-drama`，媒体验收归 `short-drama-review`。
+复刻/翻拍按 `short-drama` 的 `../drama-skills/skills/short-drama/references/video-remake.md` 衔接：把 `video_path` 交给 `video-previs` 的 `extract_shots.py --rep-frames ...` 生成切点与代表帧。`--look` 的压缩识图副本只用于读画面，不能登记为 `SRC-xx.jpg`；本技能只负责链接取证与原片保留，项目编排归 `short-drama`，媒体验收归 `short-drama-review`。
 
 ## 输出结构（JSON）
 

@@ -2,7 +2,7 @@
 """short-drama-produce adapter for the Windows h3q queue.
 
 Reads the adapter JSON contract on stdin, submits only through h3qc/h3qg on
-win-desktop, records the queue id before polling, and collects without resubmit.
+the render box (SSH alias from H3Q_SSH_HOST), records the queue id before polling, and collects without resubmit.
 No credentials are accepted in the job or adapter config.
 
 Video workflows: `ref2va`（单镜，默认）与 `multishot`（多窗容器）。两者走同一条
@@ -29,18 +29,29 @@ import sys
 import time
 import uuid
 
-HOST = os.environ.get("H3Q_SSH_HOST", "win-desktop")
-PYTHON = os.environ.get(
-    "H3Q_REMOTE_PYTHON",
-    r"E:\ComfyUI\ComfyUI_windows_portable\python_embeded\python.exe",
-)
-CLI = os.environ.get("H3Q_REMOTE_CLI", r"E:\H3-Studio\scripts\h3qc.py")
-REF_CLI = os.environ.get("H3Q_REMOTE_REF_CLI", r"E:\H3-Studio\scripts\h3qg.py")
-REMOTE_ROOT = os.environ.get("H3Q_REMOTE_ROOT", r"E:\H3-Studio\short-drama")
-COMFY_INPUT = os.environ.get(
-    "H3Q_COMFY_INPUT",
-    r"E:\ComfyUI\ComfyUI_windows_portable\ComfyUI\input",
-)
+HOST = os.environ.get("H3Q_SSH_HOST", "")
+
+
+def _require_host():
+    missing = [k for k, v in [
+        ("H3Q_SSH_HOST", HOST),
+        ("H3Q_REMOTE_PYTHON", PYTHON),
+        ("H3Q_REMOTE_CLI", CLI),
+        ("H3Q_REMOTE_REF_CLI", REF_CLI),
+        ("H3Q_REMOTE_ROOT", REMOTE_ROOT),
+        ("H3Q_COMFY_INPUT", COMFY_INPUT),
+    ] if not v]
+    if missing:
+        raise SystemExit(
+            "缺少远端环境变量: " + ", ".join(missing) + "。"
+            "渲染机的 SSH 别名、python、队列 CLI、根目录与 ComfyUI input 目录"
+            "全部由环境变量提供，本脚本不内置默认机器。"
+        )
+PYTHON = os.environ.get("H3Q_REMOTE_PYTHON", "")
+CLI = os.environ.get("H3Q_REMOTE_CLI", "")
+REF_CLI = os.environ.get("H3Q_REMOTE_REF_CLI", "")
+REMOTE_ROOT = os.environ.get("H3Q_REMOTE_ROOT", "")
+COMFY_INPUT = os.environ.get("H3Q_COMFY_INPUT", "")
 POLL_SECONDS = int(os.environ.get("H3Q_ADAPTER_POLL_SECONDS", "15"))
 # Existing dialogue safeguards retain their submit policy. Photography reminders
 # G34/G35 require shot/reference context; word matches cannot reject a legal
@@ -367,6 +378,7 @@ def run(argv, check=True):
 
 
 def ssh(remote_command, check=True):
+    _require_host()
     return run(["ssh", HOST, remote_command], check=check)
 
 

@@ -22,7 +22,7 @@
 
 ## 来源与证据边界
 
-MiniMax Design **官方市场快照 2026-10-25**：`micro-expression-video-generator` **1.0.3**，目录标记 `official-featured`；参考其 `references/video-prompt-guardrails.md` 的基线／泄露／压回／余态，以及 `references/tempo-density-guide.md` 的正常速度和镜内时间点。本文只迁移方法，没有采用其特写节拍数量建议，也不构成本地出片实测或成功率保证。
+MiniMax Design **官方市场快照 2026-10-25**：`micro-expression-video-generator` **1.0.3**，目录标记 `official-featured`；参考其包内 video-prompt-guardrails（基线／泄露／压回／余态）与 tempo-density-guide（正常速度和镜内时间点）两份文档。本文只迁移方法，没有采用其特写节拍数量建议，也不构成本地出片实测或成功率保证。
 
 - [官方市场列表API](https://design.minimax.cn/api/v1/skills/market?page=1&page_size=200)
 - [对应版本来源包入口](https://design.minimax.cn/api/v1/skills/market/download?name=micro-expression-video-generator&version=1.0.3)

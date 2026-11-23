@@ -74,7 +74,7 @@ description: >
 → 接触印片 `frames_<名>/contact_*.jpg` + 打印切点区间。密集抽帧**人工归并**，定每镜景别/运镜/前后景/画左画右。
 
 复刻/翻拍入口：`python scripts/extract_shots.py <video> --rep-frames <项目>/输入/原片/frames --prefix SRC-`
-→ 在代表帧目录另产 `SRC-01.jpg` 等、`shots.json` 与 `原片拆解.md` 骨架。代表帧用 ffmpeg 从每镜中点按原分辨率解码，不缩放、不烧时间戳；骨架只填实测入出点与帧路径，其余均待核对。按 `short-drama` 的 `references/video-remake.md` 把骨架接入 `项目开发/原片拆解.md` 并调整帧的项目相对路径；项目编排归 `short-drama`，媒体验收归 `short-drama-review`，本技能只产原片证据与白模预演。
+→ 在代表帧目录另产 `SRC-01.jpg` 等、`shots.json` 与 `原片拆解.md` 骨架。代表帧用 ffmpeg 从每镜中点按原分辨率解码，不缩放、不烧时间戳；骨架只填实测入出点与帧路径，其余均待核对。按 `short-drama` 的 `../drama-skills/skills/short-drama/references/video-remake.md` 把骨架接入 `项目开发/原片拆解.md` 并调整帧的项目相对路径；项目编排归 `short-drama`，媒体验收归 `short-drama-review`，本技能只产原片证据与白模预演。
 
 ### 2. 台词提取（ASR + OCR 两路并行，必须都做）
 - **OCR 烧录字幕（首选，准）**：视频有内嵌字幕时

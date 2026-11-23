@@ -1,7 +1,7 @@
 # H3 高风险写法对照表（症状层：写词被打回 / 成片出现已知崩坏模式时打开）
 
 > 本表是**查表用**，不是每次写词都要通读。写词时的加载期纪律在 `SKILL.md`（六段/三段结构、标签、时间戳）；
-> 参考图职责见 `short-drama/references/reference-roles.md`（含“控制范围挡不住画质”）；一次挂几张、强身份特征、小尺寸身份下限也在同一文件「一次挂几张参考图」；生成前物理自查在 `h3-video-gate/references/checklist.md` §10b。
+> 参考图职责见 `../../drama-skills/skills/short-drama/references/reference-roles.md`（含“控制范围挡不住画质”）；一次挂几张、强身份特征、小尺寸身份下限也在同一文件「一次挂几张参考图」；生成前物理自查在 `../../h3-video-gate/references/checklist.md` §10b。
 
 ## 写法 → 已知崩坏模式 → 替代写法（全部实测）
 
@@ -144,7 +144,7 @@ subject_definitions:
 | 同场续接（动作/时空连续） | 段内连续运镜不立切；或 I2VA 单锚首帧（锚帧需已验收获准复用；本地默认每段独立起链） | 用未验收或被拒段的尾帧作锚 |
 | 合理硬切（新信息） | Ref2VA + `[Shot N] At ... cuts to ...`；跨段时靠同向运镜/遮挡匹配/换主体接 | **同帧回锚 + 硬切节奏叠加**（v5 病灶） |
 
-## 尾部运动谷（EP01 实测，2026-10-23；工具 `smooth3d/ep01_v6/tools/seam_motion_profile.py`、`exp_qc.py`）
+## 尾部运动谷（EP01 实测，2026-10-23；工具为项目内 seam_motion_profile.py 与 exp_qc.py，不入本仓库）
 
 「首尾帧一模一样，但还是会卡」的成因不是像素跳变，是**运动在段尾塌陷**（画面静止 0.5–0.9 s = 顿挫）。
 

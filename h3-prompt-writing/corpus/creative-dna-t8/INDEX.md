@@ -15,10 +15,10 @@
 ## 全量检索（关键词）
 
 ```bash
-python3 ~/.skills/hub/h3-prompt-writing/corpus/creative-dna-t8/search.py 关键词 [关键词...]
+python3 corpus/creative-dna-t8/search.py 关键词 [关键词...]
 ```
 
-例：`python3 ~/.skills/hub/h3-prompt-writing/corpus/creative-dna-t8/search.py 身份 情绪 停顿`。脚本按官方中文标题、机制、摘要、标签、适用面匹配，输出原文路径；一次只读命中的一张卡。全量清单见 [MASTER-INDEX.md](MASTER-INDEX.md)。
+例：`python3 corpus/creative-dna-t8/search.py 身份 情绪 停顿`（在本技能目录下运行）。脚本按官方中文标题、机制、摘要、标签、适用面匹配，输出原文路径；一次只读命中的一张卡。全量清单见 [MASTER-INDEX.md](MASTER-INDEX.md)。
 
 ## 按镜头要解决的问题选卡（写作前定时用，一次只读一张）
 

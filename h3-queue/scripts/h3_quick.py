@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """h3_quick.py -- 快捷出片：一条命令选档位，不用碰 lib_workflow.py。
 
-在 win-desktop 上运行：
-  E:\\ComfyUI\\ComfyUI_windows_portable\\python_embeded\\python.exe -s h3_quick.py ^
+在渲染机（Windows）上、ComfyUI 的内嵌 python 下运行：
+  <ComfyUI 内嵌 python.exe> -s h3_quick.py ^
      --tier draft|hq|int8 --mode i2va|ref2va --prompt-file P --first-frame F ^
      [--refs a.png,b.png] [--width 768 --height 1344 --frames 107 --seed 11] ^
      [--slug myshot] [--dry-run] [--submit]
@@ -15,7 +15,7 @@
 """
 import sys, os, json, argparse, time, urllib.request, urllib.error
 
-sys.path.insert(0, r"E:\H3-Studio\scripts")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # lib_workflow 与本脚本同目录
 import lib_workflow as W
 
 PORT = 8199
@@ -171,7 +171,7 @@ def main():
         "peak_vram_gib": round(peak, 2), "prompt_id": pid,
         "outputs": paths, "workflow": g,
     }
-    mp = r"E:\H3-Studio\renders\quick_%s.json" % a.slug
+    mp = os.path.join(os.environ.get("H3Q_OUT_DIR", "renders"), "quick_%s.json" % a.slug)
     with open(mp, "w", encoding="utf-8") as f:
         json.dump(meta, f, ensure_ascii=False, indent=2)
     print("META " + mp)

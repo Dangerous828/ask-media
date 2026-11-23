@@ -16,7 +16,7 @@ metadata:
 
 # video-shot-reverse — 视频逐镜反推
 
-> **注意**：本技能把视频动作**拆成文字**。如果用户要的是“把参考视频直接喂给模型，让角色照着做（含参考音轨）”，那是另一条通道，读 `h3-queue/references/video-motion-drive.md`，不要走本技能。
+> **注意**：本技能把视频动作**拆成文字**。如果用户要的是“把参考视频直接喂给模型，让角色照着做（含参考音轨）”，那是另一条通道，读 `../h3-queue/references/video-motion-drive.md`，不要走本技能。
 
 **扒片**是把眼睛看到的翻译成模型听得懂的。这套活最难的不是技术，是**克制**：看不清就说看不清，
 没听到就说没听到，拿不准标「疑似」放进备注。翻过的车几乎都翻在「你以为你看见了」。
@@ -104,5 +104,5 @@ metadata:
 - 逐镜 schema、边界判定表、证据分级、标签、翻译层与 12 条 QC：[反推格式](references/reverse-format.md)
 - 九份准备文档的清单、落盘路径与回填对账：[逆推准备文档体系](references/reverse-documents.md)
 - 逆推与正推的 merge 索引（护栏、更严项、验收层顺序）：[消费场景](references/consumers.md)
-- 复刻项目的回填节与代表帧登记：`drama-skills/skills/short-drama/references/video-remake.md`
+- 复刻项目的回填节与代表帧登记：`../drama-skills/skills/short-drama/references/video-remake.md`
 - 目标通道方言：MiniMax H3 → `h3-prompt-writing`；SD2 caption 词表只在该通道使用

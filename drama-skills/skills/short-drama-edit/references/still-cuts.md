@@ -40,7 +40,7 @@
 静帧上的运镜是一个在画面上移动的取景框。它替代不了表演，只负责把注意力推到该看的地方：
 
 六个方向词（推近/拉远/左移/右移/上移/下移）、幅度 1–30、速度 0.1–10%/秒与反向对照表的
-权威来源是 `skills/short-drama/scripts/enums.py`（`edit_tool.py` 的本地拷贝由
+权威来源是 `../../short-drama/scripts/enums.py`（`edit_tool.py` 的本地拷贝由
 `tests/test_enum_single_source.py` 逐词锁定，改词表先改 enums.py）。本节保留的是
 每个词**什么时候用**的判断：
 

@@ -58,7 +58,7 @@
 `short-drama-direct` 拥有这一层。它不写视频提示词，而是保存后续阶段必须继承的观看决定：
 整集观看终点与参考边界；每场戏剧行动、转折与承受、观众知情、观看方案、空间与声音；
 以及镜头计划的来源、职责、入场状态、主要变化和离场交接。格式见
-`skills/short-drama-direct/assets/director-template.md`。
+`../../short-drama-direct/assets/director-template.md`。
 
 单场写作只带本场原文、上一场真实离场状态、本场必要视觉条目和当前输出格式，避免在长上下文中
 用近期样例替代剧本事实。导演阶段不写每镜秒数、reads 时间窗或关键帧；这些属于正式分镜。

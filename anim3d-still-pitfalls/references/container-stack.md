@@ -24,7 +24,7 @@ A plastic delivery bag supports a round white porcelain bowl; the bowl holds cle
 | 半开/开盖 | 盖的倾靠位置、盖下侧水珠、开口范围 |
 | 吃空见底 | 底部油迹、少量残渣的实际位置 |
 
-实测条件：win-desktop · Qwen-Image 2.1 · 垫图通路。只写 `sealed under a clear lid` 曾被“食物展示倾向”推翻成敞口。可在同通路反复失守时尝试：
+实测条件：<渲染主机SSH别名> · Qwen-Image 2.1 · 垫图通路。只写 `sealed under a clear lid` 曾被“食物展示倾向”推翻成敞口。可在同通路反复失守时尝试：
 
 1. 核对现有参考是否本身敞口；必要时选用已接受且只含所需状态的参考，或从合规定稿派生容器局部；
 2. 文字补充与当前状态一致的具体可见细节，例如盖内侧冷凝薄膜。

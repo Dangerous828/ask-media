@@ -1,7 +1,7 @@
 # 《咕角色C嘎》真实项目实测
 
 日期 2026-10-22
-对象：`~/Code/kTool/example-project/`（648 MB，EP01 已返修 4 轮）
+对象：`~/projects/example-project/`（648 MB，EP01 已返修 4 轮）
 
 ---
 
@@ -34,7 +34,7 @@ def submit_and_wait(graph, target_name):
 
 ### 第三个问题：3 张参考图在本地项目缺 1 张
 
-| 参考图 | 本地项目 | win-desktop input |
+| 参考图 | 本地项目 | <渲染主机SSH别名> input |
 |---|---|---|
 | `kf_s04_anime_sunlit.png` | ✓ | ✓ |
 | `gugu_turnaround_smooth3d.png` | ✓ | ✓ |

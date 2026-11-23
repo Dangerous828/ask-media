@@ -80,7 +80,7 @@ from screenplay word counts instead of the scene's sound timeline (`SHT-28`).
 - Does the keyframe prose begin with the seven-slot camera-language anchor — shot size,
   horizontal angle and axis side (or “no axis”), camera height, lens intent, composition
   layers, focus plane, frame phase — without overriding the shot's accepted framing or
-  axis? See `$short-drama-storyboard` → `references/keyframe-camera-language.md`.
+  axis? See `$short-drama-storyboard` → `../../short-drama-storyboard/references/keyframe-camera-language.md`.
 - Does it avoid ordered actions, performance arcs, camera moves, or transforming
   environments?
 - Read the finished keyframe text, not the shot's intent: is every visible character,

@@ -1,0 +1,24 @@
+subject_definitions:
+<Subject 1> is the chubby toddler boy from the character reference images: an oversized round head on a small soft body, big round amber-brown eyes with large white catchlights, a tiny button nose, full rosy cheeks, tousled dark-brown hair with a soft fringe across the forehead and a few strands sticking up, wearing a cream short-sleeve t-shirt with thin mustard stripes and small giraffe prints, mustard-yellow knee-length shorts, and light-grey strappy sandals, with a small neat smear of red oil at the corner of his mouth.
+<Subject 2> is the young mother from the character reference image: a young Chinese mother with shoulder-length dark hair tied in a low ponytail, a warm smiling face with curved eyes, wearing a soft beige cardigan over a white top.
+<Subject 3> is the sunny courtyard from the composition anchor <Picture 1>: green lawn, wooden fence, the white weathered wooden table small in the distant right third of the frame with <Subject 2> sitting at it, soft tree shade.
+<Picture 1> is the composition anchor for [Shot 1]: <Subject 1> standing full-body slightly left of center on the lawn, one eye winked shut, belly pushed forward, one palm resting on his belly, the red-oil smear on his mouth corner.
+
+summary:
+[reference generation + keyframe completion] The target video is a 5.88-second vertical 3D-animated full-body shot. <Subject 1> winks, pushes out his little belly, pats it twice with pride, while <Subject 2> laughs at the distant table. The characters' identities follow the reference images; the composition follows <Picture 1>.
+
+retention_analysis:
+<Subject 1> (appears in [Shot 1]): fully_preserved - the toddler's identity, outfit, and the red-oil smear at his mouth corner are retained exactly.
+<Subject 2> (appears in [Shot 1]): fully_preserved - the mother stays small at the distant table on the right third, laughing.
+<Subject 3> (appears in [Shot 1]): fully_preserved - the lawn, fence, tree shade and the white table small on the right third are retained.
+<Picture 1> ([Shot 1] composition anchor): fully_preserved - the full-body framing, the wink, and the belly-proud pose are retained; the boy's whole body stays inside the frame at all times.
+
+detailed_description:
+The target video is a vertical 3D CG animated shot in the style of a modern animated feature: soft subsurface scattering on skin, soft global illumination, warm filmic grade, shallow depth of field. High warm afternoon sun from the upper right, dappled light on the lawn.
+[Shot 1] The camera holds a static full-body shot and pushes in with small amplitude at slow speed, about eight percent closer over the whole shot. At 00:00.000, <Subject 1> stands full-body slightly left of center on the sunny lawn, the white wooden table small in the distant right third where <Subject 2> sits. Between 00:00.000 and 00:01.200, his winked eye opens for a blink and squeezes back into the wink, one full wink cycle. Between 00:01.200 and 00:02.500, his little belly pushes forward and holds. Between 00:02.500 and 00:04.000, his palm pats his belly twice, pat-pat, and rests there. Between 00:04.000 and 00:05.880, the camera completes its slow push-in; at the distant table <Subject 2> laughs, her shoulders trembling lightly, her voice warm and off-hand. The boy holds his proud pose - wink, belly out, palm on belly, red-oil smear at his mouth corner - his whole body inside the frame until the shot ends at 00:05.880.
+
+overall_soundscape:
+Outdoor courtyard ambience with birdsong and breeze, two soft patting sounds on a small belly, and a distant mother's warm laughter.
+
+non_diegetic_music:
+A bouncy, proud little brass-and-woodwind figure at a cheerful tempo, like a tiny victory fanfare, swelling slightly at the push-in and ending with a short button.

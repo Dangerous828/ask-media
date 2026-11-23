@@ -17,7 +17,7 @@
 - **影像任务先读 [ask-media](ask-media/SKILL.md)** 选路；产物自审的恒常要求见 [开发纪律](ask-media/references/discipline.md)。
 - **短剧协作**：现用技能继续实际写作、验收与执行；按 [协作契约](SHORT-DRAMA-ROUTING.md) 读取命中分支的项目/资产/连续性规则，不一律先转交short-drama。跨阶段、状态与初始化才用总路由。
 - 先读项目当前剧本、已接受的画风／观看体验和真实产物，沿用项目已验收写法。保留创作者原文与已确认剧情；涉及核心动作、画风或结局的真实分叉才交创作者决定，其余明确部分继续完成。
-- **`ask-studio` 已停用**（2026-10-22）：路由与切镜流程不再执行；其参考资料仅作历史保留在 `.archive/ask-studio/`，现用技能需要的判据已内联，不从归档读取规则。`ask-media` 只承接入口选路，不恢复其切镜流程与正文。
+- **`ask-studio` 已停用**（2026-10-22）：路由与切镜流程不再执行；其参考资料的历史归档未随公开版发布，现用技能需要的判据已内联，不从归档读取规则。`ask-media` 只承接入口选路，不恢复其切镜流程与正文。
 
 - 本文件以下各节（1–5）保存跨阶段纪律与禁令，**不再是按任务查入口的地方**；入口与阶段判据见上两处。
 
@@ -62,8 +62,8 @@
 ### 5. 画幅、操作台与渠道资料
 
 - 画幅服从创作者已确认规格和项目当前事实，不默认横屏或竖屏。有真实产物时读图片尺寸／`ffprobe` 并对账；只有剧本时使用已给规格，不为检查要求不存在的媒体。冲突说明后按创作者决定对齐。
-- **贞贞的无限画布 = `T8mars/T8-penguin-canvas`（本机 `/Applications/T8-PenguinCanvas.app`）**；`~/Code/kTool/ai-video-studio` 是本家自研工作台，二者不得混用。
-- 只有操作画布时读 [画布操作手册](.archive/ask-studio/references/zhenzhen-canvas.md)；只有查生产仓库地图或渠道边界时读 [渠道目录](.archive/ask-studio/references/channels.md) §五、§六。这两份是渠道资料，与 ask-studio 技能本体无关；ask-studio 的路由与切镜流程已删除，不恢复为创作总入口。
+- **贞贞的无限画布 = `T8mars/T8-penguin-canvas`（本机 `/Applications/T8-PenguinCanvas.app`）**；`~/projects/ai-video-studio` 是本家自研工作台，二者不得混用。
+- 画布操作手册与渠道目录两份资料存内部归档（未随公开版发布）；ask-studio 的路由与切镜流程已删除，不恢复为创作总入口。
 
 ## 文字创作与发布
 

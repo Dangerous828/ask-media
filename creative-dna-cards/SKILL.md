@@ -20,10 +20,10 @@ description: "查 Creative DNA / T8 镜头机制卡全量库。当用户要找�
 一句话需求先按关键词查，不要通读全量库：
 
 ```bash
-python3 ~/.skills/hub/h3-prompt-writing/corpus/creative-dna-t8/search.py 关键词 [关键词...]
+python3 ../h3-prompt-writing/corpus/creative-dna-t8/search.py 关键词 [关键词...]
 ```
 
-脚本按官方中文标题、机制、摘要、标签、适用面匹配，输出原文路径。全量标题清单在 `~/.skills/hub/h3-prompt-writing/corpus/creative-dna-t8/MASTER-INDEX.md`；按症状精选的入口在 `INDEX.md`。
+脚本按官方中文标题、机制、摘要、标签、适用面匹配，输出原文路径。全量标题清单在 `../h3-prompt-writing/corpus/creative-dna-t8/MASTER-INDEX.md`；按症状精选的入口在 `INDEX.md`。
 
 命中后**只读一张卡**：读该卡的 `SKILL.md` + `summary.md` + `template.md` 逐字原文，不要只看中文摘要。
 
@@ -39,7 +39,7 @@ python3 ~/.skills/hub/h3-prompt-writing/corpus/creative-dna-t8/search.py 关键�
 
 ## 正常生产链怎么接
 
-当前链路见 [PRODUCTION-INTEGRATION.md](~/.skills/hub/h3-prompt-writing/corpus/creative-dna-t8/PRODUCTION-INTEGRATION.md)：准备检索 → ④ 导演采纳／③ 资产回补 → ⑤ 场记落实 → ⑥ 分镜证明 → ⑦⑧ 提示词继承 → ⑨⑩ 生产与独立验收 → ⑪ 剪辑采用。完整交接约定见 [语料机制与剪辑准备](../drama-skills/skills/short-drama/references/mechanism-preparation.md)。FAIL 是验收的正常输出；返工可查卡换路线，但须回对应 owner 更新决定。
+当前链路见 [PRODUCTION-INTEGRATION.md](../h3-prompt-writing/corpus/creative-dna-t8/PRODUCTION-INTEGRATION.md)：准备检索 → ④ 导演采纳／③ 资产回补 → ⑤ 场记落实 → ⑥ 分镜证明 → ⑦⑧ 提示词继承 → ⑨⑩ 生产与独立验收 → ⑪ 剪辑采用。完整交接约定见 [语料机制与剪辑准备](../drama-skills/skills/short-drama/references/mechanism-preparation.md)。FAIL 是验收的正常输出；返工可查卡换路线，但须回对应 owner 更新决定。
 
 ## 硬边界
 

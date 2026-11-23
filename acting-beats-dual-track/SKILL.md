@@ -59,9 +59,9 @@ description: 已有分镜后，为每一镜写演员表演节拍（意图 / 手�
 ## 7. 下游衔接
 
 - **静帧**：节拍里"决定性一秒"的那一拍是关键姿势（pose_proof，仅供审查），交给 `doc-still-prompt` 写成态度锚点句；视频首帧仍是本镜 0 秒起点，不用这一拍开场。
-- **H3 视频**：节拍转写进 `detailed_description` 时，改成带边界的英文动作句与时间点（"tilts his head slightly and holds"；不写度数、厘米或亚秒错拍，H3 执行不了这种精度），不带风格词；说话与不说话的人按 `h3-prompt-writing/SKILL.md` 的规范写明。
+- **H3 视频**：节拍转写进 `detailed_description` 时，改成带边界的英文动作句与时间点（"tilts his head slightly and holds"；不写度数、厘米或亚秒错拍，H3 执行不了这种精度），不带风格词；说话与不说话的人按 `../h3-prompt-writing/SKILL.md` 的规范写明。
 - 转换例：演员节拍写“听到报价后掩饰失望，指腹停在盒沿，目光从价签移到店员”；静帧只取指定时刻的手位与视线；H3 反应镜可写 `He masks his disappointment; his fingertip stops on the box rim, then his gaze lifts from the price label to the clerk.`。这是转换示例，不代表新增动作已获项目授权或模型效果已验证。
-- 与 `storyboard-30s/references/performance-micro.md` 的情绪→身体翻译表配合使用。
+- 与 `../storyboard-30s/references/performance-micro.md` 的情绪→身体翻译表配合使用。
 
 ## 自检
 

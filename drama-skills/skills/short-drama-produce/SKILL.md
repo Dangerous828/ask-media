@@ -1,5 +1,6 @@
 ---
 name: short-drama-produce
+version: 1.0.0
 description: 在创作者明确确认后，执行短剧项目的图片、视频、TTS/配音或时间线音乐生产任务，并把结果与精简运行记录落回项目。用户说“生成这张图/这段视频/这句配音/这段配乐”“开始跑图/跑视频/合成语音/生成音乐”“把已确认提示词送去生产”，或要求批量执行已确认媒体任务时使用；不负责创作提示词、镜头、台词、歌词或声音身份，也绝不把预览、继续、预算说明或既有接受状态当作本次付费生产确认。
 license: MIT
 ---
@@ -22,11 +23,11 @@ license: MIT
 warn 逐条说明处理理由；退出码不作为能否继续的依据。会硬拦截的是：参考图准入（`ref_gate`）、真正提交付费生成，以及生产选帧——`SHOT-...#KF-...` 必须解析到《分镜.md》`画面证明计划` 里唯一的 role，`用途：起始帧` ⇔ `first_frame`、`用途：结束帧` ⇔ `last_frame` 必须成对。
 ## 自看硬规则
 
-任何产物出来都要自己看过才往下走：**视频一秒一帧，闸门过了不算看过。** 完整细则与"什么叫不算看过"见 `ask-media` 技能的 `references/discipline.md`，本条不复述。
+任何产物出来都要自己看过才往下走：**视频一秒一帧，闸门过了不算看过。** 完整细则与"什么叫不算看过"见 `ask-media` 技能的 `../../../ask-media/references/discipline.md`，本条不复述。
 
 ## 语料与剪辑准备的继承
 
-消费当前分镜与提示词中已落实的证明段、状态与接续素材需求。条件未定先回 owner；生产不临场改戏。按真实产物复核可用带及运动余量，clone 定格不算真实运动余量；新生产仍遵守本次授权与逐条验收。完整分工与就绪判据见 语料机制与剪辑准备（`short-drama` 技能 `references/mechanism-preparation.md`）。新增散文条件由人工回读，现有检查器不自动核验。
+消费当前分镜与提示词中已落实的证明段、状态与接续素材需求。条件未定先回 owner；生产不临场改戏。按真实产物复核可用带及运动余量，clone 定格不算真实运动余量；新生产仍遵守本次授权与逐条验收。完整分工与就绪判据见 语料机制与剪辑准备（`short-drama` 技能 `../short-drama/references/mechanism-preparation.md`）。新增散文条件由人工回读，现有检查器不自动核验。
 
 ## Quick Start
 
@@ -91,7 +92,7 @@ creator-first job 必须从 `图片提示词.md`、`分镜.md` 或 `视频提示
 ## 视频先出草稿档（硬规则，2026-11-01）
 
 本地 h3q 视频 job 的 `parameters.tier` 缺省就是 `draft`（当前引擎 `pdd`：8 步蒸馏、1024×576 首采，362 帧约 285 秒；不是 15–26 分钟的 20 步正式档）。
-档位、引擎与实际参数的唯一权威是 `h3-queue/SKILL.md` §2.8 的「视频引擎 / 视频档位」PDD 契约；本技能只规定创作侧的确认顺序，不在这里重定义档位。
+档位、引擎与实际参数的唯一权威是 `../../../h3-queue/SKILL.md` §2.8 的「视频引擎 / 视频档位」PDD 契约；本技能只规定创作侧的确认顺序，不在这里重定义档位。
 
 1. 新写或改过的段**先出 draft**，给创作者看构图、运动方向、身份和因果（`prepare` 的 preview 里 `tier_note` 字段会显示 ⚠️ DRAFT）。**草稿只用于验收，不进剪辑，不作为交付素材**。跨会话继续时必须重新确认 tier——缺省就是 draft，不会自动升档；不要一上来 `final`。
 2. 创作者认可某段草稿后，才为它建 `tier: final` 的 job；prepare 预览必须能看出这是 final、且对应哪段已验收草稿。`draft_job_id` / `draft_accepted` 是 lu2 时代的 latent 接续凭据，pdd 分支不读取；可以写进记录便于追溯，但不要把它当成 latent 接续承诺。
@@ -137,7 +138,7 @@ python3 <本技能目录>/scripts/production_tool.py audit <project>
   上下文续接的入口按其角色组合提交，不以计划尾帧或文字代替真实文件。本地 h3q 不接受
   `reference_video`：若上游要求继承整段运动/声音上下文，就回 video-prompts 重设计；若上游已经
   选择单帧视觉接力，则可提交已验收的真实尾帧为下一段 `first_frame`，注明只继承可见状态、
-  不继承原运动或音频。首尾配对与全参考互斥，当前范围见 h3-queue 输入能力（`h3-queue/SKILL.md`）。上一段必须已在审查技能
+  不继承原运动或音频。首尾配对与全参考互斥，当前范围见 h3-queue 输入能力（`../../../h3-queue/SKILL.md`）。上一段必须已在审查技能
   通过画风验收并批准复用，它的帧才可能进入下一段。creator-first 视频 job 还会把同集 `剧本.md`
   纳入确认输入指纹和私有快照；项目存在 `h3-series-config.json` 时也一并固定，供跨镜身份与时间检查。
   本地 h3q adapter 在上传前逐字核对实际 `<d>` 台词。旧的已确认任务若快照没有剧本会明确标记 NOTCHK，
@@ -180,9 +181,9 @@ adapter 配置必须在项目外，只包含 argv 命令和超时；凭据由 ad
 - [MiniMax H3 视频](references/providers/minimax-h3-video.md)：模型 ID、分辨率集合与时长区间必须
   由账号显式配置；提示词进 `content` 的 text 项，参考图按显式 role 绑定，本地参考在没有可信上传时
   fail closed。该模型与画面同一次生成声音，写法影响见视频提示词技能的目标模型能力档案。
-- **本地 h3q（本机默认视频/图片通道）**：`h3-queue` 技能的 `scripts/short_drama_h3q_adapter.py`，
+- **本地 h3q（本机默认视频/图片通道）**：`h3-queue` 技能的 `../../../h3-queue/scripts/short_drama_h3q_adapter.py`，
   adapter profile `local-h3q-video` / `local-h3q-image`，配置示例见 h3-queue「2.8」。它经 h3q 队列
-  提交到 win-desktop，不需要云端 API Key，也绝不直连 ComfyUI。输入组合与部署核验查 h3-queue 输入能力（`h3-queue/SKILL.md`）：
+  提交到 <渲染主机SSH别名>，不需要云端 API Key，也绝不直连 ComfyUI。输入组合与部署核验查 h3-queue 输入能力（`../../../h3-queue/SKILL.md`）：
   单首帧、首尾配对或全参考互斥；没有参考视频、参考音频或无图文生。项目档案须采用 `minimax-h3` 方言中的「本地 h3q 通道档案」；
   档案仍写云端 `minimax-h3` 却要走本地通道时，先让 video-prompts owner 改档案和受影响条目再投产。
 
@@ -229,10 +230,10 @@ Magpie MCP 三条路径都走同一个 `ref_gate`，因此都会自动生效。
 声明职责而文件名无标记时，走 `cast_exempt` 或改用带 bindings 的通道。
 
 补覆盖机位、换角度、末帧延展时尤其容易漏：换了机位不换身份，参考组仍要带齐本镜出场角色的身份板，
-做法见 `video-studio` 技能的 `references/craft/base-action-coverage.md`（基础动作 → 覆盖机位）。
+做法见 `video-studio` 技能的 `../../../video-studio/references/craft/base-action-coverage.md`（基础动作 → 覆盖机位）。
 
 上述检查由共享 `ref_gate.py check` 统一执行。默认安装位置是技能中枢的
-`~/.skills/hub/drama-skills/skills/short-drama-review/scripts/ref_gate.py`：`production_tool.py` 从本技能目录按
+`../short-drama-review/scripts/ref_gate.py`：`production_tool.py` 从本技能目录按
 `../short-drama-review/scripts/ref_gate.py` 解析共享副本，解析不到才回退到同目录的 `scripts/ref_gate.py`；
 adapter 侧可用 `SHORT_DRAMA_REF_GATE` 显式覆盖共享副本路径，`production_tool.py` 按这两级解析、不读该变量。
 `~/.agents/skills/...` 只是同步目标，不作为默认源。生产私有快照会按原项目相对路径带上

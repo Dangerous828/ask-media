@@ -2,8 +2,8 @@
 
 - 验证状态：**通过**（纯文生图两轮后达成基本复刻）
 - 通道：本地 h3q · Qwen Image 2.1，1088×1408，seed 42，cfg 4.5（r1 为 3.5），40 步标准档，无参考图
-- 出图证据：`~/Code/kTool/research/t2i-contract-regression-20261106/output/compare-S02-r2.png`
-- 原图：`~/Code/kTool/recreate-20261106/refs/ref02-kitchen-girl.png`
+- 出图证据：`~/projects/research/t2i-contract-regression-20261106/output/compare-S02-r2.png`
+- 原图：`~/projects/recreate-20261106/refs/ref02-kitchen-girl.png`
 
 ## 原图观察
 

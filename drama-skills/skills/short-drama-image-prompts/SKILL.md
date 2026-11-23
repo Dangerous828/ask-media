@@ -1,5 +1,6 @@
 ---
 name: short-drama-image-prompts
+version: 1.0.0
 description: 为短剧人物、造型、地点、道具和状态编写或修改可直接复制的图片提示词 Markdown。用户提到角色设定图、三视图、参考图、场景板、道具图、风格帧、Look Development、状态变体或局部编辑提示词时使用；不生成图片，也不调用供应商。
 license: MIT
 ---
@@ -20,7 +21,7 @@ license: MIT
 
 ## 语料与剪辑准备的继承
 
-按已接受的机制需求落实资产状态变体与指定瞬间，状态名取视觉设定、连续性值取场记；终态不能提前进起始帧。纯后期效果只准备其所需元素，不让生成预烘焙。完整分工与就绪判据见 语料机制与剪辑准备（`short-drama` 技能 `references/mechanism-preparation.md`）。新增散文条件由人工回读，现有检查器不自动核验。
+按已接受的机制需求落实资产状态变体与指定瞬间，状态名取视觉设定、连续性值取场记；终态不能提前进起始帧。纯后期效果只准备其所需元素，不让生成预烘焙。完整分工与就绪判据见 语料机制与剪辑准备（`short-drama` 技能 `../short-drama/references/mechanism-preparation.md`）。新增散文条件由人工回读，现有检查器不自动核验。
 
 ## Quick Start
 
@@ -53,7 +54,7 @@ license: MIT
    分镜来源的状态/端点图读取其显式 `composition / start / pose_proof / end`、时刻与七项镜头字段，
    在可复制引用块外保留 `- 镜头语言：...`，正文写可见取景和该瞬间状态；role、相位标签、
    后续运镜及排除项留说明层，不重设计机位。字段定义由 `$short-drama-storyboard` 的
-   `references/keyframe-camera-language.md` 持有。
+   `../short-drama-storyboard/references/keyframe-camera-language.md` 持有。
 4. 每张参考只控制身份、造型、地理、构图或风格中的明确部分，并在 `REF-...` 槽位里写出封闭词表中的 `用途`。
 5. 检查身份与变体、文字政策、视角和光线是否冲突。
 6. 用户要全部资产就完成全部，资产组只是内部批次。
@@ -82,7 +83,7 @@ license: MIT
 - 造型和状态变体：[造型与状态变体](references/look-and-state-variant.md)
 - 多对象组合板：[Production Sheet 配方](references/production-sheet-recipes.md)
 - 比较视觉方向的代表帧：[Lookdev 风格帧](references/lookdev-frame.md)
-- 分镜关键帧的七项镜头语言锚点：`$short-drama-storyboard` 的 `references/keyframe-camera-language.md`
+- 分镜关键帧的七项镜头语言锚点：`$short-drama-storyboard` 的 `../short-drama-storyboard/references/keyframe-camera-language.md`
 - 局部修改和 preserve set：[定点修改](references/edit-and-revision.md)
 - 完成前的可生成性检查：[审查与示例](references/review-and-fixtures.md)
 

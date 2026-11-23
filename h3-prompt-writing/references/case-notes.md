@@ -155,7 +155,7 @@ def motion_per_sec(frames):          # frames: 灰度图列表
 
 ---
 
-## C · Occlusion Transitions (实测 2026-10-20，win-desktop · H3 · 24fps · 1248×704)
+## C · Occlusion Transitions (实测 2026-10-20，<渲染主机SSH别名> · H3 · 24fps · 1248×704)
 
 场景要换、但**不能留下切点**时，用「遮挡扫过」代替转场。观感上比后期叠化/擦除更干净，
 因为遮挡期间画面信息量趋近于零，模型换成什么都看不见。
@@ -274,7 +274,7 @@ def occlusion_ok(text):
 
 ---
 
-## D · 接缝实施边界：跨段拼接的顿挫与鬼影（实测 2026-11-03，win-desktop · h3q · 24fps · 1344×768）
+## D · 接缝实施边界：跨段拼接的顿挫与鬼影（实测 2026-11-03，<渲染主机SSH别名> · h3q · 24fps · 1344×768）
 
 **两段独立生成的视频，拼接帧处必然存在「纹理噪声 + 光流场模式」的双重突变。** 30s 一镜到底复刻中实测四种接缝实施：
 
@@ -301,7 +301,7 @@ A second, complementary prompt architecture. Where the official six-section form
 *fields*, Creative DNA fixes *causal mechanism*. Use it when a brief describes a repeatable
 beat pattern (a greeting, a reveal, a chase payoff) rather than a one-off scene.
 
-Each DNA case is a folder with `SKILL.md` + `references/summary.md` + `references/template.md`:
+Each DNA case is a folder with SKILL.md plus its references/summary.md and references/template.md:
 
 - **Mechanism** — one sentence naming the reusable causal chain (e.g. "five small state
   changes: side orientation → direct gaze → downward pause → peak smile → open recovery").
@@ -346,7 +346,7 @@ before codifying.**
 Corpus: hundreds of cases under `skills/` in the T8 repo (7.3 GB total incl. videos — fetch
 only `SKILL.md` + `references/` per case). Two worked examples archived locally at
 `prod1017/community/vendor_promptskill/case1` and `case2`. Tested as experiment V4
-(`eval_prompt/V4_t8_dna.txt`) against the plain six-section baseline V0.
+(the V4 T8 DNA variant, kept in the internal engineering archive) against the plain six-section baseline V0.
 
 ---
 
@@ -377,7 +377,7 @@ only `SKILL.md` + `references/` per case). Two worked examples archived locally 
 
 ---
 
-## G · Multi-Space Long-Take State Chain（实测 2026-11-03，win-desktop · h3q · 24fps · 14.59s 定稿）
+## G · Multi-Space Long-Take State Chain（实测 2026-11-03，<渲染主机SSH别名> · h3q · 24fps · 14.59s 定稿）
 
 **适用边界**：本地容量档单次 ≤15s、空间可以连续走通。超过 15s 或必须分次生成时，先读 §Shot Joining: Three Layers——不要在剪辑层硬拼。
 

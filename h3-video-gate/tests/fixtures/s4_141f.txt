@@ -1,0 +1,24 @@
+subject_definitions:
+<Subject 1> is the chubby toddler boy from the character reference images: an oversized round head on a small soft body, big round amber-brown eyes with large white catchlights, a tiny button nose, full rosy cheeks, tousled dark-brown hair with a soft fringe across the forehead and a few strands sticking up, wearing a cream short-sleeve t-shirt with thin mustard stripes and small giraffe prints, mustard-yellow knee-length shorts, and light-grey strappy sandals.
+<Subject 2> is the young mother from the character reference image: a young Chinese mother with shoulder-length dark hair tied in a low ponytail, a warm smiling face with curved eyes, wearing a soft beige cardigan over a white top.
+<Subject 3> is the sunny courtyard dining setup from the composition anchor <Picture 1>: a white weathered wooden table filling the lower half of the frame, a small colourful water gun resting flat at the center of the table, two white bowls, green lawn and wooden fence behind, high warm afternoon sun.
+<Picture 1> is the composition anchor for [Shot 1]: <Subject 2> on the right pushing a bowl toward <Subject 1>, who sits properly on a wooden chair on the left, feet dangling below the table edge, hands flat on the table edge, glancing sideways at the bowl with pursed lips.
+
+summary:
+[reference generation + keyframe completion] The target video is a 5.88-second vertical 3D-animated two-shot. <Subject 2> pushes a bowl of noodles toward the seated <Subject 1>, who sneaks a glance, then snaps his head forward and purses his lips in refusal. The characters' identities follow the character reference images; the composition follows <Picture 1>.
+
+retention_analysis:
+<Subject 1> (appears in [Shot 1]): fully_preserved - the toddler's face, hair, giraffe-print shirt, mustard shorts, and grey sandals are retained exactly; he stays seated on the chair with his feet below the table, never on it.
+<Subject 2> (appears in [Shot 1]): fully_preserved - the mother's ponytail, beige cardigan and warm smile are retained exactly.
+<Subject 3> (appears in [Shot 1]): fully_preserved - the white table, the water gun resting flat and untouched, the two bowls, and the sunny courtyard are retained.
+<Picture 1> ([Shot 1] composition anchor): fully_preserved - the over-shoulder two-shot framing and table position are retained.
+
+detailed_description:
+The target video is a vertical 3D CG animated shot in the style of a modern animated feature: soft subsurface scattering on skin, soft global illumination, warm filmic grade, shallow depth of field. High warm afternoon sun from the upper right, soft tree shade in the background.
+[Shot 1] The camera holds a static over-the-shoulder two-shot at table height. At 00:00.000, <Subject 2> sits on the right side of the white wooden table and <Subject 1> sits properly on a wooden chair on the left, both feet dangling below the table edge, his small hands flat on the table edge at chest height; the small colourful water gun rests flat and untouched at the center of the table. The mother (S1), in a warm, coaxing adult female voice, says: <d>[Chinese] 来尝尝吧，你吃一口就会爱上的。</d> Between 00:00.000 and 00:01.800, her fingertips push one white bowl across the table toward the boy; the bowl slides and stops at the table's center line. Between 00:01.800 and 00:03.500, the boy's big amber eyes follow the bowl as it moves to his right, his pupils sliding with small amplitude, no head movement. Between 00:03.500 and 00:04.800, he snaps his head back to face forward and presses his lips into one thin stubborn line, holding it. At 00:04.200 the toddler (S2) mumbles with a pout, <d>[Chinese] ……哼。</d> Between 00:04.800 and 00:05.880, <Subject 2>'s smile deepens, her eyes curving, and her fingertip taps the bowl rim twice, tap-tap, then rests. The water gun never moves. The boy stays seated with his feet below the table throughout.
+
+overall_soundscape:
+Outdoor courtyard ambience with birdsong and a light breeze, the soft wooden scrape of the bowl sliding on the table, two light fingertip taps on porcelain, and a child's muffled grunt.
+
+non_diegetic_music:
+A gentle warm acoustic-guitar figure at a moderate tempo, light and amused, staying low under the dialogue.

@@ -3,10 +3,10 @@
 import json, os, time, shutil, subprocess, traceback, urllib.request, urllib.error
 
 BASE = "http://127.0.0.1:8199"
-WD = r"E:\ComfyUI\motion_drive_delivery"
+WD = os.environ.get("MOTION_DRIVE_WD", "motion_drive_delivery")
 GRAPH = os.path.join(WD, "graph.json")
 STATUS = os.path.join(WD, "status.json")
-OUTPUT_ROOT = r"E:\ComfyUI\ComfyUI_windows_portable\ComfyUI\output"
+OUTPUT_ROOT = os.environ.get("COMFYUI_OUTPUT", "ComfyUI/output")
 TARGET = os.path.join(WD, "motion-drive-output.mp4")
 META = os.path.join(WD, "motion-drive-output.meta.json")
 SAVE_NODE = "11"

@@ -58,8 +58,5 @@ description: 3D 动画 / Q 版（竖屏或横屏）的关键帧或角色设定�
 
 以下真实相对指针指向保留的 Slate 原卡，仅供追溯病例；原卡保持不动：
 
-- [container-stack.md](../../../.skills-backup-20261016/slate-workbench-skills/image-style/container-stack.md)
-- [physical-grounding.md](../../../.skills-backup-20261016/slate-workbench-skills/image-style/physical-grounding.md)
-- [performance-dual-track.md](../../../.skills-backup-20261016/slate-workbench-skills/image-style/performance-dual-track.md)
-- [identity-anchor.md](../../../.skills-backup-20261016/slate-workbench-skills/image-style/identity-anchor.md)
-- [doc-still-qban-doctrine.md](../../../.skills-backup-20261016/slate-workbench-skills/image-style/doc-still-qban-doctrine.md)
+- [container-stack.md](references/container-stack.md)
+- physical-grounding / performance-dual-track / identity-anchor / doc-still-qban-doctrine 四张原卡存内部备份档案（未随公开版发布），文件名保留于此仅供追溯。

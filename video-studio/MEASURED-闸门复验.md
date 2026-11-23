@@ -17,7 +17,7 @@
 | 版本溯源：v4s 九段都跑在修好的单段式提示词上 | ✅ 九段「提示词 mtime ≤ 渲染 mtime」全部 OK（见文末命令） |
 | P0-4 退出码语义（三段 exit=1 / 单段 exit=0） | ✅ 用文档的 `/tmp/lintchk/multi.txt` 复造，exit=1 / exit=0 成立 |
 | G08b 裸标签误报已修 | ✅ `h3_gate.py:76,553` 有 `LABEL_RE_ANY`；带 `--frames` 后项目文件不再报 G08b |
-| ask-studio 已停用 | ✅ `~/.skills/hub/.archive/ask-studio/` 存在；AGENTS.md 规则 8 已改写 |
+| ask-studio 已停用 | ✅ `内部归档（未随公开版发布）` 存在；AGENTS.md 规则 8 已改写 |
 
 **文档 §二 的四条元经验，本轮又被印证了一次**（见下面第 3、4 处缺口）——
 它们不是抽象总结，是还能继续复现故障的活判据。
@@ -32,8 +32,8 @@
 
 ```bash
 # 双帧 + 三段式，首行写成 "Picture 1 is the first frame ..." 而不是官方那句 "aligns with the ... mark"
-python3 ~/.skills/hub/video-studio/scripts/h3_lint.py /tmp/lintchk2/full1.txt          # 修复前 exit=0 ✗
-python3 ~/.skills/hub/h3-video-gate/scripts/h3_gate.py /tmp/lintchk2/full1.txt --frames 107 --strict   # 修复前 exit=0 ✗
+python3 video-studio/scripts/h3_lint.py /tmp/lintchk2/full1.txt          # 修复前 exit=0 ✗
+python3 h3-video-gate/scripts/h3_gate.py /tmp/lintchk2/full1.txt --frames 107 --strict   # 修复前 exit=0 ✗
 ```
 
 **根因**：P0-4 的判据是 `has_align = re.search(r"aligns with the .{0,40}?(?:mark|second)", low)`，
@@ -124,20 +124,20 @@ is_fl = (1 in pics and 2 in pics) or (has_align and len(pics) >= 2)
 
 ```bash
 # 帧级复现全部接缝与切点
-cd ~/Code/kTool/example-project/smooth3d/ep01_v4/tools && python3 cut_detect.py
+cd ~/projects/example-project/smooth3d/ep01_v4/tools && python3 cut_detect.py
 
 # 闸门退出码（P0-4 / G28 / G21）
-python3 ~/.skills/hub/video-studio/scripts/h3_lint.py /tmp/lintchk2/full1.txt;         echo $?   # 1
-python3 ~/.skills/hub/video-studio/scripts/h3_lint.py /tmp/lintchk2/official_single.txt; echo $? # 0
-python3 ~/.skills/hub/h3-video-gate/scripts/h3_gate.py /tmp/lintchk2/full1.txt --frames 107 --strict
-cd ~/.skills/hub/h3-video-gate && python3 -m pytest tests/ -q                            # 28 passed
+python3 video-studio/scripts/h3_lint.py /tmp/lintchk2/full1.txt;         echo $?   # 1
+python3 video-studio/scripts/h3_lint.py /tmp/lintchk2/official_single.txt; echo $? # 0
+python3 h3-video-gate/scripts/h3_gate.py /tmp/lintchk2/full1.txt --frames 107 --strict
+cd （仓库根）h3-video-gate && python3 -m pytest tests/ -q                            # 28 passed
 
 # 版本溯源（提示词 mtime ≤ 渲染 mtime）
-cd ~/Code/kTool/example-project/smooth3d/ep01_v4/h3_prompts && stat -f '%Sm %N' -t '%H:%M:%S' *_*.txt
+cd ~/projects/example-project/smooth3d/ep01_v4/h3_prompts && stat -f '%Sm %N' -t '%H:%M:%S' *_*.txt
 
 # 回滚
-mv ~/.skills/hub/video-studio/scripts/h3_lint.py.bak-20261022-1518 ~/.skills/hub/video-studio/scripts/h3_lint.py
-mv ~/.skills/hub/h3-video-gate/scripts/h3_gate.py.bak-20261022-1523 ~/.skills/hub/h3-video-gate/scripts/h3_gate.py
+mv video-studio/scripts/h3_lint.py.bak-20261022-1518 video-studio/scripts/h3_lint.py
+mv h3-video-gate/scripts/h3_gate.py.bak-20261022-1523 h3-video-gate/scripts/h3_gate.py
 ```
 
 **备份**：`h3_lint.py.bak-20261022-1518`、`h3_gate.py.bak-20261022-1523`（改前原件，md5 已核对）。

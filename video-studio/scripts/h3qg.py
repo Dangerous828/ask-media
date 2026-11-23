@@ -39,7 +39,7 @@ h3qc.py 是客户端，每次提交都是新进程，**改完立刻生效、零�
 
 环境
 ----
-    H3QG_SKILL   video-studio scripts 目录（默认 ~/.skills/hub/video-studio/scripts）
+    H3QG_SKILL   video-studio scripts 目录（默认按本仓库内的相对位置）
 
 退出码
 ------
@@ -116,8 +116,7 @@ def split_refs(raw: str) -> list:
         if not p.is_absolute():
             # ComfyUI 的 input 目录；只用于读取判据，不改原图
             p = Path(os.environ.get(
-                "H3QG_INPUT",
-                r"E:\ComfyUI\ComfyUI_windows_portable\ComfyUI\input")) / name
+                "H3QG_INPUT", "ComfyUI/input")) / name
         out.append(p)
     return out
 

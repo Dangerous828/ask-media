@@ -2,12 +2,12 @@
 
 > 适用：A、B 两段已各自出片，同一空间、机位或站位有变，装不进同一次生成。
 > 做法：取 A 的**真实末帧**做 `first_frame`、B 的**真实首帧**做 `last_frame`，走 FL2VA 生成 C；成片 A + C + B，接缝各去掉一帧重复。
-> 判据（同一场景/同一光位/同一集合/一段连续运动能走完）与分流顺序见 `drama-skills/skills/short-drama-video-prompts/references/seam-transition.md` §0.4。本文只管怎么跑通。
+> 判据（同一场景/同一光位/同一集合/一段连续运动能走完）与分流顺序见 `../../drama-skills/skills/short-drama-video-prompts/references/seam-transition.md` §0.4。本文只管怎么跑通。
 
 ## 一条命令跑完
 
 ```bash
-python3 ~/.skills/hub/h3-queue/scripts/transcard.py \
+python3 ../scripts/transcard.py \
   --before 剧集/EP0xx/制作成果/video/A.mp4 \
   --after  剧集/EP0xx/制作成果/video/B.mp4 \
   --prompt-file 脚本/transcard_107f.txt \

@@ -82,7 +82,7 @@ class H3QAdapterContractTest(unittest.TestCase):
             return SimpleNamespace(
                 stdout=json.dumps({
                     "state": "done",
-                    "output": r"E:\H3-Studio\short-drama\job\result" + self.media_suffix,
+                    "output": r"E:\render-root\job\result" + self.media_suffix,
                 }),
                 returncode=0,
             )
@@ -797,12 +797,12 @@ class H3QAdapterContractTest(unittest.TestCase):
 
     def test_resolve_real_image_done_record(self):
         state = {
-            "params": {"out": r"E:\H3-Studio\renders\image.png"},
-            "output": "saved E:/H3-Studio/renders/image.png 1663381 bytes in 27.1s",
+            "params": {"out": r"E:\render-out\image.png"},
+            "output": "saved E:/render-out/image.png 1663381 bytes in 27.1s",
         }
         self.assertEqual(
             adapter.resolve_output({"modality": "image"}, state),
-            r"E:\H3-Studio\renders\image.png",
+            r"E:\render-out\image.png",
         )
 
     def test_image_deduplicated_job_uses_queue_output_path(self):
@@ -811,8 +811,8 @@ class H3QAdapterContractTest(unittest.TestCase):
             fallback=r"E:\retry\result.png"), r"E:\first\result.png")
 
     def test_resolve_real_video_done_record(self):
-        record = r"E:\H3-Studio\renders\video_243frames.json"
-        media = r"E:\ComfyUI\output\h3studio\video_00001_.mp4"
+        record = r"E:\render-out\video_243frames.json"
+        media = r"E:\comfy-output\video_00001_.mp4"
         adapter.ssh = lambda command: SimpleNamespace(stdout=media + "\n", returncode=0)
         state = {"output": "COPY_OF_RECORD " + record}
         self.assertEqual(adapter.resolve_output({"modality": "video"}, state), media)

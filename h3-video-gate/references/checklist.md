@@ -1,6 +1,6 @@
 # H3 视频提示词:人工 / 模型判断项清单
 
-闸门(`scripts/h3_gate.py`)退出码 0 之后再过这份清单。每条只写"怎么判"和"依据"。
+闸门(`../scripts/h3_gate.py`)退出码 0 之后再过这份清单。每条只写"怎么判"和"依据"。
 依据缩写:ref = 官方 ref-en.txt;base = 官方 base-en.txt;方言 = minimax-h3-dialect.md;
 OPS / SPEC-R / STATUS = H3-Studio 的 OPS-NOTES.md / RENDER-SPEC.md / STATUS.md;审查 = opus-review-s1-s6.md。
 

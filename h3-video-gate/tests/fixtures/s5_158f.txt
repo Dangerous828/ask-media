@@ -1,0 +1,24 @@
+subject_definitions:
+<Subject 1> is the chubby toddler boy from the character reference images: an oversized round head on a small soft body, big round amber-brown eyes with large white catchlights, a tiny button nose, full rosy cheeks, tousled dark-brown hair with a soft fringe across the forehead and a few strands sticking up, wearing a cream short-sleeve t-shirt with thin mustard stripes and small giraffe prints, mustard-yellow knee-length shorts, and light-grey strappy sandals.
+<Subject 2> is the young mother from the character reference image: a young Chinese mother with shoulder-length dark hair tied in a low ponytail, a warm smiling face with curved eyes, wearing a soft beige cardigan over a white top.
+<Subject 3> is the courtyard table setup from the composition anchor <Picture 1>: the white weathered wooden table edge crossing the lower third of the frame, the boy's bowl nearly empty with red-oil residue and two roasted peanuts, the mother's bowl half-finished with chopsticks resting across its rim, high warm afternoon sun.
+<Picture 1> is the composition anchor for [Shot 1]: <Subject 1> seated on a wooden chair slurping noodles from his bowl, cheeks just beginning to puff, a noodle strand still connecting his mouth to the bowl, <Subject 2> beside him pointing at the bowl with a laughing face.
+
+summary:
+[reference generation + keyframe completion] The target video is a 6.58-second vertical 3D-animated shot. <Subject 1> slurps the last noodles, his cheeks puff out like a hamster, red oil smears the corner of his mouth, and he protests with his chin raised while <Subject 2> laughs and taps the bowl. The characters' identities follow the reference images; the composition follows <Picture 1>.
+
+retention_analysis:
+<Subject 1> (appears in [Shot 1]): fully_preserved - the toddler's identity and outfit are retained exactly; his feet stay below the table edge, never on the table.
+<Subject 2> (appears in [Shot 1]): fully_preserved - the mother's ponytail, beige cardigan and laughing curved eyes are retained.
+<Subject 3> (appears in [Shot 1]): fully_preserved - the near-empty bowl with red-oil residue and two peanuts, the half-finished bowl with chopsticks, and the white table are retained.
+<Picture 1> ([Shot 1] composition anchor): fully_preserved - the slurping pose, the table-edge framing and the warm courtyard light are retained.
+
+detailed_description:
+The target video is a vertical 3D CG animated shot in the style of a modern animated feature: soft subsurface scattering on skin, soft global illumination, warm filmic grade, shallow depth of field. High warm afternoon sun from the upper right, the table edge crossing the lower third of the frame.
+[Shot 1] The camera holds a static medium-close two-shot. At 00:00.000, <Subject 1> sits on a wooden chair, both feet dangling below the table edge, slurping the last noodles from his nearly-empty bowl, one thin noodle strand still running from his mouth down into the bowl, his cheeks just starting to puff. The mother (S1), laughing, says: <d>[Chinese] 你吃了臭臭也要变成小臭豆豆啦！</d> Between 00:00.000 and 00:01.500, the noodle strand slides into his mouth and disappears. Between 00:01.500 and 00:02.800, he swallows, and his cheeks puff out round like a hamster's, growing fuller frame by frame. Between 00:02.800 and 00:03.800, a smear of red oil glistens at the corner of his mouth. At 00:03.800 the toddler (S2), cheeks still puffed, protests in a muffled small voice: <d>[Chinese] 豆豆不是臭豆豆！</d> Between 00:03.800 and 00:06.000, he raises his chin upward, his round eyes wide and looking up, holding the puffed-cheek pose; his lips move with the words. Throughout the shot, <Subject 2>'s fingertip taps the bowl rim lightly again and again and her laughing eyes stay curved. From 00:06.000 to 00:06.580 the frame holds still on the boy's stubborn puffed-cheek pout. The bowl, the oil smear, and the table never change.
+
+overall_soundscape:
+Outdoor courtyard ambience with birdsong, a loud happy noodle slurp, a wet swallow, light fingertip taps on porcelain, and a mother's warm laughter underneath.
+
+non_diegetic_music:
+N/A

@@ -4,7 +4,7 @@
 
 ## 为什么现在不动
 
-中枢发布器 `publish_hub_skills.py` 的 `prepare()` 要求 `SKILL.md` 在技能目录根；13 个 Agent 端的软链也指向 `~/.skills/hub/humanizer/SKILL.md`。提前重构会让打包校验直接失败，各端技能不可触发。等 PR 合并、确认上游定稿布局后再整体迁移。
+中枢发布器 `publish_hub_skills.py` 的 `prepare()` 要求 `SKILL.md` 在技能目录根；13 个 Agent 端的软链也指向 `../SKILL.md`。提前重构会让打包校验直接失败，各端技能不可触发。等 PR 合并、确认上游定稿布局后再整体迁移。
 
 ## 合并后迁移清单
 
@@ -12,9 +12,9 @@
    - `detect.py`：`ACADEMIC_DEMOTE` / `ACADEMIC_PAPER_CHECKS` / `effective_levels()` / `--genre` / `fmt_report` 分档 / 5 脚本 UTF-8 补丁
    - `report.py`：`levels_of()` / `paper_check_section*` / 两处分级循环
    - `tests/test_academic_genre.py`：整目录带走
-   - `references/academic-paper.md`、`references/research-pipeline.md`、`references/upstream-pr13.md`：整目录带走
+   - `academic-paper.md`、`research-pipeline.md`、`upstream-pr13.md`：整目录带走
    - `SKILL.md` frontmatter（version / description 里的两个指针）与「第一步」「第四步」命令
-   - `CHANGELOG.md`、`AGENTS.md` 的文字创作表
+   - `CHANGELOG.md`、`../../AGENTS.md` 的文字创作表
 2. 决定中枢里的目录形态：若上游子目录布局与 Hub 根目录要求冲突，保留平铺，在 metadata 里注明「上游已改子目录，本地为兼容 Hub 保持平铺」。
 3. 重跑 `python3 tests/test_academic_genre.py`，13 项须全绿。
 4. 跑 `publish_hub_skills.py --dry-run --only humanizer`，确认打包通过。

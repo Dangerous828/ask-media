@@ -50,9 +50,9 @@ references but no bindings fails closed rather than guessing.
 
 Prompt wording for Seedance 2.0 is version-specific: normal reference uses “参考 @视频1”, while
 continuation says “向后延长 @视频1” and binds the actual tail as `@图片1`. See the video-prompt
-skill's `references/seedance-2.0.md`.
+skill's `../../../short-drama-video-prompts/references/seedance-2.0.md`.
 
-Seedance 2.5 has a separate `references/seedance-2.5.md` dialect and may carry
+Seedance 2.5 has a separate `../../../short-drama-video-prompts/references/seedance-2.5.md` dialect and may carry
 `omni_reference_task_type: reference|edit|extend|auto`. The compiler enforces the documented hard
 parameter combinations for `edit` (`adaptive`, `-1`, reference video) and `extend` (`adaptive`,
 reference video). It does not infer the task type from prompt keywords, because the API checks that

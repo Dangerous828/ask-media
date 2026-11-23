@@ -123,7 +123,7 @@ skill 带着一个赛博题材的默认档去判 3D 卡通片 → 同一批 9 �
 阈值/档位/基准帧必须移出 `~/.skills/`，进项目目录。
 
 ```
-~/.skills/hub/video-studio/          ← 只有算法，不含阈值
+video-studio/          ← 只有算法，不含阈值
   scripts/qc_image.py                --baseline <path> 必填，无默认档
   scripts/qc_signals.py              小亮块/最大亮块/高频（归一化 464×256）
   scripts/qc_compare.py              与基准帧比，输出相对偏差
@@ -673,7 +673,7 @@ else:
 
 ## 十七、词长梯度实验：800 字符是可执行下限（2026-10-22）
 
-素材与结论全文见 `~/Code/kTool/h3-demo-repro/wordlen_lab/RESULTS.md`，此处只记要点。
+素材与结论全文见 `~/projects/h3-demo-repro/wordlen_lab/RESULTS.md`，此处只记要点。
 
 ### 17.1 设计
 

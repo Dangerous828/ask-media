@@ -4,7 +4,7 @@
 > 现行缺省档已换 Turbo LoRA 8 步 / CFG 1.0（创作者指令，见 SKILL.md §2.7）；现行档下
 > `cfg=1` 无负向通道，排除项写正文正向，`--negative` 会被静默丢弃。
 
-本机 win-desktop（RTX 5070 Ti 16GB），Qwen Image 2.1 `qwen_image_2.1_int8_convrot`，
+本机 <渲染主机SSH别名>（RTX 5070 Ti 16GB），Qwen Image 2.1 `qwen_image_2.1_int8_convrot`，
 ComfyUI 8199，无 LoRA。用于核对"标准档为什么是 40 步 / CFG 3.5"，
 以及**CFG 与负向通道的关系**——这两件事常被分开谈，实际是同一件事。
 
@@ -49,7 +49,7 @@ ComfyUI 8199，无 LoRA。用于核对"标准档为什么是 40 步 / CFG 3.5"�
 
 `models/loras/qwen_image_2.1_turbo_lora_avg_rank_178_bf16.safetensors`（871 MB）与
 `models/diffusion_models/qwen_image_2.1_turbo_int8_convrot.safetensors`（6.9 GB）
-已移入 `E:\ComfyUI\_archived-turbo\`，**未删除**。
+已移入 `<ComfyUI根目录>\_archived-turbo\`，**未删除**。
 
 配套代码处理：`h3q_img.py` 不再定义 `TURBO_LORA` / `STEPS_FAST`，也不再自动挂 LoRA；
 `--fast` 仍被 argparse 接受但**被忽略**（保留仅为兼容旧命令行，不因残留脚本报错）。
@@ -77,13 +77,13 @@ LoRA 的 graph，提交必然失败；且 `--fast 1` 与 `cfg 3.5` 组合本身�
 
 ```bash
 # 标准档（默认）
-python -s E:\H3-Studio\scripts\h3q_img.py --prompt-file P.txt --out O.png --size 768x1344
+python -s <渲染机脚本目录>\h3q_img.py --prompt-file P.txt --out O.png --size 768x1344
 
 # 2K + 透明
-python -s E:\H3-Studio\scripts\h3q_img.py --prompt-file P.txt --out O.png --size 2k-9x16 --alpha 1
+python -s <渲染机脚本目录>\h3q_img.py --prompt-file P.txt --out O.png --size 2k-9x16 --alpha 1
 
 # 排除项（需 cfg>1，默认 3.5 已满足）
-python -s E:\H3-Studio\scripts\h3q_img.py --prompt-file P.txt --out O.png --negative 'text, watermark'
+python -s <渲染机脚本目录>\h3q_img.py --prompt-file P.txt --out O.png --negative 'text, watermark'
 ```
 
 实测收尾：改后跑真实出图 `queued ... steps=40 lora=- ... saved ... 1491238 bytes in 27.1s`，

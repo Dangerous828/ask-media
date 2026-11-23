@@ -26,3 +26,8 @@ python launch.py 8775
 - 工作台 ⑥ 页签按钮：「✨ 从分镜JSON 一键生成 3D 场景」= 生成脚本 → 自动发送 Blender MCP(9876) 构建；之后可点「Blender CLI 后台渲染」出帧
 - 支持：tatami 和室预设（榻榻米/障子/矮桌碟碗/坐姿）与 generic 通用房间预设；机位/fov/切点全部来自分镜 JSON
 - 注意：previs_engine 自动机位模式（无显式 pos/look）暂不支持生成，需 dialogue 契约 JSON
+
+## LLM 配置与 API Key
+在设置页保存的 GLM API Key 会**明文**写入本目录 `llm_config.json`（已被根 `.gitignore` 排除，绝不入仓）。
+- 推荐优先用环境变量 `ZHIPUAI_API_KEY` / `GLM_API_KEY`，页面保存只作为本机可选项。
+- 若曾在此目录保存过 key，勿把 `llm_config.json` 加入任何提交。

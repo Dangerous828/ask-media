@@ -103,7 +103,7 @@ negative = 上面那串
 
 ```bash
 # 对照组产物与提示词
-ls ~/Code/kTool/img-compare-20261109/
+ls ~/projects/img-compare-20261109/
 # 正文：prompts/C-官方体-餐桌四人.md（观察体）
 # 参数：cfg=2.5 + 负向词；seed 42；1536x896
 ```

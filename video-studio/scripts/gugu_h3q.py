@@ -11,8 +11,7 @@
 它直连 `127.0.0.1:8199/prompt`。手工调它 = 抢卡、不与队列互斥、无排队位次。
 ⇒ 现在改成调 `h3qc.py submit --kind image`，走 8200 唯一的 admission gate。
 
-同时修 SSH 路由：默认 `win-desktop-cf`。`win-desktop` / `uu-2222` 实测拒连
-（只有 CF Tunnel 通），旧默认值会让人以为脚本坏了。
+远端主机与目录全部来自环境变量，未配置直接报错，避免静默连错机器。
 
 用法（替换原来的 submit_and_wait）：
     from gugu_h3q import render_via_h3q
@@ -28,7 +27,7 @@
     python3 gugu_h3q.py --prompt-file p.txt --out o.png [--refs a.png,b.png] [--seed 42]
     python3 gugu_h3q.py ... --dry-run      # 只打印将执行的命令，不提交
 
-本脚本不直接连 ComfyUI，只调远端（`win-desktop-cf`）上的 `h3qc.py`。
+本脚本不直接连 ComfyUI，只通过环境变量指定的渲染机上的 `h3qc.py` 提交队列。
 """
 import json
 import os
@@ -38,16 +37,33 @@ import sys
 import tempfile
 from pathlib import Path
 
-# 唯一可用路由：CF Tunnel（`win-desktop` / `uu-2222` 实测拒连，2026-10-22 复验）
-HOST = os.environ.get("H3Q_HOST", "win-desktop-cf")
-REMOTE_SCRIPTS = os.environ.get("H3Q_SCRIPTS", r"E:\H3-Studio\scripts")
-REMOTE_PY = os.environ.get("H3Q_PY", r"E:\ComfyUI\ComfyUI_windows_portable\python_embeded\python.exe")
-REMOTE_TMP = os.environ.get("H3Q_TMP", r"C:\Users\xc")
-REMOTE_OUT_DIR = os.environ.get("H3Q_OUT", r"E:\H3-Studio\renders")
-LOCAL_OUT_DIR = os.environ.get(
-    "GUGU_OUT",
-    "~/Code/kTool/example-project/smooth3d/assets/generated",
-)
+# 远端环境全部走环境变量：H3Q_HOST / H3Q_SCRIPTS / H3Q_PY / H3Q_TMP / H3Q_OUT。
+# 未配置时在提交入口报错，不内置任何默认主机。
+HOST = os.environ.get("H3Q_HOST", "")
+REMOTE_SCRIPTS = os.environ.get("H3Q_SCRIPTS", "")
+REMOTE_PY = os.environ.get("H3Q_PY", "")
+REMOTE_TMP = os.environ.get("H3Q_TMP", "")
+REMOTE_OUT_DIR = os.environ.get("H3Q_OUT", "")
+LOCAL_OUT_DIR = os.environ.get("GUGU_OUT", "./generated")
+
+
+def _require_env() -> None:
+    missing = [k for k, v in [
+        ("H3Q_HOST", HOST), ("H3Q_SCRIPTS", REMOTE_SCRIPTS),
+        ("H3Q_PY", REMOTE_PY), ("H3Q_TMP", REMOTE_TMP),
+        ("H3Q_OUT", REMOTE_OUT_DIR),
+    ] if not v]
+    if missing:
+        sys.exit(
+            f"缺少远端环境变量: {', '.join(missing)}。\n"
+            "请先设置渲染机的 SSH 主机与目录，例如:\n"
+            "  export H3Q_HOST=<渲染主机>            # ssh 可达的渲染机\n"
+            "  export H3Q_SCRIPTS=<渲染机脚本目录>   # 含 h3qc.py\n"
+            "  export H3Q_PY=<渲染机 python 路径>\n"
+            "  export H3Q_TMP=<渲染机临时目录>\n"
+            "  export H3Q_OUT=<渲染机产物目录>\n"
+            "  export GUGU_OUT=<本地产物目录>       # 可选，默认 ./generated"
+        )
 
 
 def _ssh(ps_body: str, timeout: int = 900) -> tuple[int, str]:
@@ -87,6 +103,7 @@ def render_via_h3q(prompt_text: str, ref_images: list[str], out_name: str,
                    seed: int = 42, steps: int = 0, size: str = "1376x768",
                    label: str = "h3q/gugu", timeout: int = 900,
                    dry_run: bool = False) -> dict:
+    _require_env()
     """通过 h3q **队列**出图。返回 {ok, out, raw}。
 
     steps：0 = 队列默认（8 步 + Turbo LoRA）

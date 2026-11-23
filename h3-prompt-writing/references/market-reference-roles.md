@@ -24,7 +24,7 @@
 
 ## 来源与证据边界
 
-MiniMax Design **官方市场快照 2026-10-25**：`h3-prompt-expert` **1.0.5**，目录标记 `official-featured`；参考主文 Full-Reference Mode、`references/modes-all-purpose-reference.md` 的参考维度与满足度，以及 `references/audio-dialogue.md` 的声音职责。这里只吸收核对方法，不把市场指南当成本地入口能力或出片实测。
+MiniMax Design **官方市场快照 2026-10-25**：`h3-prompt-expert` **1.0.5**，目录标记 `official-featured`；参考主文 Full-Reference Mode、其包内 modes-all-purpose-reference（参考维度与满足度）与 audio-dialogue（声音职责）两份文档。这里只吸收核对方法，不把市场指南当成本地入口能力或出片实测。
 
 - [官方市场列表API](https://design.minimax.cn/api/v1/skills/market?page=1&page_size=200)
 - [对应版本来源包入口](https://design.minimax.cn/api/v1/skills/market/download?name=h3-prompt-expert&version=1.0.5)

@@ -1,0 +1,22 @@
+subject_definitions:
+<Subject 1> is the chubby toddler boy from the character reference images: an oversized round head on a small soft body, big round amber-brown eyes with large white catchlights, a tiny button nose, full rosy cheeks, tousled dark-brown hair with a soft fringe across the forehead and a few strands sticking up, wearing a cream short-sleeve t-shirt with thin mustard stripes and small giraffe prints, mustard-yellow knee-length shorts, and light-grey strappy sandals.
+<Subject 2> is the warm home hallway from the composition anchor <Picture 1>: wooden floor, warm ceiling lamp, a sofa and a bright sunlit doorway at the far end, afternoon daylight everywhere.
+<Picture 1> is the composition anchor for [Shot 1]: <Subject 1> standing in the bright hallway holding a white plastic takeout bag with both hands in front of his waist, arms extended forward offering the bag toward the camera, a white bowl with a sealed clear lid visible inside the bag, his eyebrows slightly raised in a puzzled look.
+
+summary:
+[reference generation + keyframe completion] The target video is a 5.88-second vertical 3D-animated shot. The toddler <Subject 1> has picked up the takeout delivery and carries it down the hallway, offering it toward his mother, who is the camera's viewpoint; he says the delivery is for her, and she answers off-screen. The boy's identity follows the character reference images; the environment and composition follow <Picture 1>.
+
+retention_analysis:
+<Subject 1> (appears in [Shot 1]): fully_preserved - the toddler's face, hair, giraffe-print shirt, mustard shorts, and grey sandals are retained exactly.
+<Subject 2> (appears in [Shot 1]): fully_preserved - the warm hallway, ceiling lamp, wooden floor, sofa and sunlit doorway are retained; it stays bright afternoon, never night.
+<Picture 1> ([Shot 1] composition anchor): fully_preserved - the boy holding the white takeout bag with both hands offering it forward, and the sealed lidded bowl inside the bag, are retained.
+
+detailed_description:
+The target video is a vertical 3D CG animated shot in the style of a modern animated feature: soft subsurface scattering on skin, soft global illumination, warm filmic grade.
+[Shot 1] The camera is at an adult's eye level in the hallway and holds a static shot. At 00:00.000, <Subject 1> walks into the composition of <Picture 1> - he comes two small steps along the wooden hallway toward the camera, holding the white plastic takeout bag with both hands in front of his waist, the white bowl sealed under its clear lid visible inside the bag. At 00:00.600 the toddler (S1), in a clear, bright small child's voice, calls out excitedly, starting his line with the word 外卖 right at the top of the utterance: <d>[Chinese] 外卖！妈妈，你的外卖！</d> The first 外卖 is spoken at the very start of the sentence with crisp, careful toddler articulation - "wài-mài" with a firm, audible "m" sound at the start of the second syllable, never slurred into "wài-wai". His lips move clearly with each syllable. Between 00:02.000 and 00:03.500, he extends his arms and offers the bag forward toward the camera, stopping at waist height in front of him, holding it steady. At 00:03.600 the mother, off-screen (S2), in a warm relaxed adult female voice, says: <d>[Chinese] 先放桌上吧，等下一起吃。</d> The boy's lips stay closed while she speaks. Between 00:03.500 and 00:05.000, the boy tilts his head five degrees to one side and holds the tilt, and his big amber eyes blink once. From 00:05.000 to 00:05.880 he holds the offering pose - bag forward in both hands, head tilted, puzzled brows - and the shot ends. The boy's identity, clothing, the hallway, the bag, and the sealed bowl never change.
+
+overall_soundscape:
+Warm indoor room tone with the soft rustle of the plastic bag, two small footsteps on wood, and gentle fabric movement.
+
+non_diegetic_music:
+Light pizzicato strings and a soft marimba at a gentle tempo, playful and curious, keeping a low volume under the dialogue.

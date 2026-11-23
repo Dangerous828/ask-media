@@ -11,12 +11,12 @@
 主要技能：
 
 - **链路入口**：`ask-media`
-- **短剧套件**：`drama-skills/`（12 个 `short-drama-*` 技能，管项目事实、阶段边界与连续性）
+- **短剧套件**：`drama-skills/`（第三方，MIT；12 个 `short-drama-*` 技能，管项目事实、阶段边界与连续性，实际位置在 `drama-skills/skills/*` 两层深）
 - **静帧与分镜**：`doc-still-prompt`、`anim3d-still-pitfalls`、`storyboard-30s`、`video-previs`、`director-style-presets`
 - **视频提示词与闸门**：`h3-prompt-writing`、`h3-video-gate`
 - **生产与验收**：`h3-queue`、`video-studio`、`concat-video`、`narration-route`
-- **复刻**：`shortvideo-understand`、`video-shot-reverse`
-- **写作与设计**：`write-article`、`write-tweet`、`humanizer`、`grab-article`、`frontend-design`、`mobile-ios-design`、`mobile-android-design`、`ui-ux-pro-max`、`tailwind-design-system`、`web-design-guidelines`
+- **复刻**：`shortvideo-understand`（第三方，MIT）、`video-shot-reverse`
+- **写作与设计**：`write-article`、`write-tweet`、`grab-article`、`humanizer`（第三方，CC BY-NC 4.0，**仅限非商业使用**）、`frontend-design`、`mobile-ios-design`、`mobile-android-design`、`ui-ux-pro-max`、`tailwind-design-system`、`web-design-guidelines`
 
 `AGENTS.md` 是根级路由与纪律约定。
 
@@ -30,16 +30,21 @@
 npx skills add Dangerous828/ask-media -y -g
 ```
 
-`-g` 全局安装，所有目录可用；去掉 `-g` 则只装到当前目录。更新时重新执行同一条命令即可。如果该命令找不到技能，改用方法二手动链接。
+`-g` 全局安装，所有目录可用；去掉 `-g` 则只装到当前目录。更新时重新执行同一条命令即可。
+
+**注意**：`short-drama-*` 的 12 个技能嵌套在 `drama-skills/skills/*` 两层深，`npx skills add` 能否自动发现嵌套技能**未验证**。装完请核对：11 个阶段的全部 owner 技能（含 12 个 `short-drama-*`）都应出现在你的技能目录里；缺了就按方法二补第二轮软链。
 
 ### 方法二：手动链接
 
 ```bash
 git clone https://github.com/Dangerous828/ask-media.git && cd ask-media
 mkdir -p "$HOME/.claude/skills"
-for skill in ask-media video-studio video-previs h3-queue h3-prompt-writing h3-video-gate; do
-  ln -s "$PWD/$skill" "$HOME/.claude/skills/$skill"
-done
+
+# 顶层技能：一个循环全链上
+for skill in */; do ln -s "$PWD/$skill" "$HOME/.claude/skills/$skill"; done
+
+# 嵌套技能：drama-skills 的 12 个 short-drama-* 单独一轮，否则链路 1-10 阶段会缺 owner
+for skill in drama-skills/skills/*/; do ln -s "$PWD/$skill" "$HOME/.claude/skills/$(basename "$skill")"; done
 ```
 
 不同客户端的技能目录：
@@ -53,13 +58,16 @@ done
 ### 入口与环境
 
 - 影像任务先读 `ask-media/SKILL.md` 选路，再按阶段读对应的 owner 技能。
-- 需要额外环境的技能：`video-previs` 需要智谱 GLM API Key（`ZHIPUAI_API_KEY` 或 `GLM_API_KEY`）；`h3-queue` / `video-studio` 需要作者本地的 ComfyUI + h3q 生产队列，不附带；`shortvideo-understand` 需要 yt-dlp。其余技能多为纯文档，直接可用。
+- 需要额外环境的技能：`video-previs` 需要智谱 GLM API Key（`ZHIPUAI_API_KEY` 或 `GLM_API_KEY`）；`h3-queue` / `video-studio` 需要本地 ComfyUI + h3q 生产队列，不附带；`shortvideo-understand` 需要 yt-dlp。其余技能多为纯文档，直接可用。
 
 ## 说明
 
-这是从内部技能库整理出的公开版本，仅包含通用方法论。项目实测数据、内部路径与客户相关信息已移除，因此部分文档中的"实测记录"引用的是脱敏后的示例标识。
+这是从内部技能库整理出的公开版本，仅包含通用方法论：
 
-部分技能的完整能力依赖具体运行环境（本地 GPU 队列、特定 API 等）；文档描述方法与判据，不附带这些环境配置。
+- 内部项目名、路径、主机名与用户名已替换为占位符（如 `<渲染机脚本目录>`、`角色A-D`、`example-project`）；实测记录保留测量数值本身。
+- 部分文档引用的渲染机脚本（`h3qc.py` 等）与内部工程档案不在本仓库中，文中已注明。
+- 完整能力依赖具体运行环境；文档描述方法与判据，不附带这些环境配置。
+- 文档引用可用 `scripts/check_references.py` 校验（当前 0 断链）。
 
 ## 许可
 
