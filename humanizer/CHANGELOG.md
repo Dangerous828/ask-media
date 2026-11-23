@@ -25,7 +25,7 @@
 
 **4. 上游 [PR #13](https://github.com/larashero3-dotcom/lieflat-less-ai-tone/pull/13) 迁移预案**
 
-上游拟把 SKILL.md / DETECT.md / references/ / scripts/ 移进 `lieflat-less-ai-tone/` 子目录，尚未合并。**本仓不跟进**：这里以 `humanizer/` 平铺发布，根级路由与仓内相对引用都指向 `humanizer/SKILL.md`，重构会断路径且无收益。若上游合并，只同步规则正文与脚本行为变化，不照搬布局，见 `references/upstream-pr13.md`。
+上游拟把 SKILL.md / DETECT.md / references/ / scripts/ 移进 `lieflat-less-ai-tone/` 子目录，尚未合并。**本仓不跟进**：这里以 `humanizer/` 平铺发布，根级路由与仓内相对引用都指向仓库根下的 `humanizer/SKILL.md`，重构会断路径且无收益。若上游合并，只同步规则正文与脚本行为变化，不照搬布局，见 `references/upstream-pr13.md`。
 
 **许可**：公开版 [CC BY-NC 4.0](./LICENSE)，学位论文 / 个人投稿属非商业使用，够用；商业交付与产品集成需另购 [lieflat.work](https://lieflat.work/skills/less-ai-tone/#pricing) 授权，本轮未购买。
 

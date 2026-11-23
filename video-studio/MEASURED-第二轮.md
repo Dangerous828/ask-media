@@ -135,7 +135,7 @@ exit=1
 | 3 | 产物无可追溯（profile 版本/脚本版本/输入 hash） | 未做 |
 | 4 | `profile 的「叙事世界」写成了题材` | `3d_anime.md` 里写「当代温暖都市」，做古装就得新建 profile |
 | 5 | 「构图与运动」维度丢了 | 【景别机位】无画风依据 |
-| 6 | `formats/shots.md` 缺 | 五槽填写规范散在 SKILL.md 散文里 |
+| 6 | `formats/shots.md`（上游规范文件，本仓无此目录） 缺 | 五槽填写规范散在 SKILL.md 散文里 |
 
 ---
 

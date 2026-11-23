@@ -10,7 +10,7 @@
 ### 问题：所有脚本硬编码 18199，该端口没有服务
 
 ```python
-# smooth3d/tools/rerender_kf_s05.py:17 等 5 个文件
+# smooth3d/tools/rerender_kf_s05.py:17 等 5 个文件（项目实测文件，未随公开版发布）
 COMFY_HOST = "127.0.0.1:18199"
 ```
 

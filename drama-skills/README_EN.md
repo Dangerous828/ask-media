@@ -82,7 +82,7 @@ provider-neutral.
 
 ### ClawHub
 
-ClawHub distribution is governed by the repository's [explicit publish inventory](.clawhub/publish.json), with discovery through [ClawHub](https://clawhub.ai/). A skill-specific link is added here only after its publisher, version, and anonymous accessibility are verified, so this README never presents a nonexistent listing as live.
+ClawHub distribution is governed by the upstream repository's explicit publish inventory, `.clawhub/publish.json` (upstream release infrastructure, not included in this public copy), with discovery through [ClawHub](https://clawhub.ai/). A skill-specific link is added here only after its publisher, version, and anonymous accessibility are verified, so this README never presents a nonexistent listing as live.
 
 
 Prerequisite: you already use Claude Code, Codex or another coding agent that supports the Agent Skill spec; the
@@ -396,7 +396,7 @@ ID and reason, and a range such as "001 to 009" is no longer accepted.
 
 - The creator-first sample *Let You Run the Account*, EP001 is local-only (not included in the public release); the validator-regression fixtures are likewise not included.
 - [Excerpts of real output](docs/real-outputs_EN.md): one shot through four documents, checker errors, the cut list and its measurements, the source triage backfill, the adaptation contract, model observations.
-- [Evaluations](evaluations/README.md) (Chinese): the complete output of one run made by following the docs, the pre-release regression gate, and how a main-workflow run is done.
+- **Evaluations** (upstream `evaluations/` directory, Chinese — not included in this public copy): the complete output of one run made by following the docs, the pre-release regression gate, and how a main-workflow run is done.
 - [An open-source AI short-drama pipeline](docs/open-source-short-drama-pipeline.md): what the pack does, stage by stage.
 - [Comic-drama workflow guide](docs/comic-drama-workflow.md) (Chinese): the twelve skills as one production line, with per-step commands, outputs, and common pitfalls.
 - [Cross-shot consistency](docs/character-consistency-across-shots.md) (Chinese): character consistency across shots and episodes, and the three layers of file facts beyond a turnaround sheet.

@@ -6,6 +6,9 @@
 > `[MiniMax H3](./prompts/minimax-h3.md)`、`[Seedance 2.0](./prompts/seedance-2.0.md)`、`references/summary.md`、
 > `references/template.md` 等**指向上游仓的结构**（上游有 `prompts/`、`references/`、`locales/`、`preview.gif`，本仓只收文本）。
 > 这些链接在本仓**解析不到文件**（见下一条的逐项口径）；为了保住"逐字收录"没有改原文。
+> 原文块里的 `"skill_ref": "../../../skills/<名字>"` 同理：上游的技能目录本仓没有，但**同名机制卡在
+> `cards/<名字>.md`**，需要读那份就按这个名字去找；`locales/zh-CN.json`、`locales/en.json`、`preview.gif`
+> 是上游条目的清单字段（不是本仓文件），留着是为了保持与上游数据一致。
 > 要查机制卡用本索引与 [search.py](search.py)，不要跟着卡片里的相对链接走。
 
 > **指纹口径（2026-11-23 核实）**：`catalog-index-source.json` 的 `indexSha256` = `702c329d…`，**与本仓当前 `catalog.json` 的实测 SHA-256（`3a288cbf…`）不一致**，且仓内没有任何材料能证明它指代什么（试过索引文件自身、`catalog.json`、几种常见序列化都不匹配）。**结论：该字段目前不可用于校验任何东西**，按未解的历史字段对待；要指纹就 `shasum -a 256 catalog.json` 现算。索引其余自检项一致：`catalogItems` 的 id 集合与顺序与 `catalog.json` 624/624 完全相同。

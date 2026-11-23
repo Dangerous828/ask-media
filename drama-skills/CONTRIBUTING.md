@@ -83,7 +83,7 @@ uv venv --python 3.9 /tmp/floor && \
 python3 -m unittest tests.test_workflow_evaluation
 ```
 
-它只判定「没有退步」。判定「流程还顺不顺」要按 [evaluations/README.md](evaluations/README.md)
+它只判定「没有退步」。判定「流程还顺不顺」要按上游仓 `evaluations/README.md`（未随本公开版收录）
 的做法人工实跑一次——上一轮最重的一个缺陷（文档写的重建方式与脚本实际行为不一致）
 所有测试都是绿的，只有实跑能看见。
 

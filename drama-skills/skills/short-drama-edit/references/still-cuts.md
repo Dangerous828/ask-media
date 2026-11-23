@@ -41,7 +41,7 @@
 
 六个方向词（推近/拉远/左移/右移/上移/下移）、幅度 1–30、速度 0.1–10%/秒与反向对照表的
 权威来源是 `../../short-drama/scripts/enums.py`（`edit_tool.py` 的本地拷贝由
-`tests/test_enum_single_source.py` 逐词锁定，改词表先改 enums.py）。本节保留的是
+`../../../../tests/test_enum_single_source.py` 逐词锁定，改词表先改 enums.py）。本节保留的是
 每个词**什么时候用**的判断：
 
 - `推近` 用在一句话落到关键信息、人物反应要被看清时；`拉远` 用在交代处境或收尾。

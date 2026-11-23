@@ -193,7 +193,7 @@ video-studio/          ← 只有算法，不含阈值
 - 无 `--qc-profile` 且无 `--baseline` → **退出码 2**，并提示可用档位
 - 代码里仍保留模块级 `DEFAULT_PROFILE = "virtual-void"`，它**只是 `measure()` 的函数默认参数值**，
   兼容旧脚本直接调用；`main()` 强制显式给档或基准，不读取该常量作默认档，故不算“默认档复活”
-- 项目侧新增 `qc/profile.json` 声明本片档位（example-project 已建，档位 `cartoon3d`）
+- 项目侧新增 `qc/profile.json` 声明本片档位（项目实测文件，未随公开版发布）（example-project 已建，档位 `cartoon3d`）
 
 验收：不给档位被拒 ✓；显式 `--qc-profile cartoon3d` 正常输出 3/9 ✓。
 
@@ -311,7 +311,7 @@ python3 /tmp/verify_claims.py
 
 ### 9.5 顺带发现（说明工具确实在工作）
 
-对账工具**抓出了我自己写的 `ep01_v5/h3_prompts/v5_06_FL2VA.txt` 的缺陷**：
+对账工具**抓出了我自己写的 `ep01_v5/h3_prompts/v5_06_FL2VA.txt` 的缺陷**（项目实测文件，未随公开版发布）：
 那支文件里 角色A 只有「手在挎包翻盖处」，没有「取出 → 递出 → 接住」的交接动作。
 （注：该目录随后被并行会话重写为 v5_02~v5_08 共 7 支，赠橘镜改为 `v5_07`，新版本 HANDOVER 零错误。）
 

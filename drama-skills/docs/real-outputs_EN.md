@@ -249,7 +249,7 @@ Originals: [`creative-brief.md`](../evaluations/让你管账号/reference-run/�
 
 ## Claims about models in the skills were checked against real generations first
 
-Origin: `evaluations/model-behavior-probes.md`. Every "what the model does" statement in the skills corresponds to
+Origin: `上游 `evaluations/model-behavior-probes.md`（未随公开版收录）`. Every "what the model does" statement in the skills corresponds to
 a generation observation on record: a batch of exploratory observations from September 2026 (MiniMax H3, Seedance
 2.0/2.5, gpt-image-2), the summary kept in the repository and the raw media outside it, with sample size, method and
 what each one can support (4 of the table's 20 rows, translated):
@@ -261,4 +261,4 @@ what each one can support (4 of the table's 20 rows, translated):
 | H3 speaker lip-sync | One shot (a child shouts a line in the distance, a rider up close says nothing), three groups of 6, 6 s each. In the group where the rider still faces the camera during the line: the current phrasing put the lips on the rider, the child's mouth closed, in 2 of 3; with the speaker given a voice and on-screen tag, the line placed after his action sentence, and the rider written explicitly as not speaking with lips closed, all 3 landed on the child … | The voice was not wrong; the lips landed on the most prominent front-facing face … small sample, still check whose face the lips land on after generating |
 | Continuing from the real last frame | With the previous clip's last frame bound, 2 runs kept the opening; text only, 2 runs did not | When continuity matters, prefer real outputs as references |
 
-Full table and execution-path caveats: [Model behaviour observations](../evaluations/model-behavior-probes.md) (Chinese).
+Full table and execution-path caveats: [Model behaviour observations](../上游 `evaluations/model-behavior-probes.md`（未随公开版收录）) (Chinese).

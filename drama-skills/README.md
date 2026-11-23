@@ -66,7 +66,7 @@ Drama Skills 覆盖 AI 短剧 / 漫剧从点子或原著到成片的全流程：
 
 ### ClawHub
 
-ClawHub 分发由仓库中的 [显式发布清单](.clawhub/publish.json) 管理，并通过 [ClawHub](https://clawhub.ai/) 提供发现入口。具体 skill 链接只有在发布者、版本和匿名访问均验证后才会写入本文档，避免把尚不存在的条目当成已上架。
+ClawHub 分发由上游仓的显式发布清单 `.clawhub/publish.json` 管理（属上游发布基建，未随本公开版收录），并通过 [ClawHub](https://clawhub.ai/) 提供发现入口。具体 skill 链接只有在发布者、版本和匿名访问均验证后才会写入本文档，避免把尚不存在的条目当成已上架。
 
 
 前提：你已经在用 Claude Code、Codex 或其他支持 Agent Skill 规范的编程 Agent；下面这条命令需要终端里能运行 `npx`（Node.js）。
@@ -340,7 +340,7 @@ macOS、Linux、WSL 与 Windows 原生都可运行。创作台以 `--detach` 独
 
 - 示例项目《让你管账号》EP001 为 local-only，未随公开版发布；仓库校验器的回归夹具同样未随公开版发布。
 - [真实产出节选](docs/real-outputs.md)：一镜穿过四份文档、检查器报错、剪辑单与实测、原著快评回填、改编契约、模型行为观察。
-- [评估](evaluations/README.md)：按文档实跑一次的完整产物、发布前的回归闸门与主工作流实跑方法。
+- **评估**（上游仓 `evaluations/` 目录，含按文档实跑一次的完整产物、发布前回归闸门与主工作流实跑方法）：该目录属上游发布基建，未随本公开版收录。
 - [漫剧创作全流程指引](docs/comic-drama-workflow.md)：把十二个技能按漫剧产线从头串一遍，每步命令、产物与卡点。
 - [跨镜一致性怎么做](docs/character-consistency-across-shots.md)：跨镜、跨集角色一致性，三视图之外的三层文件事实。
 - [小说改短剧指南](https://zenstory.ai/zh/drama-skills/novel-to-short-drama)：从有权改编的原著出发，形成分集决策、单集剧本与小范围分镜交接。

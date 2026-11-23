@@ -6,7 +6,7 @@ it does not create a tag or release.
 
 ## Contract
 
-- `.release/policy.json` is source-bound and names every version authority, the
+- `.release/policy.json`（上游发布基建，未随本公开版收录）is source-bound and names every version authority, the
   dated changelog, exact installable files, exclusions, and exact main CI jobs.
 - Pull requests run a read-only contract/archive validation.
 - `workflow_dispatch` is allowed only on `main` and never publishes. It also
