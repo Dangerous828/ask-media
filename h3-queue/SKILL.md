@@ -64,7 +64,7 @@ MCP 侧（独立部署的 magpie-h3-mcp 服务，不入本仓库）的 `h3_gener
 否则同一句指令走不同入口会拿到不同行为。
 pdd 的 `draft → final` 是两次完整采样，**没有 pass-1 latent 接续**；`draft_job_id` / `draft_accepted` /
 `from_latent` / `refine_denoise` / `chunk_frames` 是 lu2 时代字段，pdd 分支不读取，不要用它们推断
-「交付的就是验收过的那一版」。档位矩阵与实测见 §2.8。
+「交付的就是验收过的那一版」。档位矩阵与实测见 [produce-adapter.md](references/produce-adapter.md) 的「视频档位」节。
 
 ## 输入能力与续接职责
 

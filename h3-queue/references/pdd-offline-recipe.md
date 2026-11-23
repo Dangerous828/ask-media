@@ -34,7 +34,8 @@ $PY -s '<渲染机脚本目录>\mkdraft.py' \
 #   追加 --no-upscale  -> 1024x576，约 167 s
 
 # 批量（固定三个镜头）
-python -s make_graphs.py draft <city.png>
+# make_graphs.py 不在本仓，须在渲染机上跑（路径见 SKILL.md 的「离线研究副本」表）
+python -s <渲染机脚本目录>\make_graphs.py draft <city.png>
 ```
 
 ### 离线执行记录（禁止用于生产提交）

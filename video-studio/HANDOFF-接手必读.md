@@ -66,7 +66,7 @@ SKILL 的可执行规则见 `SKILL.md` §三 R4a。
 1. **引用关系更新**：剧本格式 → `../drama-skills/skills/short-drama-write/references/screenplay-format.md`；镜头语言 → `../drama-skills/skills/short-drama-storyboard/references/production-shot-grammar.md`；资产规范 → `../drama-skills/skills/short-drama-assets/SKILL.md`；Qwen 后端档位 → `../h3-queue/references/still-standard-tier-20261105.md`。
 2. **当时已就绪**：`video-studio` 注册到 `~/.agents/skills/video-studio`（软链，2026-10-22 补）；`qc_image.py` / `h3_lint.py` 实跑通过；v4 九镜关键帧 + 九段视频 + 成片落盘；成片音轨修复（`animatic_v4s_audio.mp4`）。
 3. **当时未完成**：第二个 profile（只有 3d_anime，只在赛博题材跑过）；出片验收已由 short-drama-review 的 look_check / video_check 承担；两条格式待办已失效（见第 1 点）；根 AGENTS.md 停用表述已于 2026-10-26 修正。
-4. **历史实验指标**：当时没有一张同时满足四项（旧 skill 散文 + 前置锚词最好 n=1；官方词+锚词四项全挂），已被 `MEASURED-第五轮.md` §3.1 的 nx1_clean 四项全过更新；原表数值见 `MEASURED-第三轮.md` §一，46 张归档 / 34 张归位见 `MEASURED-第三轮.md` §七第 5 项与 §一。
+4. **历史实验指标**：当时没有一张同时满足四项（旧 skill 散文 + 前置锚词最好 n=1；官方词+锚词四项全挂），已被 `MEASURED-第五轮.md` §3.1 的 nx1_clean 四项全过更新；原表数值与归档/归位的张数见 `MEASURED-第三轮.md` §一与 §七第 5 项。
 5. **ready 判据（外部建议，当时未执行）**：9 格 × 3 seed ≥7/9 格通过且无灾难格、产物带 manifest、≥2 个 profile（其中 1 个非赛博）、H3 提示词过官方结构校验。
 6. **v5 未开工**：`example-project/smooth3d/ep01_v5/` 只有一份 `CONTINUITY_PLAN.md`（2026-10-22 14:38），三张待出图（v5_S02_out / v5_S05 / v5_S07）一张未出。创作者三条决定（**不要推翻**）：① 涟漪是空间漏洞（portal hole），不是接触点；② 角色D从头到尾都在看着屏幕，不会「发现」他；③ 动作由角色C发起，视角翻转之后她冲向光圈。
 

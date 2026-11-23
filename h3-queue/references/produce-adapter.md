@@ -73,13 +73,13 @@
   这两个字段纠正过一次误判（`external work running=1` 被当成别人干扰的证据）；推翻经过与未归因结论见 [incidents.md](incidents.md) §2026-11-08。实测记录存项目内部档案（未随公开版发布）。
 
 - **第三条路线：HyperFlow H3 Flash —— 本机 16GB 跑不了，别装。**
-  先看归属：它是**第三方压缩模型**（Video-Rebirth 的 HyperFlow H3 Flash，13.7B），**不是 MiniMax 官方上游**。显存数字出自其仓库 Video-Rebirth/hyperflow-h3-flash 的 `<上游仓>/integrations/README.md`（上游仓路径，未随本仓发布；引用时点 2026-11-06，1344×768、6 步、2 张参考图口径，GGUF Q4_K_M / 该表未细分 INT8 档），本仓记录值为 RTX 4090 (24G) 22 GiB、RTX 5090 (32G) 30 GiB；上游现行表可能已更新，以引用时点为准。再看条件：官方补 16 GB 实测数据，或出现 16 GB 可跑的精简版；届时唯一看点是**音画同出**，不是速度。三条硬理由、显存表原文与来源链接见 [incidents.md](incidents.md) §2026-11-06。
+  先看归属：它是**第三方压缩模型**（Video-Rebirth 的 HyperFlow H3 Flash，13.7B），**不是 MiniMax 官方上游**。显存数字出自其仓库 Video-Rebirth/hyperflow-h3-flash 的 `<上游仓>/integrations/README.md`（上游仓路径，未随本仓发布；引用时点 2026-11-06，1344×768、6 步、2 张参考图口径，GGUF Q4_K_M / 该表未细分 INT8 档），本仓 2026-11-06 记录值为 Q4_K_M 档 RTX 4090 (24G) 22 GiB、RTX 5090 (32G) 30 GiB；**2026-11-23 复查上游现行 README**：INT8 / 5.2s 口径的峰值是 RTX 4090 21 GiB、RTX 5090 31 GiB、PRO 6000 39 GiB——与上面两个数不是同一量化档，不能互相校验，引用哪个都要带上量化档与日期；以引用时点为准。再看条件：官方补 16 GB 实测数据，或出现 16 GB 可跑的精简版；届时唯一看点是**音画同出**，不是速度。三条硬理由、显存表原文与来源链接见 [incidents.md](incidents.md) §2026-11-06。
 
 - **视频档位 `parameters.tier`（adapter 代码强制，不靠提示）：**
 
   | engine | tier | 实际参数 | 用途 | 约束 |
   |---|---|---|---|---|
-  | `pdd` | `draft`（**缺省**） | `--workflow pdd_lu --no-upscale --sol-profile off`，首采 1024×576 | 验构图/运动/身份。362 帧约 285s | 步数由档位模板固定（8 步）；adapter 会把 `parameters.steps` / `parameters.cfg` 透传到 h3qc 命令行，服务端是否接受以实际部署为准，不要指望靠透传步数改变该档 |
+  | `pdd` | `draft`（**缺省**） | `--workflow pdd_lu --no-upscale --sol-profile off`，首采 1024×576 | 验构图/运动/身份。362 帧约 285s（2026-11-19 时点实测，本机 16G 卡） | 步数由档位模板固定（8 步）；adapter 会把 `parameters.steps` / `parameters.cfg` 透传到 h3qc 命令行，服务端是否接受以实际部署为准，不要指望靠透传步数改变该档 |
   | `pdd` | `final` | `--out-width/--out-height` 二采，`--sol-profile off` | 出成片。362 帧到 1536×864 约 832s | **16GB 面积上限 1536×864（1,327,104 px）；竖屏 832×1440 在内**（实测峰值 15.55/15.92 GiB）；超过直接拒绝 |
 
   > **2026-11-15 起引擎只保留 `pdd`，`lu2`/`legacy` 全部下线**（操作者指令）。`VIDEO_ENGINES=("pdd",)`、`VIDEO_TIERS=("draft","final")`；adapter/server 两条校验路径都会拒 `engine=lu2` / `tier=legacy`，底层 `--workflow lu2|legacy` 变不可达死代码。多窗另走 `multishot`（v2，见 §2.14，不占 engine/tier）。lu2 的历史实测数据仅留作对照，不再是可选档位。

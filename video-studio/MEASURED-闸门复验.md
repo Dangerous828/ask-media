@@ -194,7 +194,8 @@ cd <本地项目目录>/example-project/smooth3d/ep01_v4/tools && python3 cut_de
 python3 video-studio/scripts/h3_lint.py /tmp/lintchk2/full1.txt;         echo $?   # 1
 python3 video-studio/scripts/h3_lint.py /tmp/lintchk2/official_single.txt; echo $? # 0
 python3 h3-video-gate/scripts/h3_gate.py /tmp/lintchk2/full1.txt --frames 107 --strict
-cd （仓库根）h3-video-gate && python3 -m pytest tests/ -q                            # 28 passed
+# 在仓库根执行，先进入 h3-video-gate/
+cd h3-video-gate && python3 -m pytest tests/ -q                                   # 28 passed
 
 # 版本溯源（提示词 mtime ≤ 渲染 mtime）
 cd <本地项目目录>/example-project/smooth3d/ep01_v4/h3_prompts && stat -f '%Sm %N' -t '%H:%M:%S' *_*.txt
