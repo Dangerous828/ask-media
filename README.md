@@ -17,7 +17,7 @@
 - **视频提示词与闸门**：`h3-prompt-writing`、`h3-video-gate`
 - **生产与验收**：`h3-queue`、`video-studio`、`concat-video`、`narration-route`
 - **复刻**：`shortvideo-understand`（自研 skill；`lib/chubby_common` 复用 Chubby 代码，MIT）、`video-shot-reverse`
-- **写作与设计**：`write-article`、`write-tweet`、`grab-article`、`humanizer`（第三方，CC BY-NC 4.0，**仅限非商业使用**）、`frontend-design`、`mobile-ios-design`、`mobile-android-design`、`ui-ux-pro-max`、`tailwind-design-system`、`web-design-guidelines`
+- **写作与设计**：`write-article`、`write-tweet`、`grab-article`、`humanizer`（第三方，CC BY-NC 4.0，**仅限非商业使用**）、`frontend-design`、`mobile-ios-design`、`mobile-android-design`、`tailwind-design-system`、`web-design-guidelines`
 
 `AGENTS.md` 是根级路由与纪律约定。
 
@@ -96,5 +96,4 @@ for skill in drama-skills/skills/*/; do ln -s "$PWD/$skill" "$HOME/.claude/skill
   - `humanizer/`：CC BY-NC 4.0，Copyright (c) 2026 shiujan，仅限非商业使用；商用授权见 [lieflat.work](https://lieflat.work/skills/less-ai-tone/)。
   - `frontend-design/`：Apache-2.0，来源 [anthropics/skills](https://github.com/anthropics/skills)。
   - `web-design-guidelines/`：上游 MIT（[vercel-labs/web-interface-guidelines](https://github.com/vercel-labs/web-interface-guidelines)），已随 vendored 核实，与 frontmatter `license: MIT` 一致。
-  - `ui-ux-pro-max/`：来源未记录（全仓无上游出处信息，2026-11-23 核实），不代填 license；如你是其作者或知道来源，请提 issue 告知。
 - MiniMax 官方文档逐字节转载：`video-studio/references/official/base-en.txt`、`video-studio/references/official/ref-en.txt`、`h3-prompt-writing/references/base-en.txt`、`h3-prompt-writing/references/ref-en.txt` 转自 [MiniMax-AI/MiniMax-H3](https://github.com/MiniMax-AI/MiniMax-H3) 官方 skill（`base-en.txt` 222 行、SHA256 前 12 位 `2cfebc096a6e`；`ref-en.txt` 341 行、`1e574f356716`）。MiniMax-H3 仓库无 LICENSE 文件、GitHub license 字段为空（2026-11-23 经 API 核实），社区常见 Community License 声明属模型权重层面、未见覆盖仓库文档的明文条款；此处转载保留原文并署名来源，如上游后续发布文档许可条款，以之为准。原先照搬的官方索引 `h3-prompt-writing/OFFICIAL_SKILLS_INDEX.md` 已改写为本仓本地索引，仅保留官方仓库绝对链接。
