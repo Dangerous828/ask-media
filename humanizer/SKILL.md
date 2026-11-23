@@ -3,7 +3,7 @@ name: humanizer
 version: 2.1.0
 description: 三层去 AI 味（v2，源自 lieflat-less-ai-tone）：脚本检测出分级报告（A 机械改/B 建议改/C 只报告/X 已否决/F 指纹）+ 语义层判读（同义重命名/衔接连环/结论冒号/同构三连），先向用户交付专业、可读的改前报告，列出本篇指标、研究显著性、原文例句和具体改法；收到用户回复后按白名单规则改写，复测并生成前后对比报告（默认 Markdown，与文稿同格式）。规则基于两轮实测（629 篇对照 + 270 对同题同事实配对复测）整理。适用于写作完成后的成稿清理；学位论文与期刊稿用 `--genre academic` 并读 [academic-paper 档](./references/academic-paper.md)；跨阶段的论文全流程读 [流水线契约](./references/research-pipeline.md)。
 whenToUse: 写作完成后的成稿清理、去 AI 味；学位论文与期刊稿加 --genre academic。
-license: CC BY-NC 4.0（vendored，见本目录 LICENSE；商业使用需 lieflat.work 授权）
+license: CC-BY-NC-4.0
 ---
 
 # 去AI味 v2

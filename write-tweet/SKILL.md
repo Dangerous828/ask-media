@@ -3,7 +3,7 @@ name: write-tweet
 version: 1.0.2
 description: 短内容成稿：X 单条与串推、微博、即刻、朋友圈、公众号摘要。定平台与读者，首行钩子独立成立，字数与链接放法当场核实，交付可复制的成稿加字符数。长文章走 write-article。
 whenToUse: 要发一条帖子、一段串推，或把一个观点压成短内容时。
-license: MIT（本仓根 LICENSE）
+license: MIT
 ---
 
 # 短内容

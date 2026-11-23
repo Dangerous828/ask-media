@@ -2,7 +2,7 @@
 name: ask-media
 version: 1.0.1
 description: 影像任务的阶段路由入口：不确定该用哪个技能、自己在第几步、要不要现在就去生产时先用本技能。按「开发→剧本→资产→导演→场记→分镜→图片词→视频词→生产→验收→剪辑」这条链定位阶段，指到唯一步骤 owner。用户说“这个该用哪个技能”“从哪开始”“我现在到哪一步了”，或一句话里同时出现写词、出图、出片、剪辑等多件事时使用。只做选路与交接；不写提示词、不出图、不提交生产、不做验收。
-license: MIT（本仓根 LICENSE）
+license: MIT
 ---
 
 # Ask Media
@@ -78,3 +78,8 @@ license: MIT（本仓根 LICENSE）
 已经知道自己在第几步、只要查“这步该读哪份参考”，读 [阶段路由表](references/route-table.md)。其余情况不用打开它。
 
 语料和剪辑知识在文档准备时按需求引入：`creative-dna-cards` 检索完整模板 → ④ 导演采纳/改编并分派镜头 → ③ 资产按需回补状态 → ⑤ 场记落实状态与接续条件 → ⑥ 分镜定证明时间窗 → ⑦⑧ 词执行 → ⑨⑩ 真实产物核证据 → ⑪ 剪辑采用。已有专项入口也须继承本次相关条件；不是末端兜底，不增加阶段。完整分工、未定项与执行器限制见 [语料机制与剪辑准备](../drama-skills/skills/short-drama/references/mechanism-preparation.md)，检索见 [机制卡索引](../h3-prompt-writing/corpus/creative-dna-t8/INDEX.md)。ask-media 只选路交接，不代选机制或写创作正文。
+
+
+## 许可
+
+MIT，见本仓根 `LICENSE`。本技能只做阶段路由与交接，不含第三方内容。

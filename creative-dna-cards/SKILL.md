@@ -3,7 +3,7 @@ name: creative-dna-cards
 version: 1.0.0
 description: "查 Creative DNA / T8 镜头机制卡全量库。当用户要找某类镜头的组织机制（双人问答、情绪压力曲线、身份一致性、产品证据递进等），文档准备、导演或场记阶段需要机制条件与剪辑准备，或写分镜/视频提示词前想借一个可复用创作结构，或独立验收需要把写作阶段的不变量变成带时间码的观察项时使用。点名 T8、机制卡、creative dna、案例库也用。只检索并给出卡与锚点，不写 H3 正文、不改阶段决定、不生产、不替代独立验收。"
 whenToUse: 文档准备、导演或场记阶段需检索镜头机制卡，或写分镜/视频提示词前想借可复用创作结构时。
-license: 内容 CC BY 4.0（© T8mars）；技能代码 MIT（本仓根 LICENSE）
+license: CC-BY-4.0 AND MIT
 ---
 
 # Creative DNA 机制卡检索

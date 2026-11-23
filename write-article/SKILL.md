@@ -3,7 +3,7 @@ name: write-article
 version: 1.0.3
 description: 长文章成稿：公众号推文、博客、随笔、复盘、发布稿、行业分析。先有一句可反驳的中心主张，按文体配提纲与证据密度，管段落节奏与公众号硬约束，交付独立 Markdown 加标题与摘要候选。短内容走 write-tweet。
 whenToUse: 要产出 500 字以上成稿，或把素材、旧稿扩写成一篇时。
-license: MIT（本仓根 LICENSE）
+license: MIT
 ---
 
 # 文章
