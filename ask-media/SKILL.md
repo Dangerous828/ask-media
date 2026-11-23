@@ -1,7 +1,8 @@
 ---
 name: ask-media
 version: 1.0.1
-description: 影像任务的阶段路由入口：不确定该用哪个技能、自己在第几步、要不要现在就去生产时先用本技能。按「剧本→资产→导演→场记→分镜→图片词→视频词→生产→验收→剪辑」这条链定位阶段，指到唯一步骤 owner。用户说“这个该用哪个技能”“从哪开始”“我现在到哪一步了”，或一句话里同时出现写词、出图、出片、剪辑等多件事时使用。只做选路与交接；不写提示词、不出图、不提交生产、不做验收。
+description: 影像任务的阶段路由入口：不确定该用哪个技能、自己在第几步、要不要现在就去生产时先用本技能。按「开发→剧本→资产→导演→场记→分镜→图片词→视频词→生产→验收→剪辑」这条链定位阶段，指到唯一步骤 owner。用户说“这个该用哪个技能”“从哪开始”“我现在到哪一步了”，或一句话里同时出现写词、出图、出片、剪辑等多件事时使用。只做选路与交接；不写提示词、不出图、不提交生产、不做验收。
+license: MIT（本仓根 LICENSE）
 ---
 
 # Ask Media
@@ -12,11 +13,11 @@ description: 影像任务的阶段路由入口：不确定该用哪个技能、�
 | # | 阶段 | 产出文档 | 步骤 owner |
 |---|---|---|---|
 | 1 | **开发** | — | `short-drama-novel-analyze` / `short-drama-develop` |
-| 2 | **剧本** | `剧本.md` | `short-drama-write` / `short-film-scene-continuity` |
+| 2 | **剧本** | `剧本.md` | `short-drama-write` |
 | 3 | **资产** | `视觉设定.md` | `short-drama-assets` |
 | 4 | **导演** | `导演.md` | `short-drama-direct` / `director-style-presets` |
-| 5 | **场记** | `设定集/场记.md` | `short-drama` / `video-previs` |
-| 6 | **分镜** | `分镜.md` | `short-drama-storyboard` / `storyboard-30s` / `acting-beats-dual-track` |
+| 5 | **场记** | `设定集/场记.md` | `short-drama` |
+| 6 | **分镜** | `分镜.md` | `short-drama-storyboard` / `storyboard-30s` |
 | 7 | **图片提示词** | `图片提示词.md` | `short-drama-image-prompts` / `doc-still-prompt` / `anim3d-still-pitfalls` |
 | 8 | **视频提示词** | `视频提示词.md` | `short-drama-video-prompts` / `h3-prompt-writing` / `h3-video-gate` |
 | 9 | **生产** | `制作成果/` | `short-drama-produce` / `h3-queue` |
@@ -25,6 +26,8 @@ description: 影像任务的阶段路由入口：不确定该用哪个技能、�
 <!-- CHAIN:END -->
 
 链条顺序来自 [`chain.json`](chain.json)。**改阶段只改 JSON，再跑 `python3 gen_table.py`**；表在标记之间自动重写，不要手改。
+
+阶段说明（非 owner，不占表内一格）：② 剧本的场景账与连续性核对读 `short-film-scene-continuity`；⑤ 场记的 `video-previs` 白模/拉片是场记账的上游输入；⑥ 分镜定稿后读 `acting-beats-dual-track` 补演员表演节拍。三者的定位见 [`chain.json`](chain.json) 对应阶段的 `notes` 与 [协作契约](../SHORT-DRAMA-ROUTING.md)。
 
 ## 先判这是不是短剧项目
 
@@ -64,7 +67,7 @@ description: 影像任务的阶段路由入口：不确定该用哪个技能、�
 
 **用户要角色“学动作 / 照着参考视频做 / 动作参考 / 翻跳”（视频动作驱动、含参考音轨）**：直接到 ⑨ 生产，读 `../h3-queue/references/video-motion-drive.md`，它不经 h3q 队列，与“拆成文字的 MOTION 复刻”是两回事。
 
-对已有任务的队列查询、既有媒体审查和纯已有素材剪辑，不另起创作路由；实际生产仍遵守生产 owner 的授权规则。**复审视频要看/核对台词时**，直接用 `transcribe <视频> [--format srt] [--lang zh]` 出带时间轴的文字稿（本地离线 ASR，入口在 `~/.local/bin/transcribe`，已软链 `mlx_whisper`）；需要画面动作信息再用 `video-reader`。这是只读审查，不碰生成工具。`concat-video` 只负责通用已有素材执行；发现需要补素材、改剧情/镜头职责/起终态时，回对应上游。短剧仍走 `short-drama-edit`，不建平行剪辑工程。
+对已有任务的队列查询、既有媒体审查和纯已有素材剪辑，不另起创作路由；实际生产仍遵守生产 owner 的授权规则。**复审视频要看/核对台词时**，用通用 ASR 工具出带时间轴文字稿（作者本机用 `transcribe <视频> [--format srt] [--lang zh]`——这是作者本机工具，入口 `~/.local/bin/transcribe` 已软链 `mlx_whisper`，未随本仓发布；通用替代：`mlx-whisper`、`whisper.cpp` 或任意本地离线 Whisper 实现）；需要画面动作信息时自行抽帧逐帧核对。这是只读审查，不碰生成工具。`concat-video` 只负责通用已有素材执行；发现需要补素材、改剧情/镜头职责/起终态时，回对应上游。短剧仍走 `short-drama-edit`，不建平行剪辑工程。
 
 ## 动手前必读一条
 

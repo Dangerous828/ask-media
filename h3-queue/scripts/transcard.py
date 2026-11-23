@@ -18,6 +18,7 @@ i2va/fl2va 图）：提交时不带 --workflow。
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -27,12 +28,13 @@ import sys
 import time
 from pathlib import Path
 
-HOST = os.environ.get("H3Q_SSH_HOST", "")
+# 主名 H3Q_SSH_HOST / H3Q_REMOTE_PY，旧名 H3Q_HOST / H3Q_PY 作兼容别名（新名优先）。
+HOST = os.environ.get("H3Q_SSH_HOST") or os.environ.get("H3Q_HOST", "")
 
 
 def _require_host():
     missing = [k for k, v in [
-        ("H3Q_SSH_HOST", HOST), ("H3Q_REMOTE_PY", REMOTE_PY),
+        ("H3Q_SSH_HOST/H3Q_HOST", HOST), ("H3Q_REMOTE_PY/H3Q_PY", REMOTE_PY),
         ("H3Q_REMOTE_CLI", REMOTE_CLI), ("H3Q_COMFY_INPUT", COMFY_INPUT),
         ("H3Q_REMOTE_ROOT", REMOTE_ROOT),
     ] if not v]
@@ -41,13 +43,25 @@ def _require_host():
             "缺少远端环境变量: " + ", ".join(missing) + "。"
             "渲染机的路径全部由环境变量提供，本脚本不内置默认机器。"
         )
-REMOTE_PY = os.environ.get("H3Q_REMOTE_PY", "")
+REMOTE_PY = os.environ.get("H3Q_REMOTE_PY") or os.environ.get("H3Q_PY", "")
 REMOTE_CLI = os.environ.get("H3Q_REMOTE_CLI", "")
 COMFY_INPUT = os.environ.get("H3Q_COMFY_INPUT", "")
 REMOTE_ROOT = os.environ.get("H3Q_REMOTE_ROOT", "")
-GATE = os.environ.get(
-    "H3Q_GATE",
-    str(Path.home() / ".skills/hub/h3-video-gate/scripts/h3_gate.py"))
+def _default_gate_path():
+    """闸门默认路径：优先本仓库同布局的相对路径，再退回常见的中枢安装位置。"""
+    candidates = (
+        # 本仓库 scripts/ 的上一级就是技能根，h3-video-gate 与其平级。
+        Path(__file__).resolve().parents[2] / "h3-video-gate/scripts/h3_gate.py",
+        Path.home() / ".skills/hub/h3-video-gate/scripts/h3_gate.py",
+    )
+    for candidate in candidates:
+        if candidate.is_file():
+            return str(candidate)
+    # 都不存在时返回仓库相对路径，让 gate_check 明确报错，而不是静默跳过。
+    return str(candidates[0])
+
+
+GATE = os.environ.get("H3Q_GATE", _default_gate_path())
 
 
 def log(msg: str) -> None:
@@ -112,8 +126,11 @@ def frame_mad(a: Path, b: Path) -> float:
 
 
 def gate_check(prompt_file: Path, frames: int) -> str:
+    # 闸门缺失是硬错误，不允许静默跳过——否则 --skip-gate 这个显式开关形同虚设。
     if not Path(GATE).is_file():
-        return "gate skipped (script absent)"
+        raise RuntimeError(
+            "h3_gate 闸门脚本不存在: %s。请设 H3Q_GATE 指向实际部署的 h3_gate.py；"
+            "只有显式 --skip-gate 才能跳过闸门。" % GATE)
     res = run([sys.executable, GATE, str(prompt_file), "--mode", "base",
                "--frames", str(frames)], check=False)
     out = (res.stdout + res.stderr).strip()
@@ -122,19 +139,39 @@ def gate_check(prompt_file: Path, frames: int) -> str:
     return "gate pass"
 
 
+def _remote_q(value: str) -> str:
+    """把值包成远端命令里的双引号串；先拒绝引号/元字符，防止跳出引用注入。"""
+    if not isinstance(value, str) or any(c in value for c in ('"', "'", "&", "|", ";", "`", "$", "\n", "\r")):
+        raise ValueError("远端参数含不允许的字符: %r" % value)
+    return '"%s"' % value
+
+
+def _idem_key(label: str, seed: int, frames: int, ff_name: str, lf_name: str) -> str:
+    """幂等键含身份信息 + 两帧文件名哈希；重投/脚本重跑不会重复提交。"""
+    digest = hashlib.sha256(
+        ("%s|%d|%d|%s|%s" % (label, seed, frames, ff_name, lf_name)).encode("utf-8")
+    ).hexdigest()[:16]
+    return "tc-%s-s%d-f%d-%s" % (
+        re.sub(r"[^A-Za-z0-9_-]+", "-", label)[:24] or "transcard", seed, frames, digest)
+
+
 def submit(prompt_remote: str, ff_name: str, lf_name: str, frames: int,
            width: int, height: int, seed: int, slug: str, label: str) -> str:
     """不带 --workflow：走默认分支 h3_render_ref.py（i2va/fl2va 图）。"""
     for value, name in ((width, "width"), (height, "height")):
         if value % 32:
             raise ValueError("%s=%s 必须是 32 的倍数" % (name, value))
-    argv = ['"%s"' % REMOTE_PY, "-s", '"%s"' % REMOTE_CLI, "submit", "--kind", "video",
-            "--prompt-file", '"%s"' % prompt_remote,
-            "--slug", '"%s"' % slug, "--version", "v1",
+    for name, value in (("first-frame", ff_name), ("last-frame", lf_name), ("slug", slug)):
+        if not re.fullmatch(r"[A-Za-z0-9_.\-]+", value):
+            raise ValueError("%s 只能含 ASCII 字母数字/点/下划线/连字符: %r" % (name, value))
+    argv = [_remote_q(REMOTE_PY), "-s", _remote_q(REMOTE_CLI), "submit", "--kind", "video",
+            "--prompt-file", _remote_q(prompt_remote),
+            "--slug", _remote_q(slug), "--version", "v1",
             "--seed", str(seed), "--width", str(width), "--height", str(height),
             "--frames", str(frames), "--sol-profile", "off",
-            "--first-frame", ff_name, "--last-frame", lf_name,
-            "--label", '"%s"' % label]
+            "--first-frame", _remote_q(ff_name), "--last-frame", _remote_q(lf_name),
+            "--label", _remote_q(label),
+            "--idem-key", _remote_q(_idem_key(label, seed, frames, ff_name, lf_name))]
     res = ssh(" ".join(argv), timeout=120)
     m = re.search(r"\bjob\s+([0-9a-f]{8,32})\b", res.stdout, re.I)
     if not m:
@@ -167,9 +204,10 @@ def remote_media(state: dict) -> str:
     raw = (state.get("output") or "").strip()
     if raw.startswith("COPY_OF_RECORD "):
         record = raw[len("COPY_OF_RECORD "):].strip()
-        code = ("import json;print(json.load(open(r'%s',encoding='utf-8'))"
-                "['comfy_output'])" % record)
-        out = ssh('"%s" -c "%s"' % (REMOTE_PY, code)).stdout.strip()
+        # 用 json.dumps 生成字符串字面量，避免路径含单引号时跳出引用注入。
+        code = ("import json;print(json.load(open(%s,encoding='utf-8'))"
+                "['comfy_output'])" % json.dumps(record))
+        out = ssh("%s -c %s" % (_remote_q(REMOTE_PY), _remote_q(code))).stdout.strip()
         return out.replace("\\", "/")
     if raw.startswith("OUTPUT "):
         return raw[len("OUTPUT "):].strip().replace("\\", "/")
@@ -185,12 +223,15 @@ def assemble(a: Path, c: Path, b: Path, out: Path) -> Path:
     # A 全段；C 去掉首帧（与 A 末帧重合）；B 去掉首帧（与 C 末帧重合）
     c_tail = work / "_c_tail.mp4"
     b_tail = work / "_b_tail.mp4"
+    # 去首帧后必须 setpts 重打时间戳：否则被去掉的首帧位置会留空，
+    # 经 concat demuxer -c copy 拼接时出现 1 帧时间戳间隙/错位。
+    drop_first_vf = "select=gte(n\\,1),setpts=N/FRAME_RATE/TB"
     run(["ffmpeg", "-v", "error", "-y", "-i", str(c),
-         "-vf", "select=gte(n\\,1)", "-fps_mode", "passthrough",
+         "-vf", drop_first_vf,
          "-c:v", "libx264", "-crf", "16", "-pix_fmt", "yuv420p",
          "-c:a", "aac", "-b:a", "192k", str(c_tail)])
     run(["ffmpeg", "-v", "error", "-y", "-i", str(b),
-         "-vf", "select=gte(n\\,1)", "-fps_mode", "passthrough",
+         "-vf", drop_first_vf,
          "-c:v", "libx264", "-crf", "16", "-pix_fmt", "yuv420p",
          "-c:a", "aac", "-b:a", "192k", str(b_tail)])
     for p in (a, c_tail, b_tail):
@@ -283,6 +324,16 @@ def main() -> int:
     mad_ff = frame_mad(c_first, ff_local)
     mad_lf = frame_mad(c_last, lf_local)
     log("两端 MAD: 首 %.2f / 末 %.2f（<10 视为锁住）" % (mad_ff, mad_lf))
+    # MAD 门限：≥10 视为没锁住（docstring 记录的失败案例 MAD 43.0），
+    # 不继续 assemble，写结果 JSON 并 exit 1 供调用方判定。
+    mad_ok = max(mad_ff, mad_lf) < 10.0
+    if not mad_ok:
+        print(json.dumps({
+            "job": jid, "c": str(c_local), "mad_first": mad_ff, "mad_last": mad_lf,
+            "mad_ok": False, "assemble": None, "gate": gate_note,
+            "error": "MAD >= 10：首尾帧未锁住，不拼接",
+        }, ensure_ascii=False, indent=2))
+        return 1
 
     if args.assemble:
         joined = assemble(a, c_local, b, out_dir / ("%s-A+C+B.mp4" % slug))
@@ -290,6 +341,7 @@ def main() -> int:
 
     print(json.dumps({
         "job": jid, "c": str(c_local), "mad_first": mad_ff, "mad_last": mad_lf,
+        "mad_ok": True,
         "assemble": str(out_dir / ("%s-A+C+B.mp4" % slug)) if args.assemble else None,
         "gate": gate_note,
     }, ensure_ascii=False, indent=2))

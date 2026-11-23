@@ -68,6 +68,54 @@ class H3LintRegressionTests(unittest.TestCase):
         self.assertEqual(result["status"], "PASS")
         self.assertEqual(result["notchecked"], [])
 
+    def test_p0_4_official_single_shot_is_allowed(self):
+        # 官方 base-en.txt :201-203：双帧都写成 (from Shot 1)，单个 [Shot 1] 连续插值。
+        text = (
+            "How the reference pictures align with the target video — "
+            "Picture 1 (from Shot 1) aligns with the 0.00-second mark of the target video; "
+            "Picture 2 (from Shot 1) aligns with the 8.00-second mark of the target video.\n"
+            "integrated_multimodal_description: [Shot 1] A cyclist begins in the framing of "
+            "Picture 1 and settles into the pose of Picture 2 at the end of the shot."
+        )
+        path = self.write_prompt(text)
+        self.assertEqual(h3_lint.check_fl2va_single_shot(text), [])
+        self.assertNotIn("P0-4", " ".join(h3_lint.lint(path)["p0"]))
+
+    def test_p0_4_three_shots_without_declared_cut_is_blocked(self):
+        text = (
+            "How the reference pictures align — <Picture 1> (from [Shot 1]) aligns with 0.00s; "
+            "<Picture 2> (from [Shot 3]) aligns with 8.00s.\n"
+            "[Shot 1] <Picture 1> is the opening. A woman stands by the window.\n"
+            "[Shot 2] She lifts her gaze toward the lights.\n"
+            "[Shot 3] She folds the letter into the pose of <Picture 2>."
+        )
+        path = self.write_prompt(text)
+        issues = h3_lint.check_fl2va_single_shot(text)
+        self.assertTrue(any("P0-4" in x for x in issues), issues)
+        self.assertTrue(any("P0-4" in x for x in h3_lint.lint(path)["p0"]))
+
+    def test_p0_4_three_shots_with_declared_hard_cut_is_allowed(self):
+        text = (
+            "How the reference pictures align — <Picture 1> (from [Shot 1]) aligns with 0.00s; "
+            "<Picture 2> (from [Shot 3]) aligns with 8.00s.\n"
+            "[Shot 1] <Picture 1> is the opening. A woman stands by the window.\n"
+            "[Shot 2] At 00:03.000, the camera cuts to a close-up of the letter.\n"
+            "[Shot 3] She folds the letter into the pose of <Picture 2>."
+        )
+        path = self.write_prompt(text)
+        self.assertEqual(h3_lint.check_fl2va_single_shot(text), [])
+        self.assertNotIn("P0-4", " ".join(h3_lint.lint(path)["p0"]))
+
+    def test_p0_4_official_bare_picture_labels_are_recognized(self):
+        # 裸 `Picture N (from Shot N)` 不带尖括号，也必须被识别为双帧 FL2VA。
+        text = (
+            "Picture 1 is the first frame and Picture 2 is the ending.\n"
+            "[Shot 1] A woman begins at Picture 1 and ends at Picture 2 in one take.\n"
+            "[Shot 2] She keeps walking."
+        )
+        self.assertTrue(h3_lint.check_fl2va_single_shot(text),
+                        "裸标签双帧被漏判为并非 FL2VA")
+
     def test_undeterminable_dialogue_duration_is_explicit_notchk(self):
         path = self.write_prompt("[Shot 1] The speaker says <d>[Chinese] 你好吗</d>.")
 

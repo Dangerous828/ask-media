@@ -1,13 +1,15 @@
-# T8 Creative DNA 全量目录（624 条）
+# T8 Creative DNA 可检索目录（624 条）
 
-> 由官方 `catalog/template-index.json` 生成。按标题或机制关键词直接搜：[search.py](search.py)；本页供按类型浏览。
+> 本页 624 条 = 613 案例原文 + 9 官方 Skill + 2 社区 Skill，与 [catalog.json](catalog.json) / [search.py](search.py) 同源、可检索；按标题或机制关键词直接搜 `search.py`，本页供按类型浏览。**另有 273 张正式模板卡仅见于 `catalog-index-source.json` 的 `recommendationEntities`，未入本地检索索引**，故不计入本页 624 条。
+>
+> 社区 Skill「自然街拍互动」「突遇惊吓到手势和解」原 `cards-community/` 条目只有头部元数据、原文段为空，已从索引移除并从磁盘删除；其可检索的原文见 `cards/` 下同名文件（类型标为机制卡，内容以该文件为准）。
 
 ## 机制卡 / 官方 Skill / 社区 Skill
 
 | 条目 | 类型 | 一句话机制 | 本地原文 |
 |---|---|---|---|
-| 自然街拍互动 | community-skill | 单一社交前提驱动连续街道路线上人物与镜头的距离变化；表演、视差、移动自然光和现场声共同把关系推进到可读结尾。 | [direct-street-interview-video](cards-community/direct-street-interview-video.md) |
-| 突遇惊吓到手势和解 | community-skill | 平静主体与技术观察者先保持可读距离；双方独立视角建立信息差，一次非致命惊慌反应提高风险。主体随后贴近透明边界并掌握距离主导权；持续对视与一个 | [stage-startle-to-truce-encounter](cards-community/stage-startle-to-truce-encounter.md) |
+| 自然街拍互动 | community-skill | 单一社交前提驱动连续街道路线上人物与镜头的距离变化；表演、视差、移动自然光和现场声共同把关系推进到可读结尾。 | [direct-street-interview-video](cards/direct-street-interview-video.md) |
+| 突遇惊吓到手势和解 | community-skill | 平静主体与技术观察者先保持可读距离；双方独立视角建立信息差，一次非致命惊慌反应提高风险。主体随后贴近透明边界并掌握距离主导权；持续对视与一个 | [stage-startle-to-truce-encounter](cards/stage-startle-to-truce-encounter.md) |
 | 3D 动画短片生成器 | official-skill |  | [3d-animation-short-generator](cards/direct-seedance-3d-animation.md) |
 | 品牌宣传短片生成器 | official-skill |  | [brand-promo-video-generator](cards/direct-seedance-brand-promo.md) |
 | 双人游戏开场视频生成器 | official-skill |  | [co-op-game-intro-generator](cards/direct-seedance-coop-game-intro.md) |

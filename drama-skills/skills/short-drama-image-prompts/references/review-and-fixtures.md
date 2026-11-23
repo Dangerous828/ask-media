@@ -83,7 +83,7 @@ Finding：
 
 > 桌面上的值班登记簿，封面必须清楚写“设备复核记录”，画面中不要任何文字、字母或符号。
 
-`readable` 与全局 no-text 可由本地检查证明冲突。修复不是祈求“正确生成”，而是在 `readable` 与 `postproduction` 中选择一种并调整正文。
+`readable` 与全局 no_readable_text 可由本地检查证明冲突。修复不是祈求“正确生成”，而是在 `readable` 与 `postproduction` 中选择一种并调整正文。
 
 ### 反例 C：越权 edit
 

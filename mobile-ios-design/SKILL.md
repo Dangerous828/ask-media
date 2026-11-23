@@ -1,6 +1,7 @@
 ---
 name: mobile-ios-design
 version: 1.0.0
+license: MIT
 description: Master iOS Human Interface Guidelines and SwiftUI patterns for building native iOS apps. Use when designing iOS interfaces, implementing SwiftUI views, or ensuring apps follow Apple's design principles.
 ---
 

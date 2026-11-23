@@ -1,5 +1,18 @@
 # 变更记录
 
+## 1.3.1（补记）
+
+> 1.3.0 / 1.3.1 两次版本提升当时未逐条留档，现依据当前 `SKILL.md` 正文补记可核验要点，非当时的完整变更清单。
+
+- `SKILL.md` frontmatter 版本升至 1.3.1（自首次公开发布即为 1.3.1，CHANGELOG 此前缺对应条目）。
+- 明确本地 h3q 约束：adapter 仅支持 I2VA / FL2VA / Ref2VA，**不支持纯文生（T2VA 仅作官方模式说明，本地不可提交）**。
+- 多窗容器接入 V2：选路先读 `h3-queue` §2.14，`workflow=multishot` 走 `multishot_render_ref.py` → `H3MultishotMemorySampler`。
+
+## 1.3.0（补记）
+
+- 正文规则成型：*Body Consistency Rules*（首帧即第 0 秒、构图锚点带时刻、时间线单调、台词有开口时刻、绝对词只给整段不变事实等）与 *Continuous-Relay* 写入主技能。
+- Workflow 增加按素材职责选模式（Ref2VA / I2VA / FL2VA / L2VA / T2VA）与动笔前三读（首帧、场记卡、分镜 reads 时间窗）。
+
 ## 2026-11-07 · 视频生产契约审计
 
 - 收录EP002停车、参考改绑和真实观察范围案例，保存006/007完整原文；候选修订句式标未实测。
@@ -24,7 +37,7 @@
 
 - 新增 *Body Consistency Rules*：正文先对齐输入再谈氛围——第 0 秒等于真正的首帧；`用途：构图` 的图写成 composition anchor 并带画面证明计划里的时刻，不写 opening composition；时间线单调、反应晚于触发；台词有开口时刻；一件事只在发生处说一次；绝对词（全程 / the whole time）只给整段不变的事实；机位和光取自场记账；声音事件有来源有起点；画面文字只写存在的。
 - 重写 *Camera Motion Mapping*：运镜取自场记卡与分镜，七项句式降为词库；容器成员各自保持场记卡，成为各自的 `[Shot k]`，不合并成固定取景。
-- 重写光线一节为 *Light and Exposure*：亮度关系照首帧写，不叠整体压暗氛围词；附 midnight-cream-veil 三段的第 0 帧亮度实测与量法（`seam_check.py`），明确原因未做 A/B。
+- 重写光线一节为 *Light and Exposure*：亮度关系照首帧写，不叠整体压暗氛围词；附 example-project 三段的第 0 帧亮度实测与量法（`seam_check.py`），明确原因未做 A/B。
 - 重写续接一节为 *Continuous-Relay: Facts That Carry Over*：只写本段可见内容碰到的事实，不再要求每段 `Throughout:` 锁块。
 - 把项目实测案例（连续飞行、暖灯笼光色、遮挡转场全文、剪辑层拼接、T8 DNA、打戏配方、一镜到底宴席、门洞状态锁）原样移入 `references/case-notes.md`，SKILL.md 只留抽象原则与入口。原文逐行比对一致。
 - `references/failure-modes.md`：遮挡转场的 `without cutting` 改为正向写法；新增六行（构图帧写成开场、反应早于触发、绝对词打架、压暗氛围词、多卡合并成固定取景、画质清单与"无文字"整句）。

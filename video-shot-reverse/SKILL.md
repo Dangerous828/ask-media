@@ -1,6 +1,7 @@
 ---
 name: video-shot-reverse
 version: 1.0.0
+license: MIT
 description: >
   把一条已有视频逐镜反推并重建一套逆推准备文档（剧本还原、场记账、导演还原、分镜表、
   提示词、引用映射、QC）：解析、拆镜、反推、提取提示词、扒片、镜头边界判定、

@@ -291,27 +291,27 @@ PROJECT_CASES = [
 ]
 
 
-VIEW_FULL = "Gugu wears a black penguin hood, a white belly patch and orange slippers."
-VIEW_REAR = "Gugu wears a black penguin hood and orange slippers."
-VIEW_LIBRARY = IDENTITY_OK + "\n## Gugu\n> presence: Gugu\n```text\n" + VIEW_FULL + "\n```\n### 背面\n> identity: Gugu\n> view: rear\n```text\n" + VIEW_REAR + "\n```\n"
+VIEW_FULL = "角色A wears a black penguin hood, a white belly patch and orange slippers."
+VIEW_REAR = "角色A wears a black penguin hood and orange slippers."
+VIEW_LIBRARY = IDENTITY_OK + "\n## 角色A\n> presence: 角色A\n```text\n" + VIEW_FULL + "\n```\n### 背面\n> identity: 角色A\n> view: rear\n```text\n" + VIEW_REAR + "\n```\n"
 
-def view_doc(anchor=VIEW_REAR, declaration="身份视图：Gugu=rear"):
+def view_doc(anchor=VIEW_REAR, declaration="身份视图：角色A=rear"):
     return good_doc().replace("### 2. 裁决\n", "### 2. 裁决\n" + declaration + "\n").replace(
         "no text, no watermark", anchor + " no text, no watermark")
 
 PROJECT_CASES.extend([
     ("project：空身份库不能作为免检", good_doc(), False, {"identity": "# 身份库\n"}),
     ("project：已登记背面锚点可用，无需补出正脸", view_doc(), True, {"identity": VIEW_LIBRARY}),
-    ("project：未知视图不能绕过身份", view_doc(declaration="身份视图：Gugu=unknown"), False, {"identity": VIEW_LIBRARY}),
+    ("project：未知视图不能绕过身份", view_doc(declaration="身份视图：角色A=unknown"), False, {"identity": VIEW_LIBRARY}),
     ("project：未登记角色不能借视图放行", view_doc(declaration="身份视图：Other=rear"), False, {"identity": VIEW_LIBRARY}),
     ("project：视图不能隐式放宽默认完整身份", view_doc(declaration=""), False, {"identity": VIEW_LIBRARY}),
     ("project：完整身份默认仍可用", view_doc(anchor=VIEW_FULL, declaration=""), True, {"identity": VIEW_LIBRARY}),
-    ("project：登记视图仍必须引用锚点", view_doc(anchor="Gugu wears a red penguin hood."), False, {"identity": VIEW_LIBRARY}),
-    ("project：重复视图选择阻断", view_doc(declaration="身份视图：Gugu=rear\n身份视图：Gugu=full"), False, {"identity": VIEW_LIBRARY}),
+    ("project：登记视图仍必须引用锚点", view_doc(anchor="角色A wears a red penguin hood."), False, {"identity": VIEW_LIBRARY}),
+    ("project：重复视图选择阻断", view_doc(declaration="身份视图：角色A=rear\n身份视图：角色A=full"), False, {"identity": VIEW_LIBRARY}),
     ("project：不在场角色和其视图不强制入画", good_doc(), True, {"identity": VIEW_LIBRARY}),
-    ("project：冻结备案不掩盖未登记视图", view_doc(declaration="身份视图：Gugu=unknown").replace(
+    ("project：冻结备案不掩盖未登记视图", view_doc(declaration="身份视图：角色A=unknown").replace(
         "| 14 | 条目 | NA：本镜单主体、室内无窗、无遮挡织物、非真人分支、无跨镜交接 |",
-        "| 14 | 条目 | no | `Gugu wears a black penguin hood` 已冻结帧备案 |"), False, {"identity": VIEW_LIBRARY}),
+        "| 14 | 条目 | no | `角色A wears a black penguin hood` 已冻结帧备案 |"), False, {"identity": VIEW_LIBRARY}),
 ])
 
 

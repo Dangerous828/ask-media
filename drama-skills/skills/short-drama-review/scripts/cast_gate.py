@@ -29,6 +29,9 @@ a job for look acceptance and the agent's own viewing. A missing attachment is
 unambiguous and fail-closed.
 
 No filesystem access: the caller owns the project documents.
+
+SYNC NOTE: this file is byte-identical to short-drama-produce/scripts/cast_gate.py.
+Keep both copies in sync; any change must be applied to both.
 """
 from __future__ import annotations
 
@@ -49,7 +52,7 @@ IDENTITY_MARKERS = (
 # reference_bindings 的「控制」字段里，声明这张图捐身份时的用词
 IDENTITY_CONTROL = ("身份", "脸型", "五官", "identity", "face")
 
-# 分镜.md 的逐人调度行：`- 人物构图：江晨｜身体：…｜头部：…｜视线目标：…`
+# 分镜.md 的逐人调度行：`- 人物构图：角色A｜身体：…｜头部：…｜视线目标：…`
 CAST_LINE = re.compile(r"^-\s*人物构图[：:]\s*([^｜|：:\n]+)", re.MULTILINE)
 # 视觉设定.md 的人物条目与其画面代称
 CHARACTER_HEADING = re.compile(r"^##\s*人物\s*[·・]\s*(.+?)\s*$", re.MULTILINE)

@@ -2,11 +2,13 @@
 name: humanizer
 version: 2.1.0
 description: 三层去 AI 味（v2，源自 lieflat-less-ai-tone）：脚本检测出分级报告（A 机械改/B 建议改/C 只报告/X 已否决/F 指纹）+ 语义层判读（同义重命名/衔接连环/结论冒号/同构三连），先向用户交付专业、可读的改前报告，列出本篇指标、研究显著性、原文例句和具体改法；收到用户回复后按白名单规则改写，复测并生成前后对比报告（默认 Markdown，与文稿同格式）。规则基于两轮实测（629 篇对照 + 270 对同题同事实配对复测）整理。适用于写作完成后的成稿清理；学位论文与期刊稿用 `--genre academic` 并读 [academic-paper 档](./references/academic-paper.md)；跨阶段的论文全流程读 [流水线契约](./references/research-pipeline.md)。
+whenToUse: 写作完成后的成稿清理、去 AI 味；学位论文与期刊稿加 --genre academic。
+license: CC BY-NC 4.0（vendored，见本目录 LICENSE；商业使用需 lieflat.work 授权）
 ---
 
 # 去AI味 v2
 
-> **来源**：本技能 v2 整体取自 [lieflat-less-ai-tone](https://lieflat.work/skills/less-ai-tone/) 公开版，目录名沿用 `humanizer` 以保持 `../AGENTS.md` 与 write-article / write-tweet 的既有路由不断。v1.1.0 旧版备份在 `~/.skills/backups/humanizer-v1.1.0-20261112/`。
+> **来源**：本技能 v2 整体取自 [lieflat-less-ai-tone](https://lieflat.work/skills/less-ai-tone/) 公开版，目录名沿用 `humanizer` 以保持 `../AGENTS.md` 与 write-article / write-tweet 的既有路由不断。本仓不再保留 v1.1.0 旧版。
 
 ## 商业授权提示
 
@@ -36,7 +38,7 @@ python3 scripts/detect.py <文件> --candidates --out /tmp/candidates.json
 
 对抽出的四类候选（同义重命名段 / 段间衔接接口 / 冒号句 / 三连同构组），按 [references/semantic-criteria.md](./references/semantic-criteria.md) 的判据逐条给出 `label`/`confidence`/`reason`，写回 JSON。判断纪律（43 万次打标的教训）：只按判据判不按整体感觉、每条独立判断不看全文、拿不准选兜底标签、禁止自造标签。
 
-单篇 3000 字约 40-80 条候选，会话内直接判，token 开销可忽略。判完按判据文件末尾的汇总口径算四个数：重命名 次/段、最长连环、结论冒号占比、高度同构三连数。
+单篇 3000 字约 40-90 条候选（标题、清单较多的稿子会偏高），会话内直接判，token 开销可忽略。判完按判据文件末尾的汇总口径算四个数：重命名 次/段、最长连环、结论冒号占比、高度同构三连数。
 
 ### 第二步：给用户看检测结果和建议，等待回复
 

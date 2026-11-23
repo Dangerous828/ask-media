@@ -1,7 +1,7 @@
-# 《咕角色C嘎》真实项目实测
+# 示例项目实测
 
 日期 2026-10-22
-对象：`~/projects/example-project/`（648 MB，EP01 已返修 4 轮）
+对象：`<本地项目目录>/example-project/`（648 MB，EP01 已返修 4 轮）
 
 ---
 
@@ -37,10 +37,10 @@ def submit_and_wait(graph, target_name):
 | 参考图 | 本地项目 | <渲染主机SSH别名> input |
 |---|---|---|
 | `kf_s04_anime_sunlit.png` | ✓ | ✓ |
-| `gugu_turnaround_smooth3d.png` | ✓ | ✓ |
-| `gungun_turnaround_v1.jpg` | **✗ 缺** | ✓ |
+| `example_turnaround_smooth3d.png` | ✓ | ✓ |
+| `example_turnaround_v1.jpg` | **✗ 缺** | ✓ |
 
-（`run_s05.py` 用的是 `gungun_front_single_v1.png`，能对上）
+（`run_s05.py` 用的是 `example_front_single_v1.png`，能对上）
 
 ---
 
@@ -59,11 +59,13 @@ def submit_and_wait(graph, target_name):
 
 **指标几乎完全一致（熵差 0.01），画面内容也对得上**（牵手、跨出屏幕、发光粒子）。
 
-**结论：8 步 Turbo + LoRA 可以替代 45 步，速度提升约 2 倍。**
+**结论：8 步 Turbo 与 45 步的画质指标几乎一致；45 步耗时未记录，倍数未验证**。
 
 ---
 
 ## 三、真实项目关键帧的四件套分布（21 张）
+
+> 分母口径：本节四带均值/范围的统计样本为 **21 张**（下文四件套通过率按 **27 张**算，两者是不同统计集合，勿混用）。
 
 | 指标 | 均值 | 范围 |
 |---|---|---|
@@ -78,6 +80,8 @@ def submit_and_wait(graph, target_name):
 **真实项目几乎达到官方水平。** 这推翻了我前四轮的核心前提——我一直以为本地 Qwen 出不了好图。
 
 ### 四件套通过率：4/27
+
+> 分母 27 = 三轮 × 9 格；通过 4 张、失败 23 张（改分档阈值后通过 11/27）。21 张那组是四带分布统计样本，非同一集合。
 
 | 通过 | 失败原因 |
 |---|---|
@@ -130,8 +134,8 @@ The scene is set in the cozy stylized 3D cartoon living room from <Picture 1>:
 cream TV cabinet on the right wall, polished pastel floor tiles...
 
 - On the right wall, the large TV screen is a brilliant swirling golden vortex portal.
-  The cute penguin girl (Gugu, from image 2) is firmly holding the small hand of
-  the cute chubby toddler boy (Gungun, from image 3).
+  The cute penguin girl (角色A, from image 2) is firmly holding the small hand of
+  the cute chubby toddler boy (角色C, from image 3).
 ```
 
 **特征**：
@@ -151,5 +155,5 @@ cream TV cabinet on the right wall, polished pastel floor tiles...
 | 1 | 修正 5 个脚本的端口：18199 → 8199（或起服务） | **高** |
 | 2 | 高光阈值按画风分档（角色C档 15–25%） | 高 |
 | 3 | 把出图接到 h3q 队列，去掉直连 | 中 |
-| 4 | 检查 `gungun_turnaround_v1.jpg` 本地缺失 | 低 |
+| 4 | 检查 `example_turnaround_v1.jpg` 本地缺失 | 低 |
 | 5 | qc_image 增加 H3 提示词工程检查（Picture 引用/参考加载/术语统一） | **这才是真瓶颈** |

@@ -37,7 +37,7 @@ license: MIT
 - 证据：……
 - 影响：……
 - 修订结果：由 short-drama-storyboard 补入准确文字及可读条件。
-- 规则：SHT-01 · reviewed_invariant
+- 规则：`reviewed_invariant · SHT-01`
 ```
 
 引用只使用文件名、标题 ID、行号或短引文；不建立 sources 声明、哈希、record ID 或第二套状态。

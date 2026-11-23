@@ -28,7 +28,7 @@
     <label>-before-end.png     前段真实末帧
     <label>-after-start.png    后段真实首帧
     <label>-side-by-side.jpg   并排图，左上角标注文件名与帧号
-    <label>-grid.jpg           4x3 网格热图，标出差异落在哪些区域
+    <label>-grid.jpg           3x4 网格热图（3 行 4 列），标出差异落在哪些区域
     <label>-seam.json          全部指标与取帧来源，供写进《视频提示词.md》的接缝契约
 
 退出码：0 = 取证完成；2 = 参数/文件/ffmpeg 问题（**不代表接缝不合格**）。
@@ -166,7 +166,7 @@ def extract_frame(video: Path, edge: str, target: Path) -> dict[str, Any]:
     末帧有两种常见错法，两种都会让整套比对失效：
       * `-sseof -1` 配 `-frames:v 1` 取到的是末段窗口里的**第一帧**，不是最后一帧；
       * 按 `duration - 1/fps` 定位，在 17k+5 帧网格上会落到倒数第二帧。
-    所以这里优先按帧号取（`select=eq(n,count-1)`），只有拿不到 nb_frames 时才回退
+    所以这里优先按帧号取；ffmpeg 的 select 表达式里没有 `count` 变量，实际写成 `select=eq(n\,N-1)`（N 为已知帧数），只有拿不到 nb_frames 时才回退
     `-sseof` + `-update 1`（后者靠"每帧覆盖同一输出文件"留下最后一张）。
     """
     ffmpeg = _which("ffmpeg")
@@ -331,7 +331,7 @@ def luma_mean(pixels: np.ndarray) -> float:
 
     `luminance_mean` elsewhere in this report is the plain RGB average and
     under-reads brightness changes on warm frames, where the green channel
-    carries most of the perceived brightness (midnight-cream-veil START-A to
+    carries most of the perceived brightness (example-project START-A to
     SEG-A: -5.1% by RGB average, -6.3% by luma).
     """
     # Explicit channel sum, not a matmul: the macOS Accelerate build of numpy

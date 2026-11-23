@@ -1,8 +1,8 @@
 {
   "characters": [
-    {"id":"gungun","trigger":"chubby toddler boy","must_include":["cream","giraffe","mustard","grey strappy sandals"],"forbid":["velcro"]},
+    {"id":"characterA","trigger":"chubby toddler boy","must_include":["cream","giraffe","mustard","grey strappy sandals"],"forbid":["velcro"]},
     {"id":"mama","trigger":"young mother","must_include":["apricot","cardigan"],"forbid":["beige cardigan"]}
   ],
   "time_of_day":{"require_any":["afternoon","daylight","sunlit","sunny"],"forbid_any":["night","dusk","moonlight"]},
-  "speaker_map":{"gungun":"S1","mama":"S2"}
+  "speaker_map":{"characterA":"S1","mama":"S2"}
 }

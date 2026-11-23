@@ -5,7 +5,7 @@
 `$short-drama-produce` 并单独确认。
 
 **这是项目级文件，不是某一集的创作文档。** 它不参与 `creator_markdown_check.py` 的
-六文档校验；某一集要用的资产提示词写进该集的《图片提示词.md》，骨架以 `SKILL.md` 为准。
+六文档校验；某一集要用的资产提示词写进该集的《图片提示词.md》，骨架以 `../SKILL.md` 为准。
 
 ```markdown
 # 项目 Look Development 提示词

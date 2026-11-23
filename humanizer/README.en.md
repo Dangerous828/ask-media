@@ -4,9 +4,9 @@
 
 **Website & commercial licenses:** [lieflat.work · Lieflat Less AI Tone](https://lieflat.work/skills/less-ai-tone/)
 
-![Lieflat Less AI Tone: 5.2M characters, 100+ measures, approximately 500K model semantic judgments](assets/less-ai-tone-hero-en.png)
+**Lieflat Less AI Tone: about 5.2 million characters, 100+ measures, about 540,000 model semantic judgments.**
 
-**A post-draft Chinese writing skill built from two rounds of comparison: 629 articles in the first round, 270 matched pairs in the second, about 5.2 million Chinese characters in total, and about 500,000 model semantic judgments.** It reports what it found, cites passages from your draft, and proposes specific edits. It rewrites only after you respond, then runs a second check and shows the changes.
+**A post-draft Chinese writing skill built from two rounds of comparison: 629 articles in the first round, 270 matched pairs in the second, about 5.2 million Chinese characters in total, and about 540,000 model semantic judgments.** It reports what it found, cites passages from your draft, and proposes specific edits. It rewrites only after you respond, then runs a second check and shows the changes.
 
 ## What the study measured
 
@@ -17,10 +17,10 @@ Three methods handled different kinds of evidence:
 | Method | What it measured | Scope |
 |---|---|---|
 | Scripts | Punctuation, sentence and section structure, lexical measures, and other countable features | 90 measures across all 540 second-round articles |
-| Model semantic assessment | Whether a candidate passage meets a narrowly defined semantic criterion | About 500,000 judgments during the study (431,000 in round two plus about 110,000 in a supplementary round), using Jev |
+| Model semantic assessment | Whether a candidate passage meets a narrowly defined semantic criterion | About 540,000 judgments during the study (431,000 in round two plus about 110,000 in a supplementary round), using Jev |
 | Human review | Metaphor aptness and errors in machine judgments | Sentence-level annotation and sample checks |
 
-The 500,000 judgments describe the **research**, not the number of model calls required to check one new draft. In ordinary use, the skill's scripts extract candidates and the current conversation model assesses them against the closed criteria in [references/semantic-criteria.md](./references/semantic-criteria.md).
+The 540,000 judgments describe the **research**, not the number of model calls required to check one new draft. In ordinary use, the skill's scripts extract candidates and the current conversation model assesses them against the closed criteria in [references/semantic-criteria.md](./references/semantic-criteria.md).
 
 ## What changed after the matched-pair test
 
@@ -43,13 +43,15 @@ The [Agent memory article example](./examples/agent-memory-case/README.md) inclu
 
 ## Install and try it
 
-Ask an AI assistant that supports Agent Skills to install **Lieflat Less AI Tone** from this repository, or use:
+The skill in this repository lives in `humanizer/` (this directory). Ask an AI assistant that supports Agent Skills to read this directory's [SKILL.md](./SKILL.md) and follow its workflow; locally you can start with:
 
 ```bash
-npx skills add larashero3-dotcom/lieflat-less-ai-tone
+python3 scripts/detect.py <file-or-dir> --json   # run from inside humanizer/
 ```
 
 Then give the assistant a finished Chinese article. It will report its findings and suggested changes first. Reply with the equivalent of “apply the suggestions” or specify a narrower scope to start rewriting.
+
+> This skill derives from the public [lieflat-less-ai-tone](https://lieflat.work/skills/less-ai-tone/). Using `npx skills add` installs the **upstream original**, not this repository's `humanizer` with its academic profile and local changes.
 
 The corpus is not redistributed because of copyright and privacy constraints. The scripts, definitions, and decision criteria are provided so the method can be rerun on a corpus you are allowed to use. The reported figures are observations from these samples, not a universal authorship detector.
 

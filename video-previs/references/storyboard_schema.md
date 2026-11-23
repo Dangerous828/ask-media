@@ -1,6 +1,6 @@
 # 对白白模 storyboard 字段字典（dialogue_engine 契约）
 
-顶层：project, w(960), h(540), fps(24), set{}, actors{}, shots[]。
+顶层：project, title, scene, w(960), h(540), fps(24), set{}, actors{}, shots[]；可选：env{}（3D 场景 DSL）。
 
 ## set（环境/道具，极简）
 - type: "tatami"（影响地面色）。
@@ -29,7 +29,7 @@
 - staging：{角色ID:[x,z], …} 仅本镜临时站位（不影响全局）。
 - table：{x,z,w,d,h} 仅本镜临时道具。
 - serve：盛饭/伸手动作的角色 ID。
-- scene：room|field（可选）——field 镜画土地+战旗剪影+暖沙雾（不画桌案），3D 在 x=60 平移出战场区。
+- scene：room|field|street_stall|city_aerial|generic（可选）——field 镜画土地+战旗剪影+暖沙雾（不画桌案），3D 在 x=60 平移出战场区；street_stall 摊贩场景，city_aerial 城市航拍，generic 通用房间。
 - pose：{角色ID: seated|stand|ride}（可选）——逐镜姿态覆盖；ride 画马匹灰模+骑手抬高 1.28m。
 - 运镜参数（可选，按镜内进度插值）：dolly:"in"|"out"（推/拉）、pan:度数（摇）、whip:1（甩加速）、
   truck:米（移）、orbit:度数（环绕）、crane:米（升降）、zoom:倍率（变焦）。2D 引擎逐帧插值，3D 起止关键帧。

@@ -140,7 +140,13 @@ CASES = [
     ("运镜带起幅落幅动机（｜分隔）", good_doc(moves=["缓慢匀速向前推进｜起幅：两人中景｜落幅：手部近景｜动机：注意转向刀"] + MOVES[1:]), True),
     ("运镜自造词", good_doc(moves=["甩镜头"] + MOVES[1:]), False),
     ("小数秒区间不丢镜", good_doc(total=10, nshots=2, beat="10s·2镜").replace("镜1  0-5秒", "镜1  0-3.5秒").replace("镜2  5-10秒", "镜2  3.5-10秒"), True),
-    ("2 秒镜塞 10 字台词", good_doc(lines=["你来了。", "我等了你整整三天三夜。"] + ["无"] * 8), False),  # 镜2=2秒, "我等了三天。"6字→超6字上限? 见下
+    ("2 秒镜塞 8 字台词", good_doc(lines=["你来了。", "你终于肯来见我了"] + ["无"] * 8), False),  # 镜2=2秒，上限6字
+    ("2 秒镜塞 10 字台词", good_doc(lines=["你来了。", "我等了你整整三天三夜。"] + ["无"] * 8), False),  # 镜2=2秒，上限6字，10字必超
+    ("4 秒镜塞 13 字台词放行（4.1 公式）", good_doc(lines=["你来了。", "无", "无", "无", "无", "无", "无", "无", "那天你说过我们会再见面的啊"] + ["无"]), True),  # 镜9=4秒，上限14字
+    ("自检判 no 直接 FAIL", good_doc().replace("| 1 | 条目 | yes |", "| 1 | 条目 | no |"), False),
+    ("自检 NA 无理由 FAIL", good_doc().replace("| 1 | 条目 | yes |", "| 1 | 条目 | NA |"), False),
+    ("自检检查项文本含 no 不误判（列错位回归）", good_doc().replace("| 9 | 条目 | yes |", "| 9 | 有没有写 no 之类的词 | yes |"), True),
+    ("运镜用 ｜ 分隔缺落幅 FAIL", good_doc(moves=["固定机位｜起幅：两人中景｜动机：停在门口"] + MOVES[1:]), False),
     ("缺分镜总表节", good_doc(summary=False), False),
     ("缺切点契约/生成单元/连续性账", good_doc(tables=False), False),
     ("切点连接方式非法", good_doc().replace("| 动作接 |", "| 随便切 |", 1), False),
@@ -156,10 +162,8 @@ CASES = [
 
 
 def main():
-    # 用例9：把 2 秒镜（镜2）的台词换成 10 字
-    bad_line = LINES[:]
-    bad_line[1] = "你终于肯来见我了"  # 8 字 > 6
-    CASES[8] = ("2 秒镜塞 8 字台词", good_doc(lines=bad_line), False)
+    # 用例全部在 CASES 里按名声明；不再用下标覆盖（旧版 CASES[8] 覆盖了
+    # 「运镜带起幅落幅动机」正向用例，使其从未执行）。
     failed = sum(0 if run_one(*c) else 1 for c in CASES)
     print("\n%d/%d 用例符合预期" % (len(CASES) - failed, len(CASES)))
     return 1 if failed else 0

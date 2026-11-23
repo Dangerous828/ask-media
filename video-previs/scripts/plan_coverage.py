@@ -47,8 +47,8 @@ def plan(data):
             # 后接反应：若下一句换人或标 react -> 听者反应特写
             if "react" in beats or (nxt and nxt.get("speaker") and nxt["speaker"]!=spk):
                 rt1=nxt["t1"] if nxt else L["t1"]+1.5
-                push("cu",L["t1"],rt1,target=(nxt["speaker"] if nxt else None),spk=None,
-                     line=(nxt["line"] if nxt and nxt["speaker"]==nxt.get("speaker") else ""),note="听者反应特写")
+                push("cu",L["t1"],rt1,target=(nxt.get("speaker") if nxt else None),spk=None,
+                     line=(nxt.get("line", "") if nxt else ""),note="听者反应特写")
                 i+=2; continue
         elif nxt and nxt.get("speaker") and nxt["speaker"]!=spk and (nxt["t0"]-L["t1"])<1.2:
             # 一来一回 -> 越肩正反打（两句合一镜：听者肩+说话者）
@@ -69,8 +69,12 @@ def main():
     data=parse_srt(a.src) if a.src.lower().endswith(".srt") else json.load(open(a.src,encoding="utf-8"))
     shots=plan(data)
     out=a.out or (os.path.splitext(a.src)[0]+"_建议分镜.json")
-    json.dump({"source":os.path.basename(a.src),"shots":shots},open(out,"w",encoding="utf-8"),ensure_ascii=False,indent=2)
-    print(f"# 建议 {len(shots)} 个镜头 -> {os.path.basename(out)}")
+    # 输出是建议稿：仅含 source/shots，不是合法 storyboard（缺 project/actors/set/w/h/fps/line 等）。
+    # 需人工补全为对白契约后才能喂 dialogue_engine.py / validate_dialogue.py。
+    json.dump({"_note":"建议稿：需补全 project/actors/set/w/h/fps/title/scene 及逐镜 line/speaker 后，方可渲染或校验",
+               "source":os.path.basename(a.src),"shots":shots},
+              open(out,"w",encoding="utf-8"),ensure_ascii=False,indent=2)
+    print(f"# 建议 {len(shots)} 个镜头 -> {os.path.basename(out)}（建议稿，非可直接渲染的 storyboard）")
     for s in shots:
         who=f"{s['cam']} host={s.get('host')} target={s.get('target')}"
         print(f"  {s['id']:>3} {s['dur']:5.1f}s {who:28s} | {(s['line'] or '')[:26]}  〔{s['note']}〕")

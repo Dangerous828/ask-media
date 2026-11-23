@@ -71,7 +71,7 @@ class SingleSourceWithinShortDramaTests(unittest.TestCase):
         for framing, expected in (
             ("过肩中近景，桌面高度", "中近景"),
             ("手与茶杯大特写", "大特写"),
-            ("江晨近景，三分之四侧", "近景"),
+            ("角色A近景，三分之四侧", "近景"),
             ("越过右肩看屏幕", ""),
         ):
             self.assertEqual(

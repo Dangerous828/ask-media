@@ -18,7 +18,10 @@ python3 ../scripts/transcard.py \
 
 脚本做的事：取真实边界帧（原始像素、不缩放）→ 跑 `h3_gate --mode base` → 传 ComfyUI `input/`（裸文件名）→ 提交默认分支 → 轮询 → scp 取回 → 量两端 MAD → 可选拼 A+C+B。
 
-`--dry-run` 只取帧和过闸门，不提交；`--skip-gate` 跳过闸门。
+- **幂等**：`submit()` 自动带 `--idem-key`（由 label、seed、frames 与两端帧文件名哈希组成），脚本重跑 / 超时重投不会重复提交。符合三条硬纪律第 3 条。
+- **闸门默认路径**：优先本仓库 `h3-video-gate/scripts/h3_gate.py`，再退到 `~/.skills/hub/...`；可用 `H3Q_GATE` 显式指定。**闸门脚本缺失时直接报错退出，不静默跳过**——要跳过只能显式传 `--skip-gate`。
+- `--dry-run` 只取帧和过闸门，不提交；`--skip-gate` 跳过闸门。
+- **拼 A+C+B 会重编码全片**：A、C、B 三段统一 libx264 crf16 + aac 192k 再 concat，A、B 作为已交付成片也经历一次有损往返；去掉重复首帧后加 `setpts=N/FRAME_RATE/TB` 重打时间戳，避免拼接处 1 帧间隙。要零损失需另走无重编码装配（以实际部署的剪辑链为准）。
 
 ## 分支：必须走默认分支，不能带 `--workflow`
 

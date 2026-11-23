@@ -110,6 +110,10 @@ function load(){
   ]).then(([s,ps])=>{
     llmOK=!!s.configured;
     projects=ps;
+    if(!ps.length){
+      const pl=$('#plist');
+      if(pl)pl.innerHTML='<div class="empty" style="padding:12px;line-height:1.7">未发现项目。请在工作根下新建 <code>projects/&lt;项目名&gt;/</code>（含 拉片素材/ 等子目录），刷新后即显示；目录约定见 dashboard/README.md。</div>';
+    }
     readHash();
     if(!cur&&ps.length)cur=ps[0];
     if(cur)cur=ps.find(p=>p.name===cur.name)||ps[0];
@@ -255,7 +259,7 @@ $('#cfgBtn').onclick=async()=>{
        <input id="cfg_base" value="${esc(c.base||'https://open.bigmodel.cn/api/paas/v4')}"
          style="width:100%;margin-top:4px;padding:8px;background:#0a0e13;border:1px solid #2c4660;border-radius:6px;color:#dce6f0">
      </label>
-     <div class="notice">Key 明文保存在本机 workbench/llm_config.json（服务只监听 127.0.0.1）。保存后 ✨ 按钮立即生效。</div>
+     <div class="notice">Key 明文保存在本目录 llm_config.json（服务只监听 127.0.0.1、无鉴权，勿转发到公网）。留空保存只改模型不动 key；清除 Key 按钮会显式删除。保存后 ✨ 按钮立即生效。</div>
      <div class="row" style="margin:0">
        <button class="btn" id="cfg_save">保存</button>
        <button class="btn sm" id="cfg_clear" style="background:#5a3a2a;border-color:#8a5a3a">清除 Key</button>
@@ -376,8 +380,8 @@ function stageActions(key){
     if(src){
       const base=src.f.replace(/\.(mp4|mov|mkv)$/i,"");
       const slug=base.replace(/[^\w\u4e00-\u9fff-]+/g,"_").replace(/^_+|_+$/g,"")||"proj";
-      A.push({label:"▶ 从切点生成分镜(骨架→md+xlsx)",step:"lapdoc",args:[relPath(src)],
-        then:()=>({step:"docs",args:["projects/"+cur.name+"/分镜/"+slug+"_骨架.json","projects/"+cur.name+"/分镜"]})});
+      A.push({label:"▶ 从切点生成分镜骨架(→xlsx)",step:"lapdoc",args:[relPath(src)],
+        then:()=>({step:"xlsx",args:["projects/"+cur.name+"/分镜/"+slug+"_骨架.json"]})});
     }
     if(llmOK&&js&&src)A.push({label:"✨ AI 代填画面描述",step:"fill",args:[relPath(js),"--video",relPath(src)]});
     if(llmOK&&srt)A.push({label:"✨ AI 起草分镜(台词→骨架)",step:"draft",args:[relPath(srt)]});

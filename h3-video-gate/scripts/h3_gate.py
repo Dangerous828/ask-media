@@ -6,7 +6,7 @@ h3_gate.py —— MiniMax H3「视频提示词」交稿前机械闸门。
 只用 Python 3.9+ 标准库,不联网。Mac 的 python3 与 Windows Python 3.12 均可运行。
 
 用法:
-    python3 h3_gate.py FILE [FILE...] [--mode auto|ref|base]
+    python3 h3_gate.py FILE [FILE...] [--mode auto|ref|base|multishot]
                        [--frames N | --seconds S] [--refs N] [--rate R]
                        [--series-config FILE.json] [--json] [--strict] [-v]
 
@@ -15,7 +15,7 @@ h3_gate.py —— MiniMax H3「视频提示词」交稿前机械闸门。
     1 = 有 error(--strict 时 warn 也算失败)
     2 = 用法错误 / 文件读取错误 / 配置错误
 
-规则 ID 与阈值见 SPEC-gate.md(G01–G26,G08b,S01–S04;G23–G26 依据官方 ref-en/base-en 补充)。
+规则 ID 与阈值见本仓库 `h3-video-gate/SKILL.md` §4 规则表(G01–G26,G08b,S01–S04;G23–G26 依据官方 ref-en/base-en 补充)。
 多文件时,命令行顺序即镜序 S1..Sn,并额外运行 series 检查。
 """
 from __future__ import annotations
@@ -1366,7 +1366,7 @@ def rule_g40(doc: Doc) -> None:
 def rule_g28(doc: Doc) -> None:
     """官方 base-en.txt:62:FL2VA favors a single shot;多段只在显式声明时才允许。
 
-    实测(2026-10-22《咕角色C嘎》EP01 v4):把 FL2VA 提示词写成
+    实测(2026-10-22《示例项目》EP01 v4):把 FL2VA 提示词写成
     `[Shot 1]/[Shot 2] At 00:01.200/[Shot 3] At 00:02.800` 三段式后,
     H3 在帧 66(= 2.75s,正好对上 `At 00:02.800`)产生真硬切:
     相邻帧亮度差 106.5/255、直方图距离 0.64,机位与光照瞬时全换。
@@ -1543,7 +1543,7 @@ def rule_g32(doc: Doc) -> None:
 
 def rule_g33(doc: Doc) -> None:
     """G33 切点对账:给了 --storyboard 秒数表时,每个 [Shot k] (k>=2) 的 At 时刻必须等于
-    前面各镜秒数的累计(船长仓 cutStarts 逐字对账规则的移植)。能由代码推导的值,不允许
+    前面各镜秒数的累计(内部语料来源 cutStarts 逐字对账规则的移植)。能由代码推导的值,不允许
     LLM 手写后无人对账。未给 --storyboard 时本规则不跑,与 G22 无时间约束不跑同语义。"""
     seconds_list = getattr(doc.args, "storyboard_seconds", None)
     if not seconds_list:
@@ -1722,7 +1722,7 @@ def rule_g36(doc: Doc) -> None:
 
 
 # G38: 绝对保持词。"全程 / for the entire shot / in every frame / the whole time" 声明一件事整段不变,
-# 与时间线里会动的同一对象互相打架时,模型两头听(midnight-cream-veil:先写左手平放桌沿,后写
+# 与时间线里会动的同一对象互相打架时,模型两头听(example-project:先写左手平放桌沿,后写
 # "左腕全程贴着下巴")。只列出来让人逐个对照时间线,不判断是否真矛盾。
 ABSOLUTE_HOLD_RE = re.compile(
     r"\b(?:throughout(?:\s+(?:the\s+)?(?:(?:whole|entire)\s+)?"

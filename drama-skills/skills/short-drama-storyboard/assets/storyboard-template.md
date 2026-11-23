@@ -1,7 +1,7 @@
 # EP<编号> 分镜
 
 > 依据三级、记录值与设计值、冲突裁决、主导运镜、写作 QC 的单一真相源是
-> 逐镜证据台账（`references/observation-ledger.md`）；本模板只引用，不另写规则。
+> 逐镜证据台账（`../../short-drama/references/observation-ledger.md`）；本模板只引用，不另写规则。
 > 「记录值」是只读核对量，不参与切镜与镜长设计；镜长仍由完整声音事件、动作与 reads 反推。
 
 ## 稳定实体索引
@@ -96,6 +96,6 @@
 
 ## QC 备注
 
-按 逐镜证据台账（`references/observation-ledger.md`） 的 12 条逐条给结论
+按 逐镜证据台账（`../../short-drama/references/observation-ledger.md`） 的 12 条逐条给结论
 （通过／已修正／不适用＋理由）；`不适用` 也写理由。冲突两条都留，进「待裁决」行。
 完成判据：12 条都有结论；记录值没被当成设计值；`未定` 项都在备注里。

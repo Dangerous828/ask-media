@@ -7,6 +7,8 @@
 """
 import sys,os,json
 def main():
+    if len(sys.argv)<2:
+        sys.exit("用法: python export_dialogue.py <storyboard.json> [outdir]")
     src=os.path.abspath(sys.argv[1]); cfg=json.load(open(src,encoding="utf-8"))
     actors=cfg.get("actors",{}); outdir=sys.argv[2] if len(sys.argv)>2 else os.path.dirname(src)
     os.makedirs(outdir,exist_ok=True); base=cfg["project"]

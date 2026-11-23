@@ -1,8 +1,9 @@
 ---
 name: h3-prompt-writing
 version: 1.3.1
+license: MIT
 description: 写 MiniMax H3 视频提示词正文（T2VA 文生 / I2VA 图生 / FL2VA 首尾帧 / L2VA / Ref2VA 全参考）。用户说“写视频提示词”“把分镜转成 H3 提示词”“图生视频或文生视频提示词”“H3 三段或六段正文”“画面描述、环境声、配乐怎么写”“参考图标签 Picture 1 怎么标”时使用；也用于对齐首尾帧与关键帧。Write MiniMax H3 video generation prompts, composing integrated_multimodal_description, overall_soundscape and non_diegetic_music. 短剧任务按正文读取对应阶段知识，本技能继续完成当前工作。
-compatibility: Portable to any agent that can read local files — no external API calls, MiniMax Hub tools, or proprietary runtime required. The agents/openai.yaml file only adds optional ChatGPT/Codex UI metadata; it does not restrict the skill to OpenAI agents.
+compatibility: Portable to any agent that can read local files — no external API calls, MiniMax Hub tools, or proprietary runtime required.
 ---
 
 # H3 Prompt Writing
@@ -20,7 +21,7 @@ compatibility: Portable to any agent that can read local files — no external A
    - **I2VA**：只给一张明确起始帧，且身份/场景/风格都不需要额外参考。
    - **FL2VA**：首尾帧都给且中间是连续运动（硬切段落不用，本链实测有尾部运动谷）。
    - **L2VA**：只给终点帧。
-   - **T2VA**：无任何素材。
+   - **T2VA**：无任何素材（官方模式说明；**本地 h3q adapter 不支持纯文生**，无法提交，见下文「本地 h3q 约束」）。
    角色一致性是卖点时，不许用"一张首帧 + 文字描述"糊过去：那张图只当起始帧，身份另按 Ref2VA 的 `<Subject N>` 引用。
 2. For base text/keyframe modes, read `references/base-en.txt` and follow its final prompt structure.
 3. For full-reference mode, read `references/ref-en.txt` and follow its six-section rewrite format.
@@ -117,7 +118,7 @@ H3 把写下的时间线读得很字面，所以代价最大的失败是提示�
 **3c. 台词时间码按字数铺，不按句序均分（2026-11-13 EP003 实测）。** 生成脚本自动加时间码时，如果把
 `n` 句台词平均撒在段长的前 60%（`t = dur * (0.12 + 0.50 * i / n)`），短段里的大台词量会挤爆窗口：
 41 个汉字塞进 6 秒后，模型只能把同一角色的句子连读，另一角色的台词整体后移，听感是"台词和画面完全对不上"。
-按 `每句汉字数 × 0.215s + 句间 0.55s` 估算，先填满可用窗口（起 0.55s、尾留 0.35s），超出时按比例压缩；
+按 `每句汉字数 ÷ 4.1 字/秒（即 × 0.244s）+ 句间 0.55s` 估算（与 `h3-video-gate` 默认 `--rate 4.1` 同口径），先填满可用窗口（起 0.55s、尾留 0.35s），超出时按比例压缩；
 每段的总台词量超过"段长 − 0.5s − 动作预留"时，先砍句数或加长段长，不要让模型自由发挥。
 验收不能只看能量：`whisper-cli` 转写每段后对照剧本顺序，顺序错会立刻暴露。
 
@@ -274,7 +275,7 @@ G36 只提醒回读语义。不要为消除 warn 改掉已确认的声音/行为
 
 - 正文无运镜句，或全片都是同一句 `holds a fixed framing` → 成片"原地呼吸"，像会动的漫画；
 - 只写运镜词不写起落幅 → 模型把镜头运动做成随机漂移；
-- 几张不同机位的场记卡合并成一个 `[Shot 1]` 的固定取景 → 景别、高度、轴线侧的设计全丢（midnight-cream-veil 实例：三张卡合并成一段 13.67 秒固定中景）；
+- 几张不同机位的场记卡合并成一个 `[Shot 1]` 的固定取景 → 景别、高度、轴线侧的设计全丢（example-project 实例：三张卡合并成一段 13.67 秒固定中景）；
 - 场记写推镜、正文写固定 → 以正文为准，场记白写。
 
 
@@ -288,7 +289,7 @@ G36 只提醒回读语义。不要为消除 warn 改掉已确认的声音/行为
 4. **起点亮度关系照实际首帧或上游状态写。** 用本镜实际物件说明最亮处与暗部；后续变化按账本中的因果与时刻展开。已有光照设定上，整体压暗或改色的氛围词也须有上游依据。
 5. **同一时刻、同一表面的描述相容。** 颜色或受光确实变化时交代原因与时刻，分别写清前后状态。
 
-**实测（midnight-cream-veil EP001，本地 h3q 草稿档 512×896、4 步、首帧续接）**：用 `seam_check.py` 把送进去的首帧和视频真实第 0 帧走同一条 ffmpeg 解码路径比较，三段的第 0 帧都比首帧暗约 5–6%（Rec.601 亮度 40.1→37.6、41.9→39.7、35.2→33.1）；三段连着走又逐段变暗（段均值折成全幅亮度约 38→35→33，每个接力环节约 −5%，由 ffmpeg signalstats 的 YAVG 折算）；A 段内部也有起伏（前 240 帧最低 32.1、最高 39.7，下探出现在第 6–7 秒附近）。正文里没有任何曝光陈述，反而每段都写了整体压暗的氛围词。
+**实测（example-project EP001，本地 h3q 草稿档 512×896、4 步、首帧续接）**：用 `seam_check.py` 把送进去的首帧和视频真实第 0 帧走同一条 ffmpeg 解码路径比较，三段的第 0 帧都比首帧暗约 5–6%（Rec.601 亮度 40.1→37.6、41.9→39.7、35.2→33.1）；三段连着走又逐段变暗（段均值折成全幅亮度约 38→35→33，每个接力环节约 −5%，由 ffmpeg signalstats 的 YAVG 折算）；A 段内部也有起伏（前 240 帧最低 32.1、最高 39.7，下探出现在第 6–7 秒附近）。正文里没有任何曝光陈述，反而每段都写了整体压暗的氛围词。
 读数依赖解码路径：同一对文件用 OpenCV 直接解码（不按视频的 BT.709 标签转换）会读成约 −11%。所以前后两边必须走同一条路径，用 `seam_check.py`，不要一边 ffmpeg 一边 OpenCV。
 没有做 A/B，不能断言压暗词是原因；能确定的是文字没有给曝光任何锚点，而且每个续接环节都在往暗走。验证办法：同一首帧、同一 seed，一版去掉压暗词并写相对亮度关系，对比第 0 帧亮度和段内起伏。
 出片后量第 0 秒：`python3 drama-skills/skills/short-drama-video-prompts/scripts/seam_check.py --before <送进去的首帧.png> --after <本段.mp4> --out 审查/seam --label frame0`，看 `luma_mean.change_pct`；段内起伏看 `within_shot_envelope.luma_min/luma_max`（只在段内比较，不与 `luma_mean` 相减）。没有通用阈值：−5–6% 只描述这次测量；须结合本片已接受的亮度关系、可比区域与画面内容核对，读数本身不说明压缩、提示词或其他因素各占多少。

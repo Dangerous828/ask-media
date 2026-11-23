@@ -5,7 +5,7 @@
 ----------------
 `preflight.py` 已经能做 5 项检查，但它**不在提交路径上**：
 要靠人记得手动跑，而「最容易跳过」的恰好是代价最高的两项
-（参考图拼版 → 71.9% 废片；剧本事件丢失 → 整镜白烧）。
+（参考图拼版 → 废片输入源"拼版被当构图模板"；剧本事件丢失 → 整镜白烧。前者为小样本实测观察（样本与复现命令未随公开版发布））。
 
 本包装把闸门挂到**唯一提交入口**的前面：任何 `submit` 都要先过闸。
 
@@ -83,7 +83,8 @@ def _skill_dir():
     for p in cands:
         if (p / "ref_guard.py").exists():
             return p
-    return cands[0] if cands else HERE
+    # cands 至少含 HERE，else 分支恒不可达；返回 HERE 让 gate() 报清晰的文件缺失错。
+    return HERE
 
 
 SKILL = _skill_dir()
@@ -91,13 +92,15 @@ PY = os.environ.get("H3QG_PY", sys.executable)
 
 
 def _run(path: Path, args: list) -> tuple:
-    """跑一个闸门脚本，返回 (ok, out)。脚本不存在按通过处理并说明。
+    """跑一个闸门脚本，返回 (ok, out)。
 
+    闸门脚本缺失一律报错拦截（由调用方 gate() 先检查存在性），不按通过处理——
+    「查不了当成查过了」是最危险的失效模式，与 gate() 的哲学一致。
     子进程强制 UTF-8：Windows 下默认按 GBK 解码，闸门脚本的中文输出会
     直接 UnicodeDecodeError —— 那时 `ok=False` 会被误判成「闸门拦截」。
     """
     if not path.exists():
-        return True, "(闸门脚本不存在，跳过: %s)" % path
+        return False, "闸门脚本不存在，无法校验: %s" % path
     env = dict(os.environ, PYTHONIOENCODING="utf-8")
     p = subprocess.run([PY, "-X", "utf8", str(path)] + [str(a) for a in args],
                        capture_output=True, text=True,
@@ -204,12 +207,40 @@ def gate(a) -> int:
 def main() -> int:
     # 先解析本层关心的几个开关，其余原样透传给 h3qc
     argv = sys.argv[1:]
-    gate_off = "--gate-off" in argv
-    gate_only = "--gate-only" in argv
-    argv = [x for x in argv if x not in ("--gate-off", "--gate-only")]
+    # 只删除「作为开关出现」的 --gate-off/--gate-only；若它们恰好是上一个选项的值
+    # （如 --label --gate-off），必须原样保留透传给 h3qc，不能按值全局删除。
+    # 这里的值选项集合覆盖本包装层及 h3qc 常见需要参数的开关（--xxx=value 形式不需处理）。
+    VALUE_OPTS = {
+        "--kind", "--refs", "--first-frame", "--last-frame", "--prompt-file",
+        "--out", "--size", "--seed", "--steps", "--cfg", "--label", "--idem-key",
+        "--model", "--tier", "--width", "--height", "--frames", "--tag", "--timeout",
+    }
+    gate_off = False
+    gate_only = False
+    filtered = []
+    expect_value = False
+    for x in argv:
+        if x in ("--gate-off", "--gate-only") and not expect_value:
+            if x == "--gate-off":
+                gate_off = True
+            else:
+                gate_only = True
+            continue
+        filtered.append(x)
+        # 当前 token 若是以 "--" 开头的值选项，则下一个 token 是它的值
+        expect_value = x in VALUE_OPTS
+    argv = filtered
 
     if not argv:
         print(__doc__)
+        return 2
+
+    # h3qc.py 是最终执行体：缺失时先明确报错，别先跑一遍闸门再在最后一步失败
+    # （闸门全过却提交不了，会让人误判为闸门结论有问题）。--gate-only 只跑闸门，不需要它。
+    h3qc = HERE / "h3qc.py"
+    if not gate_only and not h3qc.exists():
+        print("ERROR: 找不到 h3qc.py（应在 %s），无法提交。" % HERE, file=sys.stderr)
+        print("       闸门未运行；先补齐 h3qc.py 或用 --gate-only 只跑闸门。", file=sys.stderr)
         return 2
 
     # 只在 submit 子命令上做闸门
@@ -235,11 +266,7 @@ def main() -> int:
                   if skipped else "--gate-only：闸门通过，未提交。")
             return 0
 
-    # 透传给 h3qc
-    h3qc = HERE / "h3qc.py"
-    if not h3qc.exists():
-        print("ERROR: 找不到 h3qc.py（应在 %s）" % HERE, file=sys.stderr)
-        return 2
+    # 透传给 h3qc（存在性已在 main 开头校验）
     p = subprocess.run([PY, "-X", "utf8", str(h3qc)] + argv,
                        env=dict(os.environ, PYTHONIOENCODING="utf-8"))
     return p.returncode

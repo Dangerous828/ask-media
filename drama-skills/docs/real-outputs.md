@@ -13,17 +13,17 @@
 ```markdown
 [OS] 其他军团的人：火箭军？四个号，加起来四个粉吧。
 
-笔记本的扬声器里一片哄笑。桌后，周薄森对着屏幕坐得笔直，脸绷着。桌前，江晨双手撑着桌沿，猛地回神。
+笔记本的扬声器里一片哄笑。桌后，角色B对着屏幕坐得笔直，脸绷着。桌前，角色A双手撑着桌沿，猛地回神。
 ```
 
 `视觉设定.md` 把跨镜必须保持的可见事实写成条目，并给造型上「连续性锁」，锁面就是一条能原样贴进提示词的短语：
 
 ```markdown
-## 人物 · 江晨
+## 人物 · 角色A
 - 识别锚点：长脸、高眉骨、深眼窝、短寸、绷直的肩背。不要改成偶像刘海或宽松潮服。
-- 画面代称：Jiangchen
-- 连续性锁：LOCK-JIANGCHEN-DRESS《江晨松枝绿常服》（镜头：SHOT-EP001-002、SHOT-EP001-003、SHOT-EP001-007、……；
-  图片提示词项：IMG-JIANGCHEN-SHEET）· 锁面：pine-green lapel service jacket
+- 画面代称：CharacterA
+- 连续性锁：LOCK-CHARACTER-A-DRESS《角色A松枝绿常服》（镜头：SHOT-EP001-002、SHOT-EP001-003、SHOT-EP001-007、……；
+  图片提示词项：IMG-CHARACTER-A-SHEET）· 锁面：pine-green lapel service jacket
 ```
 
 `分镜.md` 写这一镜的起点和终点、运镜为什么这样动，冻结关键帧只画起点那一格；写完之后反查画面里需要认出身份、造型或地理的条目，
@@ -33,16 +33,16 @@
 ## SHOT-EP001-002 · 四个号，四个粉
 - 来源：EP001-SC001
 - 时长：4s
-- 运镜：缓推，哄笑声最响时开始，越过笔记本背面推向桌后，停在周薄森绷紧的脸；这阵笑是冲他去的。
-- 起点：周薄森面对笔记本坐得笔直，右手搭在茶杯旁；江晨双手掌心朝下撑在玻璃桌沿，眼神涣散。
-- 终点：画面停在周薄森绷紧的脸与屏幕冷光；江晨仍撑着桌沿，留在画右边缘。
+- 运镜：缓推，哄笑声最响时开始，越过笔记本背面推向桌后，停在角色B绷紧的脸；这阵笑是冲他去的。
+- 起点：角色B面对笔记本坐得笔直，右手搭在茶杯旁；角色A双手掌心朝下撑在玻璃桌沿，眼神涣散。
+- 终点：画面停在角色B绷紧的脸与屏幕冷光；角色A仍撑着桌沿，留在画右边缘。
 - 输入参考图：无（创作者已明确选择文生视频）。
-- 视觉依据：《视觉设定.md》·人物「江晨」（控制：身份、体态、本集造型）；人物「周薄森」（控制：身份、体态、本集造型）；
+- 视觉依据：《视觉设定.md》·人物「角色A」（控制：身份、体态、本集造型）；人物「角色B」（控制：身份、体态、本集造型）；
   地点「副团长办公室」（控制：清玻璃桌面、杯垫、文件夹书柜、左侧卷帘窗光）；道具「笔记本电脑」（控制：银色轻薄机身、盖角红贴签）；
   道具「玻璃泡茶杯」（控制：双层玻璃杯身、沉底茶叶）。
 
 ### 冻结关键帧提示词
-> 9:16 vertical two-person medium shot in a present-day army arts-troupe office, framed at chest height: Jiangchen, a lean
+> 9:16 vertical two-person medium shot in a present-day army arts-troupe office, framed at chest height: CharacterA, a lean
 > young man in a pine-green lapel service jacket, stands mid-ground on frame right …… with both palms flat on the glass and a
 > dazed, unfocused look; Zhoubosen, a broad square-faced middle-aged officer, sits bolt upright behind the desk …… facing a
 > thin silver laptop whose lid faces the camera, …… his right hand beside a double-walled glass tea tumbler on a dark round
@@ -60,8 +60,8 @@
 - 静态视觉锚点：In a present-day army arts-troupe office with a bookcase of blue document binders ……, a lean young East Asian
   man in a pine-green lapel service jacket stands mid-ground on frame right with both palms flat on the front edge of a
   light-oak desk with a clear glass top and a dazed look, ……
-- 起始帧：周薄森对着笔记本坐得笔直，江晨撑着桌沿发懵。
-- 终点：画面停在周薄森绷紧的脸与屏幕冷光，江晨留在画右边缘。
+- 起始帧：角色B对着笔记本坐得笔直，角色A撑着桌沿发懵。
+- 终点：画面停在角色B绷紧的脸与屏幕冷光，角色A留在画右边缘。
 
 ### 可复制提示词
 > …… Laughter keeps pouring out of the laptop's small speaker. The seated officer's jaw tightens and his back straightens a
@@ -79,7 +79,7 @@
 
 ## 检查器抓什么：把样例故意改坏两处
 
-出处：同上一节的公开样例。`creator_markdown_check.py` 核对一集六份文档之间可执行的契约。原样跑过；删掉 SHOT-002 视觉依据里的周薄森、
+出处：同上一节的公开样例。`creator_markdown_check.py` 核对一集六份文档之间可执行的契约。原样跑过；删掉 SHOT-002 视觉依据里的角色B、
 再把 MOTION-003 的时长从 2s 改成 3s，它报的是原因，不是「校验失败」：
 
 ```text
@@ -87,7 +87,7 @@ $ python3 skills/short-drama/scripts/creator_markdown_check.py examples/creator-
 OK: examples/creator-first/EP001
 
 $ python3 skills/short-drama/scripts/creator_markdown_check.py <改坏的副本>/EP001 --project-root <改坏的副本>
-ERROR: SHOT-EP001-002: 冻结关键帧提示词写到人物「周薄森」，视觉依据没有覆盖；本镜确实看不见时在视觉依据末尾加「；画外：人物「周薄森」」，正文里这个名字不可靠时在《视觉设定.md》写「画面代称：无」
+ERROR: SHOT-EP001-002: 冻结关键帧提示词写到人物「角色B」，视觉依据没有覆盖；本镜确实看不见时在视觉依据末尾加「；画外：人物「角色B」」，正文里这个名字不可靠时在《视觉设定.md》写「画面代称：无」
 ERROR: SHOT-EP001-003: 分镜时长 2 秒与视频提示词 3 秒不一致；视频提示词只能原样照抄已接受的镜头时长
 ```
 
@@ -102,17 +102,17 @@ ERROR: SHOT-EP001-003: 分镜时长 2 秒与视频提示词 3 秒不一致；视
 
 ```markdown
 ## SHOT-EP001-017 · 诸君，且听龙吟
-- 来源：EP001-SC003「江晨（对着空剪辑室）：诸君，且听龙吟。」
+- 来源：EP001-SC003「角色A（对着空剪辑室）：诸君，且听龙吟。」
 - 时长：7s
 - 成片目标时长：6.5s。……第 6.5–7 秒是落幅保持的余量；剪辑阶段从末尾裁掉这 0.5 秒。
-- 声音：江晨 1 句，可发声 6 字，按 4.1 字/秒约 1.5 秒（文本估计：他平时语速快、句尾干脆，这一句压慢半档，字与字之间留出间隔）。
+- 声音：角色A 1 句，可发声 6 字，按 4.1 字/秒约 1.5 秒（文本估计：他平时语速快、句尾干脆，这一句压慢半档，字与字之间留出间隔）。
   生成 7 秒的排布：读完屏幕上的结果 1.4 秒 ＋ 缓慢呼气与松肩 1.5 秒 ＋ 抬眼 0.7 秒 ＋ 说完 1.5 秒
   ＋ 后拉到落幅并停一拍 1.4 秒（成片目标 6.5 秒在这里切）＋ 落幅保持 0.5 秒，末尾这 0.5 秒剪辑裁掉。……
 - 输入参考图：PLAN-SHOT-START（顺序：1）· SHOT-EP001-017《本镜冻结关键帧》（用途：起始帧；控制：本镜起始构图……）；
-  PLAN-JC-LOOK-C（顺序：2）· IMG-JIANGCHEN-LOOK-C《江晨干泥凌晨作训服状态板》（用途：造型状态；……）；……
+  PLAN-CA-LOOK-C（顺序：2）· IMG-CHARACTER-A-LOOK-C《角色A干泥凌晨作训服状态板》（用途：造型状态；……）；……
 ```
 
-这一镜按 MiniMax H3 写成图生视频提示词。《视觉设定.md》里江晨作训服的连续性锁「锁面：olive drab field fatigue
+这一镜按 MiniMax H3 写成图生视频提示词。《视觉设定.md》里角色A作训服的连续性锁「锁面：olive drab field fatigue
 uniform with blank collar tabs」原样出现在 `subject_definitions` 里，对白只在 `<d>` 内逐字给出：
 
 ```markdown
@@ -120,7 +120,7 @@ uniform with blank collar tabs」原样出现在 `subject_definitions` 里，对
 - 生成方式：图生视频
 
 ### 可复制提示词
-> subject_definitions: <Subject 1> is Jiang Chen, the young man in <Picture 2>: …… he wears a full olive drab field fatigue
+> subject_definitions: <Subject 1> is Character A, the young man in <Picture 2>: …… he wears a full olive drab field fatigue
 > uniform with blank collar tabs with two buttons undone and the collar turned out …… <Picture 1> is the first frame of [Shot 1].
 > ……
 > detailed_description: [Shot 1] …… From about 3.6 seconds he speaks, half a step slower than his usual pace with a small gap

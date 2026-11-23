@@ -16,19 +16,19 @@ current document contract; it passes `creator_markdown_check.py`. The same shot,
 ```markdown
 [OS] Someone from another army unit: The Rocket Force? Four accounts, four followers between them, right?
 
-Laughter pours out of the laptop's speaker. Behind the desk, Zhou Bosen sits bolt upright facing the screen, face set.
-In front of it, Jiang Chen, palms on the desk edge, snaps back to himself.
+Laughter pours out of the laptop's speaker. Behind the desk, Character B sits bolt upright facing the screen, face set.
+In front of it, Character A, palms on the desk edge, snaps back to himself.
 ```
 
 `视觉设定.md` writes the visible facts that must hold across shots as entries, and gives the look a
 **continuity lock** whose lock phrase can be pasted into a prompt unchanged (translated):
 
 ```markdown
-## Character · Jiang Chen
+## Character · Character A
 - Identity anchors: long face, high brow ridge, deep-set eyes, crew cut, straight shoulders. Not an idol fringe, not loose streetwear.
-- Screen name: Jiangchen
-- Continuity lock: LOCK-JIANGCHEN-DRESS "Jiang Chen's pine-green service uniform" (shots: SHOT-EP001-002, SHOT-EP001-003, SHOT-EP001-007, …;
-  image prompt entry: IMG-JIANGCHEN-SHEET) · lock phrase: pine-green lapel service jacket
+- Screen name: CharacterA
+- Continuity lock: LOCK-CHARACTER-A-DRESS "Character A's pine-green service uniform" (shots: SHOT-EP001-002, SHOT-EP001-003, SHOT-EP001-007, …;
+  image prompt entry: IMG-CHARACTER-A-SHEET) · lock phrase: pine-green lapel service jacket
 ```
 
 `分镜.md` writes this shot's start and end and why the camera moves the way it does; the frozen keyframe draws the start
@@ -41,17 +41,17 @@ written):
 - Source: EP001-SC001
 - Duration: 4s
 - Camera: slow push-in, starting at the loudest point of the laughter, past the back of the laptop toward the desk, stopping
-  on Zhou Bosen's set face; the laughter is aimed at him.
-- Start: Zhou Bosen sits bolt upright facing the laptop, right hand beside his tea tumbler; Jiang Chen's palms rest flat on
+  on Character B's set face; the laughter is aimed at him.
+- Start: Character B sits bolt upright facing the laptop, right hand beside his tea tumbler; Character A's palms rest flat on
   the glass edge, his eyes unfocused.
-- End: the frame settles on Zhou Bosen's set face in the screen glow; Jiang Chen still leans on the desk at the right edge.
+- End: the frame settles on Character B's set face in the screen glow; Character A still leans on the desk at the right edge.
 - Input references: none (the creator explicitly chose text-to-video).
-- Visual basis: 视觉设定.md · character "Jiang Chen" (controls: identity, build, this episode's look); character "Zhou Bosen" (controls: identity, build, this episode's look);
+- Visual basis: 视觉设定.md · character "Character A" (controls: identity, build, this episode's look); character "Character B" (controls: identity, build, this episode's look);
   location "Deputy regiment commander's office" (controls: clear glass desktop, coaster, binder shelves, blind-filtered window light);
   prop "Laptop" (controls: thin silver body, red lid sticker); prop "Glass tea tumbler" (controls: double-walled glass, sunken tea leaves).
 
 ### Frozen keyframe prompt
-> 9:16 vertical two-person medium shot in a present-day army arts-troupe office, framed at chest height: Jiangchen, a lean
+> 9:16 vertical two-person medium shot in a present-day army arts-troupe office, framed at chest height: CharacterA, a lean
 > young man in a pine-green lapel service jacket, stands mid-ground on frame right … with both palms flat on the glass and a
 > dazed, unfocused look; Zhoubosen, a broad square-faced middle-aged officer, sits bolt upright behind the desk … facing a
 > thin silver laptop whose lid faces the camera, … his right hand beside a double-walled glass tea tumbler on a dark round
@@ -70,8 +70,8 @@ you can verify (translated; the prompt is quoted as written):
 - Static visual anchor: In a present-day army arts-troupe office with a bookcase of blue document binders …, a lean young
   East Asian man in a pine-green lapel service jacket stands mid-ground on frame right with both palms flat on the front edge
   of a light-oak desk with a clear glass top and a dazed look, …
-- Start frame: Zhou Bosen sits bolt upright facing the laptop; Jiang Chen leans on the desk edge, dazed.
-- End: the frame rests on Zhou Bosen's set face in the screen glow; Jiang Chen at the right edge.
+- Start frame: Character B sits bolt upright facing the laptop; Character A leans on the desk edge, dazed.
+- End: the frame rests on Character B's set face in the screen glow; Character A at the right edge.
 
 ### Copyable prompt
 > … Laughter keeps pouring out of the laptop's small speaker. The seated officer's jaw tightens and his back straightens a
@@ -89,7 +89,7 @@ The four originals: [`剧本.md`](../examples/creator-first/EP001/剧本.md) ·
 ## What the checker catches: break the sample in two places on purpose
 
 Origin: the same public sample as the previous subsection. `creator_markdown_check.py` validates the executable
-contract between the five documents of one episode. It passes on the sample as shipped. Remove Zhou Bosen from SHOT-002's visual basis and change MOTION-003's
+contract between the five documents of one episode. It passes on the sample as shipped. Remove Character B from SHOT-002's visual basis and change MOTION-003's
 duration from 2s to 3s, and it reports the cause, not "validation failed":
 
 ```text
@@ -97,12 +97,12 @@ $ python3 skills/short-drama/scripts/creator_markdown_check.py examples/creator-
 OK: examples/creator-first/EP001
 
 $ python3 skills/short-drama/scripts/creator_markdown_check.py <broken copy>/EP001 --project-root <broken copy>
-ERROR: SHOT-EP001-002: 冻结关键帧提示词写到人物「周薄森」，视觉依据没有覆盖；本镜确实看不见时在视觉依据末尾加「；画外：人物「周薄森」」，正文里这个名字不可靠时在《视觉设定.md》写「画面代称：无」
+ERROR: SHOT-EP001-002: 冻结关键帧提示词写到人物「角色B」，视觉依据没有覆盖；本镜确实看不见时在视觉依据末尾加「；画外：人物「角色B」」，正文里这个名字不可靠时在《视觉设定.md》写「画面代称：无」
 ERROR: SHOT-EP001-003: 分镜时长 2 秒与视频提示词 3 秒不一致；视频提示词只能原样照抄已接受的镜头时长
 ```
 
-The first line says: the frozen keyframe names the character "Zhou Bosen" but the visual basis does not cover him;
-if he is genuinely not visible, append "off-screen: character Zhou Bosen" to the visual basis, and if the name in the
+The first line says: the frozen keyframe names the character "Character B" but the visual basis does not cover him;
+if he is genuinely not visible, append "off-screen: character Character B" to the visual basis, and if the name in the
 prompt body is unreliable, set his screen name to "none" in `视觉设定.md`. The second: the storyboard says 2 seconds and the
 video prompt says 3; a video prompt may only copy the accepted shot duration.
 
@@ -120,18 +120,18 @@ leave a settle margin, and the target length in the cut is written separately (t
 
 ```markdown
 ## SHOT-EP001-017 · Gentlemen, hear the dragon roar
-- Source: EP001-SC003 「江晨（对着空剪辑室）：诸君，且听龙吟。」 (Jiang Chen, to the empty edit room: "Gentlemen, hear the dragon roar.")
+- Source: EP001-SC003 「角色A（对着空剪辑室）：诸君，且听龙吟。」 (Character A, to the empty edit room: "Gentlemen, hear the dragon roar.")
 - Duration: 7s
 - Target length in cut: 6.5s. … seconds 6.5–7 are the settle margin; editing trims that 0.5 s from the end.
-- Sound: Jiang Chen, 1 line, 6 voiced characters, ≈1.5 s at 4.1 characters/s (text estimate: he normally speaks fast with crisp
+- Sound: Character A, 1 line, 6 voiced characters, ≈1.5 s at 4.1 characters/s (text estimate: he normally speaks fast with crisp
   endings; this line is half a step slower, with a gap between characters). Layout of the 7 s: finish reading the result on
   screen 1.4 s + slow exhale and shoulders dropping 1.5 s + eyes lifting 0.7 s + the line 1.5 s + pull-back to the settle and one
   beat 1.4 s (the 6.5 s cut target ends here) + hold 0.5 s, trimmed in the cut. …
 - Input references: PLAN-SHOT-START (order: 1) · SHOT-EP001-017 "this shot's frozen keyframe" (purpose: start frame; controls: opening composition …);
-  PLAN-JC-LOOK-C (order: 2) · IMG-JIANGCHEN-LOOK-C "Jiang Chen, dried-mud dawn fatigues state board" (purpose: look state; …); …
+  PLAN-CA-LOOK-C (order: 2) · IMG-CHARACTER-A-LOOK-C "Character A, dried-mud dawn fatigues state board" (purpose: look state; …); …
 ```
 
-This shot was written as an image-to-video prompt for MiniMax H3. The continuity lock on Jiang Chen's fatigues in
+This shot was written as an image-to-video prompt for MiniMax H3. The continuity lock on Character A's fatigues in
 `视觉设定.md`, "lock phrase: olive drab field fatigue uniform with blank collar tabs", appears verbatim inside
 `subject_definitions`, and the line is given character by character inside `<d>` only (translated; the prompt is
 quoted as written):
@@ -141,7 +141,7 @@ quoted as written):
 - Generation mode: image-to-video
 
 ### Copyable prompt
-> subject_definitions: <Subject 1> is Jiang Chen, the young man in <Picture 2>: … he wears a full olive drab field fatigue
+> subject_definitions: <Subject 1> is Character A, the young man in <Picture 2>: … he wears a full olive drab field fatigue
 > uniform with blank collar tabs with two buttons undone and the collar turned out … <Picture 1> is the first frame of [Shot 1].
 > …
 > detailed_description: [Shot 1] … From about 3.6 seconds he speaks, half a step slower than his usual pace with a small gap

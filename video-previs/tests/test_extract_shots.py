@@ -97,11 +97,15 @@ class ExtractShotsSyntheticTests(unittest.TestCase):
         self.assertEqual([s["id"] for s in shots], ["SRC-01", "SRC-02"])
         self.assertEqual([Path(s["frame_path"]).name for s in shots],
                          ["SRC-01.jpg", "SRC-02.jpg"])
+        # frame_path 是相对 manifest 目录的路径，不泄露本机绝对路径。
+        self.assertFalse(any(Path(s["frame_path"]).is_absolute() for s in shots))
+        self.assertNotIn(str(self.root), manifest["video"])
+        self.assertFalse(Path(manifest["video"]).is_absolute())
         self.assertAlmostEqual(shots[0]["start"], 0.0, delta=0.05)
         self.assertAlmostEqual(shots[0]["end"], 2.0, delta=0.15)
         self.assertAlmostEqual(shots[1]["end"], 4.0, delta=0.15)
         for shot in shots:
-            frame = Path(shot["frame_path"])
+            frame = (manifest_path.parent / shot["frame_path"]).resolve()
             self.assertTrue(frame.is_file())
             self.assertGreater(frame.stat().st_size, 0)
             self.assertEqual(self.image_size(frame), (320, 180))

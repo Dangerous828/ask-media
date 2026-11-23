@@ -651,7 +651,7 @@ class AuditGapRegressionTests(unittest.TestCase):
                 self.assertFalse(self._hits(data, "G32"), data["findings"])
 
     def test_g32_series_aliases_are_recognized(self):
-        config = {"characters": [{"id": "gungun", "trigger": "woman", "aliases": ["豆豆", "小豆豆"]}]}
+        config = {"characters": [{"id": "characterA", "trigger": "woman", "aliases": ["豆豆", "小豆豆"]}]}
         dialogue = "At 00:00.000, <Subject 1> (S1) says: <d>[Chinese] %s</d> "
         code, data = self._run(self._ref(dialogue % "小豆豆：快出来！"), config=config)
         self.assertEqual(code, 1, data)

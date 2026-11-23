@@ -7,7 +7,7 @@
     python3 scripts/detect.py <文件> --candidates [--out 候选.json]
 
 --candidates 抽取语义层候选（同义重命名段 / 段间衔接接口 / 冒号句 / 三连同构），
-交给会话内 Claude 按 references/semantic-criteria.md 判断，结果并入报告。
+交给本会话模型按 references/semantic-criteria.md 判断，结果并入报告。
 
 分级：
     A 机械改    固定句式/标点问题，模型复核后给建议，用户回复后改
@@ -401,7 +401,7 @@ CAND_CAPS = {"rename": 60, "cohesion": 60, "colon": 80, "iso3": 60}  # 长文防
 
 
 def extract_candidates(docs):
-    """四类语义层候选。每条带判据类型，供会话内 Claude 按
+    """四类语义层候选。每条带判据类型，供本会话模型按
     references/semantic-criteria.md 逐条封闭判断（标签+置信度），
     判断结果写回同结构 JSON 的 label/confidence/reason 字段。"""
     rename, cohesion, colon, iso3 = [], [], [], []

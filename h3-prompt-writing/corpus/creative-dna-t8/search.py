@@ -20,6 +20,11 @@ hits.sort(key=lambda r:-score(r))
 print(f"命中 {len(hits)} 条，显示前 {min(limit,len(hits))} 条：")
 for r in hits[:limit]:
     p=BASE/r["path"]
-    print(f"- {r['titleZh']} [{r['kind']}] {'OK' if p.exists() else 'MISSING'}")
+    # 存在性不足以证明可检索：空壳卡只有头部、无「原文」段，标 EMPTY 提醒勿引用
+    if p.exists():
+        status = "EMPTY" if "## 原文" not in p.read_text(encoding="utf-8") else "OK"
+    else:
+        status = "MISSING"
+    print(f"- {r['titleZh']} [{r['kind']}] {status}")
     if r["mechanism"]: print("  机制："+r["mechanism"][:130])
     print("  原文："+str(p))

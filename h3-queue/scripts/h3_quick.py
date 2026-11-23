@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
 """h3_quick.py -- 快捷出片：一条命令选档位，不用碰 lib_workflow.py。
 
+依赖（不随本仓库发布）：lib_workflow.py 是渲染机侧私有定制脚本，须另行取得并放在
+本脚本同目录；缺它则在 import 处报 ImportError。本脚本直连 ComfyUI 8199（默认
+8188，本机自定义端口），仅供离线研究、不部署、不调用；真实生产走 h3q 队列。
+
 在渲染机（Windows）上、ComfyUI 的内嵌 python 下运行：
   <ComfyUI 内嵌 python.exe> -s h3_quick.py ^
-     --tier draft|hq|int8 --mode i2va|ref2va --prompt-file P --first-frame F ^
+     --tier draft|hq|ref8|ref6 --prompt-file P --first-frame F ^
      [--refs a.png,b.png] [--width 768 --height 1344 --frames 107 --seed 11] ^
      [--slug myshot] [--dry-run] [--submit]
+
+模式由档位决定（draft/hq=i2va，ref8/ref6=ref2va），不另设 --mode。
 
 档位定义：
   draft  = fl2va_turbo_Q4_K_M.gguf（你原来的草稿档，4bit + turbo 烘焙）  仅 i2va/t2va
@@ -13,7 +19,7 @@
   ref8   = ref2va_pruned_int8_convrot.safetensors（8bit，生产在用）       仅 ref2va
   ref6   = ref2va_pruned_w6a8.safetensors + ref2v_turbo_8step_v1.1_768p   仅 ref2va
 """
-import sys, os, json, argparse, time, urllib.request, urllib.error
+import sys, os, re, json, argparse, time, urllib.request, urllib.error
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # lib_workflow 与本脚本同目录
 import lib_workflow as W
@@ -86,8 +92,10 @@ def main():
     a = ap.parse_args()
 
     tier = TIERS[a.tier]
+    # slug 消毒：只留安全字符，防止拼进 prefix / 输出文件名时越界或注入。
+    slug = re.sub(r"[^A-Za-z0-9_-]+", "-", a.slug).strip("-")[:60] or "quick"
     prompt = open(a.prompt_file, encoding="utf-8").read()
-    prefix = "h3studio/%s_%s" % (a.slug, a.tier)
+    prefix = "h3studio/%s_%s" % (slug, a.tier)
     steps = a.steps or tier["steps"]
 
     if tier["mode"] == "i2va":
@@ -134,13 +142,18 @@ def main():
     if err:
         print("SUBMIT_FAIL " + err)
         return 1
+    if not isinstance(res, dict) or not res.get("prompt_id"):
+        print("SUBMIT_FAIL 响应缺少 prompt_id: %s" % str(res)[:500])
+        return 1
     pid = res["prompt_id"]
     print("queued pid=" + pid, flush=True)
 
     t0 = time.time()
     peak = 0.0
     entry = None
-    while time.time() - t0 < 3600:
+    # 7000s 级长任务（动作驱动）会远超 1h；默认放宽到 3h，可用 H3Q_QUICK_TIMEOUT 覆盖。
+    poll_timeout = int(os.environ.get("H3Q_QUICK_TIMEOUT", "10800"))
+    while time.time() - t0 < poll_timeout:
         out, _ = api("/history/" + pid, timeout=30)
         if out and pid in out:
             entry = out[pid]
@@ -171,7 +184,9 @@ def main():
         "peak_vram_gib": round(peak, 2), "prompt_id": pid,
         "outputs": paths, "workflow": g,
     }
-    mp = os.path.join(os.environ.get("H3Q_OUT_DIR", "renders"), "quick_%s.json" % a.slug)
+    out_dir = os.environ.get("H3Q_OUT_DIR", "renders")
+    os.makedirs(out_dir, exist_ok=True)
+    mp = os.path.join(out_dir, "quick_%s.json" % slug)
     with open(mp, "w", encoding="utf-8") as f:
         json.dump(meta, f, ensure_ascii=False, indent=2)
     print("META " + mp)

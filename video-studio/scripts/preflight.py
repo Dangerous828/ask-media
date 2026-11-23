@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""preflight.py — 提交前一次跑完全部检查（4 个脚本串成一条流水线）。
+"""preflight.py — 提交前一次跑完全部检查（5 项检查串成一条流水线）。
 
 为什么要有它
 ------------
-分散跑四个脚本容易漏跑，尤其「剧本对账」和「参考图检查」这两个最容易被跳过——
+分散跑这五项检查容易漏跑，尤其「剧本对账」和「参考图检查」这两个最容易被跳过——
 而它们恰好拦的是代价最高的两类事故：
   · 整镜丢失 / 事件降级成静态（story_check）
-  · 拼版参考图导致 71.9% 废片（ref_guard）
+  · 拼版参考图导致废片："拼版被当构图模板"（ref_guard；小样本实测观察（样本与复现命令未随公开版发布））
 
 本流水线按「越早发现越省钱」排序：
     1. ref_guard     参考图 —— 拦在**生成之前**（最省，不烧 GPU）
@@ -39,18 +39,29 @@
     2  参数错误 / 必要参数缺失
 """
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parent
+# 子检查超时：某个子脚本挂住不能让整个 preflight 无限等。默认 3600s，可用
+# H3Q_PREFLIGHT_TIMEOUT 覆盖；超时记作 rc=2（NOTCHECKED，禁止提交但措辞不是「被拦」）。
+SUBCHECK_TIMEOUT = int(os.environ.get("H3Q_PREFLIGHT_TIMEOUT", "3600"))
 
 
 def run(name, cmd):
     """跑一个子检查，返回 (ok, exit_code, stdout)。"""
     print(f"\n{'='*66}\n[{name}] {' '.join(str(c) for c in cmd[1:])}\n{'='*66}")
-    p = subprocess.run([sys.executable] + [str(c) for c in cmd],
-                       capture_output=True, text=True)
+    try:
+        p = subprocess.run([sys.executable] + [str(c) for c in cmd],
+                           capture_output=True, text=True, timeout=SUBCHECK_TIMEOUT)
+    except subprocess.TimeoutExpired as e:
+        out = ((e.stdout or b"") + (e.stderr or b"")).decode("utf-8", "replace") \
+            if isinstance(e.stdout, bytes) else ((e.stdout or "") + (e.stderr or ""))
+        print(out.rstrip())
+        print(f"ERROR: 子检查超时（{SUBCHECK_TIMEOUT}s）：{name}", file=sys.stderr)
+        return False, 2, out + f"\nTIMEOUT after {SUBCHECK_TIMEOUT}s"
     out = (p.stdout or "") + (p.stderr or "")
     print(out.rstrip())
     return p.returncode == 0, p.returncode, out
@@ -139,11 +150,18 @@ def main() -> int:
 
     # 5) 介质信号（只告警，不阻断）
     if args.frames and not args.skip_signals:
-        base = args.baseline or args.frames
-        if Path(base).exists():
-            ok, rc, _ = run("5/5 qc_signals 介质告警（不阻断）",
-                            [SCRIPTS / "qc_signals.py", args.frames, "--baseline", base])
-            results.append(("qc_signals", True, rc))   # 永不阻断
+        # qc_signals.py 要求必须给 --baseline；不给就拿被测图自己当基准，比值恒在 1
+        # 附近、告警失效。无 --baseline 时明确记 NOTCHK，不用待测目录自比。
+        if args.baseline:
+            if Path(args.baseline).exists():
+                ok, rc, _ = run("5/5 qc_signals 介质告警（不阻断）",
+                                [SCRIPTS / "qc_signals.py", args.frames,
+                                 "--baseline", args.baseline])
+                results.append(("qc_signals", True, rc))   # 永不阻断
+            else:
+                results.append(("qc_signals（基准路径不存在）", True, 2))
+        else:
+            results.append(("qc_signals（未给 --baseline，NOTCHK）", True, 2))
 
     # ---- 汇总 ----
     print(f"\n{'='*66}\nPREFLIGHT 汇总\n{'='*66}")

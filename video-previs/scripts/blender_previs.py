@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """blender_previs.py — storyboard JSON -> Blender 构建脚本（支持两种契约）
 1) dialogue 契约：shots 带显式 pos/look（海街 tatami 等）
-2) previs 契约：actors.c 带 path 走位，shots 用 mode=follow/wide/cu/ots/pov/streetup
+2) previs 契约：actors.c 带 path 走位，shots 用 mode=follow/wide/cu/ots/pov/streetup/keys
 用法: python blender_previs.py <storyboard.json>
 输出: projects/<项目>/白模3D/gen_<slug>.py（发 Blender MCP 执行）；stdout 末行 GEN_SCRIPT:<path>
 坐标: JSON x=横 y=上 z=深；Blender (x, 深, 上)
@@ -258,7 +258,7 @@ for tag, tgt, xoff in ((("actor_"),figs,0.0),(("actorF_"),figsF,FX)):
             e = new_fig(tag+aid,(px,pd,0),yaw)
             (fig_seated if seated else fig_stand)(e, ac.get("shirt",[200,200,200]))
         tgt[aid]=e
-# env 场景 DSL（可由 LLM 生成，见 gen_scene_env.py）：room/field 各一份几何清单，原样灰模拼装
+# env 场景 DSL：room/field 各一份几何清单，原样灰模拼装
 # {"boxes":[[cx,cy,cz,sx,sy,sz,r,g,b],...], "cyls":[[cx,cy,cz,r,h,r,g,b],...], "spheres":[[cx,cy,cz,r,r,g,b],...]}
 _env = DATA.get("env") or {}
 def _env_build(spec, xoff, zone):

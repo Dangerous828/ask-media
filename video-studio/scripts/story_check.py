@@ -6,7 +6,7 @@
 现有闸门（h3_gate / h3_lint）只查**单份提示词内部一致性**，完全不看它与剧本的关系。
 于是三类真实事故在机制上无法被发现：
 
-1. **整镜丢失**：剧本「Doro 赠大橘子」这一镜在成片里消失（只剩一句静态描述
+1. **整镜丢失**：剧本「角色A 赠大橘子」这一镜在成片里消失（只剩一句静态描述
    `The boy hugs a plump bright golden orange under his left arm`——橘子凭空出现）
 2. **同镜内空间自溶**：一个镜头里先有屏幕黑框、跑到中途黑框自己没了
    （S02 已穿越一次，S03 又穿一次）
@@ -16,8 +16,10 @@
 --------------------------------
 - 漏洞1「降级成静态」：事件分类型。`action` 类必须出现**动词**；
   `handover`（赠予/交接）类必须**施动者 + 受动者 + 道具三者共现**，缺一即报。
-- 漏洞2「空间跃迁」：每镜声明 `space_id`；**同镜内 space_id 必须唯一**；
-  跨镜变更必须在剧本事件清单里有对应 `transition` 事件。
+- 漏洞2「空间跃迁」：当前只查「剧本 transition 事件数 vs 成片里写了穿越运镜的镜数」
+  与「单镜内同时出现框/满幅两种空间描述」，用英文硬编码的 TRANSIT_MARK 识别穿越；
+  中文穿越措辞、同镜内 space_id 唯一性**均未实现**（文本层也查不出渲染过程内部的黑框自溶，
+  后者归 segment_guard）。不要按「每镜声明 space_id 并查同镜唯一」理解本脚本。
 - 漏洞3「单向」：**剧本是唯一真源**。本脚本只读剧本与分镜，绝不回写剧本。
   （对账不通过 → 改分镜，不许改剧本以通过。）
 
@@ -149,7 +151,7 @@ def _verb_cluster_hit(text: str, verbs) -> bool:
 # "the golden sheet **passes** beneath"、"the land **takes** over the frame"，
 # 全是无人物主语的比喻用法。于是"降级成静态"的赠橘事件被判成"有交接动词"，
 # **最关键的假阴性就这么放过了**。
-# 故：只保留真正的"递取"义词组，且要求**同句内**出现（见 _sentence_has_handover）。
+# 故：只保留真正的"递取"义词组。判定见 _has_handover_action（全文级，不要求同句）。
 HANDOVER_VERBS = [
     # 取出
     "brings out", "bring out", "produces", "pulls out", "takes out",
@@ -168,7 +170,7 @@ def _has_handover_action(text: str) -> bool:
     """全文级交接判定：抽出/递出/接收任一动作出现即算（不要求同句）。
 
     为什么不再要求同句（2026-10-22 实测教训）：
-    交接动作天然跨句分布——"Doro dips into satchel and produces the orange;"
+    交接动作天然跨句分布——"角色A dips into satchel and produces the orange;"
     "she stretches her arms and offers the fruit;" "he cradles it to his chest."
     要求「一句里同时有动词+人物+道具」等于要求错误的东西，会把正确的三句写法误杀。
     改为：动作（全文中任一）+ 施动者 + 受动者 + 道具，四者**各自在全文命中**即可。
@@ -186,22 +188,6 @@ TRANSITION_WORDS = [
 def _norm(s: str) -> str:
     return re.sub(r"\s+", " ", s.strip().lower())
 
-
-
-def _sentences(text: str) -> list:
-    return [x.strip() for x in re.split(r"(?<=[.;!?])\s+", text) if x.strip()]
-
-
-def _sentence_has_handover(text: str, actors=(), props=()) -> bool:
-    """句级交接判定；人物与道具词表由项目结构提供，不内置项目专名。"""
-    for sent in _sentences(text):
-        low = sent.lower()
-        if not any(v in low for v in HANDOVER_VERBS):
-            continue
-        if any(_asset_hit(low, {a}) for a in actors) and any(
-                _asset_hit(low, {p}) for p in props):
-            return True
-    return False
 
 
 def _has_any(text: str, words) -> list:
@@ -511,15 +497,47 @@ def check(script_path: Path, shots_path: Path, visuals_path=None) -> dict:
     # 文件名不是可靠对齐键（同 §3 的镜号问题）。改为：该镜的**动作链关键词**
     # 是否在全部提示词里出现；出现即视为该镜有承接，不追究文件名。
     merged_all_early = " ".join(_norm(x["text"]) for x in shots)
-    for sh in script["shots"]:
-        chain = " ".join(sh["action_chain"])
-        # 取动作链里 2+ 字符的实词做指纹
-        toks = [t for t in re.findall(r"[a-z]{4,}", _norm(chain))][:40]
+    # 提示词是否含中文字符：决定中文字面指纹能否比对。
+    prompt_has_zh = bool(re.search(r"[一-鿿]", merged_all_early))
+
+    def _fingerprint(chain: str) -> list:
+        """中英双语指纹：英文取 4+ 字母实词；中文用 2-gram 滑窗。
+
+        不取整段连续汉字串——"林夏放下手" 整串匹配不到提示词里的 "放下手"。
+        """
+        en_toks = re.findall(r"[a-z]{4,}", _norm(chain))
+        zh_toks = []
+        for run in re.findall(r"[一-鿿]{2,}", chain):
+            zh_toks.extend(run[i:i + 2] for i in range(len(run) - 1))
+        return (en_toks + zh_toks)[:40]
+
+    # 预计算每镜指纹与文档频率：跨镜公共词（角色名等）对"这一镜是否存在"没有区分力。
+    fps = [_fingerprint(" ".join(sh["action_chain"])) for sh in script["shots"]]
+    doc_freq = {}
+    for fp in fps:
+        for t in set(fp):
+            doc_freq[t] = doc_freq.get(t, 0) + 1
+    n_script_shots = max(len(script["shots"]), 1)
+    for sh, toks in zip(script["shots"], fps):
         if not toks:
+            findings.append({
+                "level": "notchk", "kind": "SHOT_FINGERPRINT_NOTCHK", "shot": sh["shot_id"],
+                "msg": (f"剧本 {sh['shot_id']}「{sh['title'][:26]}」的动作链"
+                        f"取不到任何中英文关键词，未做整镜丢失检查"),
+            })
             continue
-        hit = sum(1 for t in toks if t in merged_all_early)
-        ratio = hit / max(len(toks), 1)
-        if ratio < 0.15:   # 该镜内容基本没被任何提示词覆盖
+        # 跨语言：中文动作链 + 全英文提示词（用视觉代称写词）时，中文字面指纹无从比对。
+        # 这类情况由 §3 按事件对账（含视觉设定里的画面代称）判定，§1 不重复判负也不记 NOTCHK。
+        chain = " ".join(sh["action_chain"])
+        if re.search(r"[一-鿿]", chain) and not prompt_has_zh:
+            continue
+        # IDF 式权重：只在 ≤半数镜出现的 token 才计区分力，公共词剔除；全公共则退化为全词。
+        weights = [1.0 / (1.0 + doc_freq[t] / n_script_shots)
+                   for t in toks if doc_freq[t] <= n_script_shots / 2] or [1.0] * len(toks)
+        weighted_tokens = [t for t in toks if doc_freq[t] <= n_script_shots / 2] or toks
+        hit = sum(w for t, w in zip(weighted_tokens, weights) if t in merged_all_early)
+        ratio = hit / sum(weights)
+        if ratio < 0.15:   # 该镜的区分性内容基本没被任何提示词覆盖
             findings.append({
                 "level": "error", "kind": "SHOT_CONTENT_MISSING",
                 "shot": sh["shot_id"],
@@ -542,7 +560,7 @@ def check(script_path: Path, shots_path: Path, visuals_path=None) -> dict:
     # 3) 事件承担检查（**按内容在全库检索，不按编号**）
     #
     # 关键设计决定：剧本镜号与成片镜号**没有必然对应关系**。
-    # 实测 EP01：剧本 8 镜 vs 成片 9 镜；剧本 S06「Doro赠橘」在成片里根本没有对应镜，
+    # 实测 EP01：剧本 8 镜 vs 成片 9 镜；剧本 S06「角色A赠橘」在成片里根本没有对应镜，
     # 唯一出现是 S08 的一句静态描述。若按「S06 比 S06」对账，会把剧本赠橘比到成片
     # 「破屏探身」上然后判"通过"——这是最危险的假阴性。故一律**按事件内容检索全部分镜**。
     all_text = {s["shot"]: _norm(s["text"]) for s in shots}
@@ -736,7 +754,9 @@ def main() -> int:
               f"transition {r['events_by_type']['transition']}])")
         print(f"成片: {r['shots_dir']}  ({r['shot_files']} 个镜头文件)")
         print()
-        if not r["findings"]:
+        # check() 总会写入一条 SHOT_COUNT info，故 findings 永不为空；
+        # 真正的“全部对齐”判据是没有任何 error / warn / notchk。
+        if r["status"] == "PASS":
             print("✓ 剧本与镜头全部对齐")
         else:
             for f in r["findings"]:

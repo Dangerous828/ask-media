@@ -1,117 +1,23 @@
-# MiniMax H3 Skills
+# H3 提示词写作 · 本仓本地索引
 
-This directory contains the skills bundled with [MiniMax H3](../README.md): **1 prompt writing skill** and **8 style-specific video generation skills**. Each skill lives in its own folder with an installable `SKILL.md` (plus a `SKILL.cn.md` Chinese version for the style skills) and any reference materials it needs.
+本文件只索引本仓库 `h3-prompt-writing/` 内实际存在的资料。上游 [MiniMax-AI/MiniMax-H3](https://github.com/MiniMax-AI/MiniMax-H3) 官方 skill 索引为逐字节转载后已改写为本页；官方原文请以该仓库为准。
 
-## Status
+## 本仓资料
 
-The skills are actively maintained and still evolving. The 8 style skills ship with bilingual `SKILL.md`/`SKILL.cn.md`; `h3-prompt-writing` is currently English-only.
+| 资料 | 用途 |
+|---|---|
+| [`SKILL.md`](SKILL.md) | H3 视频提示词正文写法（T2VA / I2VA / FL2VA / L2VA / Ref2VA），含中文说明与本项目已验收写法 |
+| [`references/base-en.txt`](references/base-en.txt) | 官方基础文本/关键帧模式提示词指南（逐字节转载，222 行，SHA256 前 12 位 `2cfebc096a6e`） |
+| [`references/ref-en.txt`](references/ref-en.txt) | 官方 Ref2VA 全参考模式提示词指南（逐字节转载，341 行，SHA256 前 12 位 `1e574f356716`） |
+| [`references/case-notes.md`](references/case-notes.md) | 已验收案例与踩坑记录 |
+| [`references/failure-modes.md`](references/failure-modes.md) | 症状 → 根因 → 替代写法 |
+| [`references/market-reference-roles.md`](references/market-reference-roles.md) | 参考图角色定位 |
+| [`references/ref-subject-picture.md`](references/ref-subject-picture.md) | 主体参考图约定 |
+| [`corpus/README.md`](corpus/README.md) | 语料索引（含 creative-dna-t8 机制卡） |
+| [`CHANGELOG.md`](CHANGELOG.md) | 本技能变更记录 |
 
-## Installation
+## 说明
 
-Install skills with the [skills CLI](https://github.com/vercel-labs/skills):
-
-```bash
-# List all skills available in this repository
-npx skills add https://github.com/MiniMax-AI/MiniMax-H3 --list
-
-# Install all skills
-npx skills add https://github.com/MiniMax-AI/MiniMax-H3 --skill '*'
-
-# Install a single skill
-npx skills add https://github.com/MiniMax-AI/MiniMax-H3 --skill h3-prompt-writing
-```
-
-## Skills
-
-### h3-prompt-writing
-
-[SKILL.md](h3-prompt-writing/SKILL.md)
-
-Write structured MiniMax H3 video generation prompts for all five generation modes: T2VA, I2VA, FL2VA, L2VA, and Ref2VA. The skill rewrites multimodal requests into H3's prompt structure — `integrated_multimodal_description`, `overall_soundscape`, and `non_diegetic_music` — aligns keyframes, and defines reference labels for images, videos, and audio. It ships with two prompt guides under [`references/`](h3-prompt-writing/references/):
-
-- [`base-en.txt`](h3-prompt-writing/references/base-en.txt) — base text/keyframe modes
-- [`ref-en.txt`](h3-prompt-writing/references/ref-en.txt) — full-reference (Ref2VA) mode
-
-### minimalist-product-ad-generator
-
-<p align="center">
-  <img src="../assets/minimalist-product-ad-generator.gif" alt="minimalist-product-ad-generator" width="240">
-</p>
-
-Turn product images and ad requirements into clean, minimalist product ad shorts for e-commerce promotion and product launches. The skill confirms format and product variants, extracts selling points, writes concise English ad copy, plans beat-synced typography and storyboards, and generates a premium product film with polished camera language. Not for KOC talking-head ads, general editing, or complex screen demos.
-
-[SKILL.md](minimalist-product-ad-generator/SKILL.md) · [SKILL.cn.md](minimalist-product-ad-generator/SKILL.cn.md)
-
-### 3d-animation-short-generator
-
-<p align="center">
-  <img src="../assets/3d-animation-short-generator.gif" alt="3d-animation-short-generator" width="240">
-</p>
-
-Create complete stylized 3D animated shorts from a story idea through an ordered production workflow: project brief, story outline, character and environment cards, standardized shot planning, text or optional pencil storyboards, video-model selection, single-shot generation, assembly, BGM matching, and final review. Built for end-to-end narrative animation with strong character consistency, scene continuity, timing, camera, performance, and audio control. Not for single images, simple edits, photorealistic live action, or one standalone clip.
-
-[SKILL.md](3d-animation-short-generator/SKILL.md) · [SKILL.cn.md](3d-animation-short-generator/SKILL.cn.md)
-
-### papercraft-stop-motion-explainer
-
-<p align="center">
-  <img src="../assets/papercraft-stop-motion-explainer.gif" alt="papercraft-stop-motion-explainer" width="240">
-</p>
-
-Explain science, education, or general knowledge through tactile handmade papercraft visuals. The skill extracts the learning goal and visual metaphor, proposes creative directions, designs paper characters, layered diorama sets, and props, creates preview concepts plus image and video prompts, and plans storyboards, camera movement, transitions, and sound with staged approvals and review checklists. It outputs a production-ready papercraft stop-motion explainer package, or selected assets such as still prompts, image-series prompts, short-video prompts, or storyboards. Best for cut-paper, pop-up-book, layered diorama, and miniature stop-motion explainers.
-
-[SKILL.md](papercraft-stop-motion-explainer/SKILL.md) · [SKILL.cn.md](papercraft-stop-motion-explainer/SKILL.cn.md)
-
-### brand-promo-video-generator
-
-<p align="center">
-  <img src="../assets/brand-promo-video-generator.gif" alt="brand-promo-video-generator" width="240">
-</p>
-
-For marketers and creators producing promotional content for brands, products, websites, apps, shops, or personal projects. The skill organizes brand facts and asset provenance, selects a narrative direction, plans precise beats and shots, generates needed imagery, video, voiceover, or music, and completes assembly and pre-delivery review. It outputs a promotional short that highlights product capabilities, use cases, and a call to action. Best for launches, website showcases, and social promotion; not for imitating real brand marks without authorized assets or inventing product claims.
-
-[SKILL.md](brand-promo-video-generator/SKILL.md) · [SKILL.cn.md](brand-promo-video-generator/SKILL.cn.md)
-
-### music-video-subtitle-generator
-
-<p align="center">
-  <img src="../assets/music-video-subtitle-generator.gif" alt="music-video-subtitle-generator" width="240">
-</p>
-
-For musicians, video creators, and social-media editors producing AI music videos or emotional short films with lyric typography. The skill analyzes beat and vocal timing, separates character, scene, and text references, designs beat-reactive spatial typography, decomposes long works into connected shots, audits prompts, and routes generation for H3 or other video tools. It outputs MV concepts, shot prompts, lyric text plans, and stitching guidance. Best for stylized MVs and subtitle-driven music visuals.
-
-[SKILL.md](music-video-subtitle-generator/SKILL.md) · [SKILL.cn.md](music-video-subtitle-generator/SKILL.cn.md)
-
-### co-op-game-intro-generator
-
-<p align="center">
-  <img src="../assets/co-op-game-intro-generator.gif" alt="co-op-game-intro-generator" width="240">
-</p>
-
-Create a two-player co-op game menu or opening animation. The skill locks identity cues, generates an approval image from a fixed menu framework with coordinated color, buttons, icons, and typography, then uses the approved result to rebuild character, UI-copy, and event timing instructions for the final video. It outputs a co-op game intro featuring two characters, player cards, and menu interaction motion. Best for game concepts, character-led menus, and social content.
-
-[SKILL.md](co-op-game-intro-generator/SKILL.md) · [SKILL.cn.md](co-op-game-intro-generator/SKILL.cn.md)
-
-### paper-collage-explainer-generator
-
-<p align="center">
-  <img src="../assets/paper-collage-explainer-generator.gif" alt="paper-collage-explainer-generator" width="240">
-</p>
-
-Give narration, knowledge points, opinions, or abstract topics a tactile paper-collage language. The skill extracts meaning, proposes visual metaphors, prepares a production plan and storyboard, generates approved halftone collage stills, then creates stop-motion clips with paper movement and tactile sound effects, with optional final assembly. By default it keeps collage SFX and does not add BGM, voiceover, or subtitles unless requested. Best for explainers, viewpoints, story visuals, and social B-roll.
-
-[SKILL.md](paper-collage-explainer-generator/SKILL.md) · [SKILL.cn.md](paper-collage-explainer-generator/SKILL.cn.md)
-
-### handdrawn-live-video-generator
-
-<p align="center">
-  <img src="../assets/handdrawn-live-video-generator.gif" alt="handdrawn-live-video-generator" width="240">
-</p>
-
-Create surreal short videos that blend rough glowing hand-drawn animation with live-action spaces. The skill clarifies the physical contact, designs continuous morphing, an escape route, and a delayed handheld chase movement, then writes a reusable 15-second 16:9 video prompt in the user's language. After confirmation it recommends MiniMax H3 generation and checks contact realism, camera delay, rough glowing stroke texture, and non-horror tone. Best for single-scene creative clips, not polished CG, horror jump scares, plush characters, or multi-scene cuts.
-
-[SKILL.md](handdrawn-live-video-generator/SKILL.md) · [SKILL.cn.md](handdrawn-live-video-generator/SKILL.cn.md)
-
-## Contribute
-
-These skills are still being improved, and community contributions are encouraged. If you optimize an existing skill or add a new one, open a PR — contributing or optimizing skills comes with API credit rewards.
+- 本仓只收录 H3 提示词写作与已吸收的语料；官方 8 个风格技能未随本仓发布，列表见官方仓库 `skills/README.md`。
+- 安装本仓版本：`npx skills add Dangerous828/ask-media`，或手动链接本目录；不要安装官方仓库版本，二者写法已分叉。
+- 转载条款：MiniMax-H3 仓库根目录没有 LICENSE 文件，转载条款以官方仓库为准。

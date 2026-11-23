@@ -112,22 +112,24 @@ This is a substantive defect rather than a disclaimer. Unverifiable figures leav
 
 The ratio column is uniformly generated ÷ human; above 1 means generated text uses it more, which is the precondition for treating it as an artifact.
 
-### Confirmed in round one (not necessarily retained as V2 rules)
+### Confirmed in round one (v1 historical record)
 
-| Feature | Hypothesis | Measured | *R* | Rule |
-|---|---|---|---|---|
-| Zero-anaphora paragraph opening | Not hypothesized; raised in use | gen 0.61%, human 0.14% (non-initial paragraphs) | 4.4× | 11 |
-| Personifying vehicle | Hypothesis was "metaphor packaging abstractions" | gen 0.018, human 0.002 | 7.3× | 7 |
-| Colon overuse (cue phrase) | "Feels templated" | gen 0.29, human 0.08 | 3.8× | 5 |
-| Colon overuse (empty line into list) | Not hypothesized | gen 0.29, human 0.03 | 9.4× | 5 |
-| Antithetical construction | "Models love not-A-but-B" | gen 0.73, human 0.22 | 3.4× | 1 |
-| Em dash | "Unique to Claude, ×3" | gen 2.38, human 0.80 | 3.0× | 4 |
-| Opening formula (说白了) | Not quantified | gen 0.025, human 0.008 | 3.2× | 9 |
-| Ordinal as subheading | "29% of GPT paragraphs use ordinals" | gen 0.19, human 0.06 | 3.1× | 6 |
-| Material density (missing figures) | Not hypothesized | numerals gen 6.34, human 17.92 | 0.35× (human 2.8× higher) | 8 |
-| Adjacent-sentence isomorphism | Hypothesis was "tripartite parallelism ×7" | per 100 paragraphs gen 9.41, human 4.81 | 2.0× | 3 |
-| Dense enumeration commas | Same as above | gen 3.21, human 1.78 | 1.8× | 2 |
-| Translationese, five types | "English syntax retained", 18 types | only 5 qualify, see below | 2.6–5.3× | 10 |
+> This table is the **first-round v1 historical record**; every number in the *Rule* column is a v1 number. The current v2 rule set is governed by [SKILL.md](./SKILL.md); the *V2 status* column shows where each item ended up (kept / deleted to X / renumbered / downgraded).
+
+| Feature | Hypothesis | Measured | *R* | v1 Rule | V2 status |
+|---|---|---|---|---|---|
+| Zero-anaphora paragraph opening | Not hypothesized; raised in use | gen 0.61%, human 0.14% (non-initial paragraphs) | 4.4× | 11 | Renumbered to rule 9; downgraded (no longer detected or rewritten) |
+| Personifying vehicle | Hypothesis was "metaphor packaging abstractions" | gen 0.018, human 0.002 | 7.3× | 7 | Kept as rule 7 (moved to human-review zone) |
+| Colon overuse (cue phrase) | "Feels templated" | gen 0.29, human 0.08 | 3.8× | 5 | Renumbered to rule 2 |
+| Colon overuse (empty line into list) | Not hypothesized | gen 0.29, human 0.03 | 9.4× | 5 | Deleted to X (reversed in matched-pair retest) |
+| Antithetical construction | "Models love not-A-but-B" | gen 0.73, human 0.22 | 3.4× | 1 | Kept as rule 1 |
+| Em dash | "Unique to Claude, ×3" | gen 2.38, human 0.80 | 3.0× | 4 | Renumbered to rule 8 (downgraded to F fingerprint) |
+| Opening formula (说白了) | Not quantified | gen 0.025, human 0.008 | 3.2× | 9 | Renumbered to rule 3 |
+| Ordinal as subheading | "29% of GPT paragraphs use ordinals" | gen 0.19, human 0.06 | 3.1× | 6 | Deleted to X (reversed in matched-pair retest) |
+| Material density (missing figures) | Not hypothesized | numerals gen 6.34, human 17.92 | 0.35× (human 2.8× higher) | 8 | Deleted to X (symmetric check: net zero) |
+| Adjacent-sentence isomorphism | Hypothesis was "tripartite parallelism ×7" | per 100 paragraphs gen 9.41, human 4.81 | 2.0× | 3 | Renumbered to rule 6 |
+| Dense enumeration commas | Same as above | gen 3.21, human 1.78 | 1.8× | 2 | Renumbered to rule 5 |
+| Translationese, five types | "English syntax retained", 18 types | only 5 qualify, see below | 2.6–5.3× | 10 | Renumbered to rule 4 (four types) |
 
 ### Not confirmed, removed
 
@@ -304,6 +306,36 @@ python3 scripts/check-translationese.py <dirs...>
 All three read `.md` files from directory arguments only. They contain no corpus and do not use directory names as labels, since corpus directories often carry source information. Operator definitions sit at the top of each script.
 
 When changing a rule, look at what the regular expression actually matches before looking at the number.
+
+## Appendix: provenance of the v2.1 detection reference values
+
+Every hard-coded value in `detect.py`'s `HUMAN_REF` and in report.py's human reference column is sourced as follows. Reference values are the medians of the two sides of the 270-pair retest (`配对指标结果-按模型分列.csv`; Wilcoxon + Cliff's δ).
+
+| Detection metric | Human median | AI median | Experimental definition | Note |
+|---|---|---|---|---|
+| Antithetical construction (not-A-but-B) | 0.22 | 0.94 | Same operator, European-construction subitem | δ +0.88 (GPT) / +0.72 (Opus), same direction in both rounds |
+| Cue colon | 0.08 | — | Semantic "conclusion cue" tier, AI 2.1× | Script colon density is higher for humans (−0.37/−0.31); only the conclusion-cue tier is a signal |
+| Enumeration commas ≥3 | 1.78 | — | First-round control; matched-pair dense enumeration AI 1.45× (7.845 vs 5.398) | **Definition gap**: the experiment counts total comma density, detect counts ≥3-item enumerations; magnitudes are not directly comparable |
+| Sentence-length CV | 0.54 | 0.46 | Matched-pair sentence-length variation | **Differs from the v1 threshold note**: v1 README cited 0.67 (sampled); v2.1 uses the matched-pair 0.54 |
+| Section-length CV | 0.83 | 0.31 | Matched-pair section-length variation | δ−0.91/−0.75 |
+| Subheadings / 1k chars | 0.32 | 1.26 | Matched-pair subheading density | Human median: 0–1 subheadings per article |
+| mtld estimate | 143 | 227 | Experimental mtld (AI 227 / human 143) | **Definition gap**: detect approximates with bigram pseudo-words; absolute values are not on the same scale as experimental mtld, comparable only within one corpus |
+| Em dash / 1k chars | 0.83 | 2.02 | Matched-pair retest | **Do not pool fingerprints**: GPT −0.54 / Opus +0.95 point in opposite directions; the AI column is a pooled reference only, edits follow the per-model direction |
+| Semicolon / 1k chars | 0.77 | 1.51 | As above | GPT-specific δ+0.80 |
+| Quotation mark / 1k chars | — | — | Opus lower δ−0.67 | Density has strong individual variation; report only, do not judge |
+| Two isomorphic sentences / 100 paragraphs | 4.81 | 8.71 | Broad-definition signature | Denominator is "per 100 paragraphs": AI 8.71 instances/100 paragraphs vs human 4.81 (1.6×), **not** the share of the highly-isomorphic tier; the highly-isomorphic tier is the semantic "highly isomorphic triplet" at 29.4% vs 10.7% (share of triplets). detect uses the broad definition for screening, the semantic layer for final judgment |
+| Three isomorphic sentences / 100 paragraphs | 0.41 | 0.84 | Broad definition | Triplet 2.75×; after broad screening the semantic layer judges "highly isomorphic" |
+
+Sources for the four semantic-layer thresholds (summary definitions):
+
+| Summary figure | Threshold | Experimental source |
+|---|---|---|
+| Synonym renaming | ≥0.7/paragraph, or disaster paragraphs (≥2 groups) >15% | AI 0.83–0.86/paragraph vs human 0.49; disaster paragraphs 20.6–22.5% vs 8.4% (Jev single-model round, weaker than the other three) |
+| Cohesion chain | Longest chain ≥6 | AI short-text median 7 vs human 2; 93% of AI articles have a ≥6 chain |
+| Conclusion colon | Any hit is reported | Conclusion-cue tier AI 2.1×; quotation/layout/definition/empty tiers are all non-signals (empty reversed) |
+| Highly isomorphic triplet | ≥2 groups | Highly isomorphic triplet AI 29.4% vs human 10.7% |
+
+**Uncalibrated items**: σ (human distribution standard deviation) was not measured, so P_H percentile scales are unavailable; the experiment provides medians only. The sentence-length CV 0.54 vs 0.67 discrepancy and the enumeration/mtld definition gaps remain open and will be reconciled after the next paired-corpus run.
 
 ---
 

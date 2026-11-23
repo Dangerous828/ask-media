@@ -6,29 +6,63 @@
 人物支持 seated(盘腿坐) / stand(站)。极简场景，不搭假景。
 用法: python dialogue_engine.py <storyboard.json> [out.mp4]
 """
-import sys,json,math,os
+import sys,json,math,os,shutil,subprocess
 try: sys.stdout.reconfigure(encoding="utf-8")
 except Exception: pass
 import numpy as np
 from PIL import Image,ImageDraw,ImageFont,ImageFilter
 import cv2
+def load_font(size):
+    """字体逐级回退：Windows 雅黑 → DejaVuSans → 系统常见字体 → PIL 默认。"""
+    candidates = [
+        r"C:\Windows\Fonts\msyh.ttc",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/Library/Fonts/Arial Unicode.ttf",
+        "/System/Library/Fonts/Supplemental/Arial Unicode.ttf",
+        "/System/Library/Fonts/Helvetica.ttc",
+    ]
+    for path in candidates:
+        try:
+            return ImageFont.truetype(path, size)
+        except (OSError, ValueError):
+            continue
+    return ImageFont.load_default()
+
 def V(*a): return np.array(a,dtype=float)
 def norm(d):
     d=d.copy(); d[1]=0; n=np.linalg.norm(d); return d/n if n>1e-6 else V(0,0,1)
 def ease(x): return 2*x*x if x<.5 else 1-(-2*x+2)**2/2
 SKY=(176,182,190); FOG=np.array([150,156,158])
 
+def make_h264_writer(out,W,H,fps):
+    """ffmpeg 管道直出 H.264/yuv420p/faststart。无 ffmpeg 直接报错，不静默退化成 mp4v。"""
+    ff=shutil.which("ffmpeg")
+    if not ff:
+        raise RuntimeError("找不到 ffmpeg：白模一律输出 H.264，请安装 ffmpeg 后重试（不要以 mp4v 冒充成品）")
+    cmd=[ff,"-y","-v","error","-f","rawvideo","-pix_fmt","bgr24","-s",f"{W}x{H}",
+         "-r",f"{fps:g}","-i","-","-an","-vf","scale=trunc(iw/2)*2:trunc(ih/2)*2",
+         "-c:v","libx264","-preset","fast","-crf","20","-pix_fmt","yuv420p",
+         "-movflags","+faststart",out]
+    p=subprocess.Popen(cmd,stdin=subprocess.PIPE,stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
+    def wr(fr): p.stdin.write(fr.tobytes())
+    def cl():
+        try: p.stdin.close()
+        except Exception: pass
+        err=p.stderr.read().decode("utf-8","replace") if p.stderr else ""
+        if p.wait()!=0: raise RuntimeError("ffmpeg 编码失败: "+err[-400:])
+    return wr,cl
+
 class E:
-    def __init__(s,cfg,clean=False):
+    def __init__(s,cfg):
         s.cfg=cfg; s.W=cfg.get("w",960); s.H=cfg.get("h",540); s.FPS=cfg.get("fps",24)
-        # 干净帧：storyboard "overlay":false 或 clean=True —— 不烧 HUD（镜号/运镜/提示词/台词），
-        # 供图生视频当参考图；默认带 HUD 是人类预演版
-        s.clean=clean or cfg.get("overlay") is False
+        # 白模恒带 HUD（镜号/运镜/提示词/台词）。不提供“干净帧”模式：
+        # 预演图不是生产参考图（SKILL 跨技能红线），不能拿去当图生视频的参考/首帧。
         s.actors=cfg["actors"]; s.shots=cfg["shots"]; s.TOTAL=sum(x["dur"] for x in s.shots)
-        s.setd=cfg.get("set",{}); s.fontL=ImageFont.truetype(r"C:\Windows\Fonts\msyh.ttc",22)
-        s.fontS=ImageFont.truetype(r"C:\Windows\Fonts\msyh.ttc",28)
-        s.fontP=ImageFont.truetype(r"C:\Windows\Fonts\msyh.ttc",17)
-        s.fontN=ImageFont.truetype(r"C:\Windows\Fonts\msyh.ttc",24)
+        s.setd=cfg.get("set",{})
+        s.fontL=load_font(22)
+        s.fontS=load_font(28)
+        s.fontP=load_font(17)
+        s.fontN=load_font(24)
     class Cam:
         def __init__(s,pos,tgt,fov,eng): s.pos=V(*pos); s.tgt=V(*tgt); s.fov=fov; s.e=eng
         def basis(s):
@@ -131,12 +165,12 @@ class E:
         elif cam=="off" and "off" in sh:
             A=s.ap(sh.get("focus") or "c"); host=sh.get("focus") or "c"
             cp=A+V(*sh["off"]); tg=A+V(0,1.0,0)
-        elif sh.get("cam")=="near":
+        elif sh.get("cam")=="near" and sh.get("focus"):
             A=s.ap(sh["focus"]); host=sh["focus"]
             cp=V(T[0],1.35,A[2]+2.7); tg=V(T[0],1.0,T[2])
         elif sh.get("cam")=="wide":
             cp=V(T[0],1.95,T[2]-6.2); tg=V(T[0],1.0,T[2]); host=None
-        elif sh.get("cam")=="two":
+        elif sh.get("cam")=="two" and host and tgt:
             A=s.ap(host); B=s.ap(tgt); mid=(A+B)/2; d=norm(B-A); perp=V(-d[2],0,d[0])
             cp=mid+perp*-3.2+V(0,1.5,0); tg=mid+V(0,1.0,0); host=None
         elif sh.get("cam")=="cu" and tgt:
@@ -229,32 +263,28 @@ class E:
             od.ellipse((-120,s.H+6,250,s.H+200),fill=col); od.ellipse((-60,-120,190,150),fill=col[:3]+(200,))
             ov=ov.filter(ImageFilter.GaussianBlur(13)); img=Image.alpha_composite(img.convert("RGBA"),ov).convert("RGB"); dr=ImageDraw.Draw(img,"RGBA")
         # 顶部运镜
-        if not s.clean:
-            camTag={"wide":"全景","near":"近景背影","two":"双人中景","cu":"单人特写","ots":"越肩反打"}.get(sh.get("cam"),sh.get("cam","?"))
-            moveTxt=sh.get("move",camTag)
-            dr.rectangle((0,0,s.W,42),fill=(10,14,18,188))
-            dr.text((12,8),f"{sh['id']}   运镜：{moveTxt}",font=s.fontL,fill=(143,208,255,255))
+        camTag={"wide":"全景","near":"近景背影","two":"双人中景","cu":"单人特写","ots":"越肩反打"}.get(sh.get("cam"),sh.get("cam","?"))
+        moveTxt=sh.get("move",camTag)
+        dr.rectangle((0,0,s.W,42),fill=(10,14,18,188))
+        dr.text((12,8),f"{sh['id']}   运镜：{moveTxt}",font=s.fontL,fill=(143,208,255,255))
         # 右上 动作/提示词
-        if not s.clean:
-            def wrap(text,font,maxw):
-                out=[];cur=""
-                for ch in text:
-                    if dr.textlength(cur+ch,font=font)>maxw: out.append(cur);cur=ch
-                    else: cur+=ch
-                if cur: out.append(cur)
-                return out
-            panel=[]
-            if sh.get("action"): panel.append("● 动作："+sh["action"])
-            if sh.get("prompt"): panel.append("● 提示词："); panel+=wrap(sh["prompt"],s.fontP,330)
-            if panel:
-                ph=len(panel)*24+14; pw=360; px=s.W-pw-10; py=50
-                dr.rectangle((px,py,s.W-10,py+ph),fill=(10,14,18,175)); yy=py+8
-                for ln in panel:
-                    col=(255,214,120,255) if ln.startswith("● 动作") else ((150,220,170,255) if ln.startswith("● 提示") else (210,222,238,255))
-                    dr.text((px+12,yy),ln,font=s.fontP,fill=col); yy+=24
-        # 底部台词（带角色名）；支持长镜头镜内台词轨 lines:[{at,dur,speaker,line}]（clean 帧不烧字幕）
-        if s.clean:
-            return np.array(img)[:,:,::-1]
+        def wrap(text,font,maxw):
+            out=[];cur=""
+            for ch in text:
+                if dr.textlength(cur+ch,font=font)>maxw: out.append(cur);cur=ch
+                else: cur+=ch
+            if cur: out.append(cur)
+            return out
+        panel=[]
+        if sh.get("action"): panel.append("● 动作："+sh["action"])
+        if sh.get("prompt"): panel.append("● 提示词："); panel+=wrap(sh["prompt"],s.fontP,330)
+        if panel:
+            ph=len(panel)*24+14; pw=360; px=s.W-pw-10; py=50
+            dr.rectangle((px,py,s.W-10,py+ph),fill=(10,14,18,175)); yy=py+8
+            for ln in panel:
+                col=(255,214,120,255) if ln.startswith("● 动作") else ((150,220,170,255) if ln.startswith("● 提示") else (210,222,238,255))
+                dr.text((px+12,yy),ln,font=s.fontP,fill=col); yy+=24
+        # 底部台词（带角色名）；支持长镜头镜内台词轨 lines:[{at,dur,speaker,line}]
         spk=sh.get("speaker"); line=sh.get("line",""); sub=""
         if sh.get("lines"):
             elap=p*sh["dur"]
@@ -277,11 +307,15 @@ class E:
         return np.array(img)[:,:,::-1]
 
     def render(s,out):
-        vw=cv2.VideoWriter(out,cv2.VideoWriter_fourcc(*"mp4v"),s.FPS,(s.W,s.H))
+        write,close=make_h264_writer(out,s.W,s.H,s.FPS)
         n=int(s.TOTAL*s.FPS)
-        for f in range(n): vw.write(s.frame(f/s.FPS))
-        vw.release(); return n
+        try:
+            for f in range(n): write(s.frame(f/s.FPS))
+        finally: close()
+        return n
 if __name__=="__main__":
+    if len(sys.argv)<2:
+        sys.exit("用法: python dialogue_engine.py <storyboard.json> [out.mp4]")
     cfg=json.load(open(sys.argv[1],encoding="utf-8"))
     out=sys.argv[2] if len(sys.argv)>2 else os.path.abspath(os.path.join(os.path.dirname(sys.argv[1]),"..","out",cfg["project"]+"_对白白模.mp4"))
     n=E(cfg).render(out); print(f"[OK] {cfg['project']}: {n} frames / {sum(x['dur'] for x in cfg['shots']):.1f}s -> {out}")

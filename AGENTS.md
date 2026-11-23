@@ -1,11 +1,12 @@
-# AGENTS.md · Skill 中枢根契约
+# AGENTS.md · 仓库根路由与纪律
 
-> 本目录是家庭技能中枢（`git.example.com/skills.git`）的家目录，各 Agent 的技能软链指向这里。
+> 适用范围：本公开仓库的目录结构与技能；文中提及的私有中枢（`git.example.com/skills.git`）、SSH 签名、入 Hub 钩子与 `sync-skills.sh` 属作者本机分发流程，未随公开版发布，读者按自己的客户端安装即可。
 > 本文件只保存根级路由与必要纪律。阶段写法、模型参数、执行命令与实测边界由对应 skill 及 references 持有，根文件不复制参数表。
+> **出图档位与交付规格的唯一权威位置**：`h3-queue/references/still-standard-tier-20261105.md` 与 `h3-queue/references/delivery-specs.md`；其余各处只引用该口径，不另写数字。
 
 ## 套件内外分工
 
-- **套件内 `drama-skills/`**：12 个 `short-drama-*`，管项目事实、阶段边界与连续性。它是主仓内的普通目录，自带 `tests/` 与 `evaluations/`；改动先跑测试再随整仓一起提交。
+- **套件内 `drama-skills/`**：12 个 `short-drama-*`（含 `short-drama` 本体），管项目事实、阶段边界与连续性。它是主仓内的普通目录，自带 `tests/`；改动先跑测试再随整仓一起提交。
 - **套件外（本目录其余技能）**：管"这一类活怎么干"——写作、静帧、分镜、H3 正文、闸门、队列、验收测量。
 - 两侧无同名技能。命中关系见 [协作契约](SHORT-DRAMA-ROUTING.md)：套件外技能命中时必读对应的套件内项目知识，不互相转交本职。
 - 分发：主仓提交需 SSH 签名并触发入 Hub 钩子。`drama-skills/` 是**容器目录**，自身不作为技能入 Hub（发布器按 `CONTAINER_DIRS` 排除，否则它的改动会让整轮入库中止）；套件内技能经 `sync-skills.sh` 广播到各终端。

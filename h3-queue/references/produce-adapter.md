@@ -42,14 +42,13 @@
 
   | 路径 | 建图方式 | 上限 |
   |---|---|---|
-  | `lu2` / legacy（`lib_workflow.build_ref2va`） | 程序化，每张 ref 建一个 `LoadImage` | **一直无上限** |
-  | `pdd_lu`（`pdd_render_ref.py` + 模板） | 照模板的 `LoadImage` 槽位 | 改前**只有 2 槽**（模板 114/214），现按 refs 动态增删，硬上限 9 |
-  | `mkdraft.py`（手建图 CLI） | 同上模板 | 改前只有 `--ref0/--ref1`，现加 `--refs` 逗号表，与渲染器共用同一实现 |
+  | `lu2` / legacy（`lib_workflow.build_ref2va`） | 程序化，每张 ref 建一个 `LoadImage` | 无上限（lu2 已下线，仅历史对照） |
+  | `pdd_lu`（渲染机侧 `pdd_render_ref.py` + 模板） | 按 refs 动态增删 `LoadImage` 槽位 | 硬上限 9（节点 autogrow `min:0,max:9`） |
+  | `mkdraft.py`（本仓手建图 CLI，离线研究副本） | 照模板现有 `LoadImage` 槽位 | **仅 2 槽**：`--ref0/--ref1`，超过模板槽数直接报错 |
 
-  **槽位逻辑只有一份**：`mkdraft.grow_ref_slots / trim_ref_slots / bind_refs`，`pdd_render_ref.build_graph` 调 `M.bind_refs`。
-  不要再在别处复制实现，也不要去找第二份——漂移过一次就是本次"2 张"误传的由来。
-  回归核对（原始备份 vs 现版）：**2 张生产路径逐字节一致**；1 张不一致是修掉了模板遗留图混入的缺陷。
-  备份：`mkdraft.py.bak-refslots-20261108`、`pdd_render_ref.py.bak-refslots-20261108`。
+  **9 张只走渲染机侧 `pdd_render_ref.py` 渲染器路径**（动态槽位逻辑在该私有脚本内，未随公开版发布，以实际部署为准）。
+  本仓 `scripts/mkdraft.py` 是离线研究副本，没有 `--refs` / `grow_ref_slots` / `trim_ref_slots` / `bind_refs`，
+  也没有动态扩容；不要用 mkdraft 这条路去验证 9 图，最多 2 张。下方"显存与张数无关"的实测均出自渲染器路径。
 
   **节点真实上限是 9**（`MiniMaxH3ReferenceToVideo.ref_images` autogrow `min:0, max:9`），不是 h3q 也不是模型的 2 张限制。`h3_gate.py` 不限制数量，只核对 `<Picture N>` 编号 ≤ 实际上传数。
 
@@ -87,7 +86,7 @@
   但开跑前仍要确认显存窗口干净（`nvidia-smi` 看 PID 归属，别用 `external work running` 判断，见下条），
   否则一次瞬时分配失败会被误读成容量问题——本次就是这么绕了一圈。
 
-  → **验构图（draft）可以身份板＋场景板＋道具板全挂上，最多 9 张**，多人镜头不必再用正文文字补身份；
+  → **验构图（draft）可以身份板＋场景板＋道具板全挂上，最多 9 张**（走 pdd_render_ref 渲染器路径；本仓 mkdraft.py 仅 2 槽，不适用），多人镜头不必再用正文文字补身份；
   → **出片（final）实测通过 2 张与 6 张**，显存无增长；要多张直接上，按每张 +13s 排时间预算即可。
   9 张那次失败属另一类问题（sticky context / 瞬时分配），不是容量；**重跑即可，不要因此退回 2 张**。
   → 一次 OOM 会让 ComfyUI 进入 Sticky 状态需重启，`h3q` 看门狗会自动拉起。
@@ -126,7 +125,7 @@
   **本机不成立的三条硬理由**：
   1. **显存**：峰值要 22 GiB，本机上限 15.92 GiB。现役 PDD 跑 1536×864 已到 15.55 GiB，只剩 0.37 GiB。换 `Q3_K_M` 只省 1.9 GB，而峰值里权重仅约 9 GB、余下 13 GB 是激活值与 VAE，填不上 6 GiB 的缺口。
   2. **没有速度收益**：24G 卡出 15 秒要 866s，比现役 PDD 的 831s 还慢；16G 只会更慢或直接 OOM。
-  3. **改动面大**：要 ComfyUI ≥ 0.43.0（运行实例版本升级前现场核对，2026-11-15 运行实例 git commit b0b7435）、装 `ComfyUI-GGUF` + `ComfyUI-HyperFlow-Flash`、用专属 `HyperFlow GGUF Loader`（普通 loader 不认两时间嵌入器）、整套工作流重写；且要下载约 35 GB（两个 GGUF + 15.7 GB 文本编码器 + VAE），E 盘 2026-11-15 实测余 148.7 GB。`<渲染机根目录>` 不是 git 仓库，升级 ComfyUI 后 PDD / LatentUpscaler3D / Sol 那套改动都要重验。
+  3. **改动面大**：要 ComfyUI ≥ 0.43.0（版本与运行实例提交号现场核对，以实际部署为准；不同来源的 `git describe` / commit 号可能不一致，判断版本只看 `comfyui_version.py` / `pyproject.toml`，见 [`../SKILL.md` "入口与环境"](../SKILL.md)）、装 `ComfyUI-GGUF` + `ComfyUI-HyperFlow-Flash`、用专属 `HyperFlow GGUF Loader`（普通 loader 不认两时间嵌入器）、整套工作流重写；且要下载约 35 GB（两个 GGUF + 15.7 GB 文本编码器 + VAE），E 盘按部署时实际余量。`<渲染机根目录>` 不是 git 仓库，升级 ComfyUI 后 PDD / LatentUpscaler3D / Sol 那套改动都要重验。
 
   **什么情况下再来看它**：官方补 16GB 实测数据，或出现 16GB 可跑的精简版。届时重估的唯一看点是**音画同出**这个能力，不是速度。
 
@@ -136,7 +135,7 @@
 
   | engine | tier | 实际参数 | 用途 | 约束 |
   |---|---|---|---|---|
-  | `pdd` | `draft`（**缺省**） | `--workflow pdd_lu --no-upscale --sol-profile off`，首采 1024×576 | 验构图/运动/身份。362 帧约 285s | 不接受 `parameters.steps` |
+  | `pdd` | `draft`（**缺省**） | `--workflow pdd_lu --no-upscale --sol-profile off`，首采 1024×576 | 验构图/运动/身份。362 帧约 285s | 步数由档位模板固定（8 步）；adapter 会把 `parameters.steps` / `parameters.cfg` 透传到 h3qc 命令行，服务端是否接受以实际部署为准，不要指望靠透传步数改变该档 |
   | `pdd` | `final` | `--out-width/--out-height` 二采，`--sol-profile off` | 出成片。362 帧到 1536×864 约 832s | **16GB 上限 1536×864**（实测峰值 15.55/15.92 GiB）；超过直接拒绝 |
 
   > **2026-11-15 起引擎只保留 `pdd`，`lu2`/`legacy` 全部下线**（操作者指令）。`VIDEO_ENGINES=("pdd",)`、`VIDEO_TIERS=("draft","final")`；adapter/server 两条校验路径都会拒 `engine=lu2` / `tier=legacy`，底层 `--workflow lu2|legacy` 变不可达死代码。多窗另走 `multishot`（v2，见 §2.14，不占 engine/tier）。lu2 的历史实测数据仅留作对照，不再是可选档位。

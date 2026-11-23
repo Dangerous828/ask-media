@@ -8,7 +8,7 @@
 
 短剧/漫剧/动画叙事任务按下表读取相应阶段技能正文，不要求用户点名；已在本轮读取的内容直接复用。只有跨阶段、项目状态或初始化请求才读取 [short-drama总路由](drama-skills/skills/short-drama/SKILL.md)。看到名称不等于读过知识，也不需要为一个明确任务先通读整套。
 
-本表只列**套件外**现用技能与套件知识的对接；短剧各阶段 owner（novel-analyze / develop / write / assets / direct / storyboard / image-prompts / video-prompts / produce / review / edit）的完整阶段表以 [ask-media 的阶段链](ask-media/SKILL.md) 为准。
+本表只列**套件外**现用技能与套件知识的对接（含 `short-drama` 本体）；左列均为本仓库根目录的套件外技能，`short-drama-direct` 指套件外的同名技能，右侧链接才是套件内知识。短剧各阶段 owner（novel-analyze / develop / write / assets / direct / storyboard / image-prompts / video-prompts / produce / review / edit）的完整阶段表以 [ask-media 的阶段链](ask-media/SKILL.md) 为准。
 
 | 当前实际使用技能 | 继续承担的工作 | 任务命中时必读的项目知识 |
 |---|---|---|
@@ -20,7 +20,7 @@
 | storyboard-30s | 设计镜头、调度、节奏与分镜表 | 短剧分镜读 [storyboard](drama-skills/skills/short-drama-storyboard/SKILL.md)，沿用既有剧情和镜头边界 |
 | h3-prompt-writing | 直接写完整H3正文、声音和参考标签 | 短剧动作/时长/交接读 [video-prompts](drama-skills/skills/short-drama-video-prompts/SKILL.md)，不要求先有另一份提示词稿 |
 | creative-dna-cards | 文档准备即按需求查完整机制模板，给导演、场记及下游提供成立条件与失败条件 | 非阶段 owner；④ 导演采纳、③ 资产按需回补、⑤ 场记落实、⑥ 分镜证明、⑦⑧ 词继承、⑨⑩ 验收、⑪ 剪辑按 [准备约定](drama-skills/skills/short-drama/references/mechanism-preparation.md) 和 [PRODUCTION-INTEGRATION](h3-prompt-writing/corpus/creative-dna-t8/PRODUCTION-INTEGRATION.md) 交接；不擅改上游、不代替验收 |
-| video-studio / shortvideo-pipeline | 工程检查、适配判断与测量（四件套、介质信号） | 生成物是否可用由 [review](drama-skills/skills/short-drama-review/SKILL.md) 的媒体验收裁决（先画风 `look_check.py`，后剧情）；本技能的测量作为证据，不单独放行 |
+| video-studio | 工程检查、适配判断与测量（四件套、介质信号） | 生成物是否可用由 [review](drama-skills/skills/short-drama-review/SKILL.md) 的媒体验收裁决（先画风 `look_check.py`，后剧情）；本技能的测量作为证据，不单独放行 |
 | h3-video-gate | 运行机械闸门、定位格式错误 | 需解释时序/动作时读 [video-prompts](drama-skills/skills/short-drama-video-prompts/SKILL.md)；机械PASS不等于语义与实图合格 |
 | h3-queue | 核对真实输入，经h3q提交并追踪结果 | 短剧新生产读 [produce](drama-skills/skills/short-drama-produce/SKILL.md) 的本次授权、生成物再作参考规则与记录要求；实际支持的首帧/首尾帧/参考等模式查当前h3-queue与执行接口，路由表不缓存能力；档案使用所选H3方言 |
 

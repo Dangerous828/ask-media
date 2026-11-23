@@ -55,7 +55,7 @@ adapter profile 没有声明接受 `reference_audio` 时 `run` 在提交前失�
 条目的「输入参考图」写成 `PLAN-...` 时，那些图片在创作者自己的工具里，项目内没有文件可送：
 `prepare` 直接失败并说明先把真实文件放进项目、改写成 `REF-...`，不拿计划当输入，也不静默丢掉参考。
 `references` 可以省略并由绑定顺序生成，也可以作为相同顺序的显式镜像。输出放在
-`剧集/<EP>/制作成果/`；这个 job 是生产工具的临时输入，不是第六份创作文档：
+`剧集/<EP>/制作成果/`；这个 job 是生产工具的临时输入，不计入六份创作文档：
 
 ```bash
 python3 {技能目录}/scripts/production_tool.py prepare <project> --job <临时-job.json>
@@ -144,7 +144,7 @@ python3 <本技能目录>/scripts/production_tool.py audit <project>
   本地 h3q adapter 在上传前逐字核对实际 `<d>` 台词。旧的已确认任务若快照没有剧本会明确标记 NOTCHK，
   重新 prepare 后才启用对账。
 - **tts**：从 `剧本.md` 读取原句与表演要求，声音参考由用户或现有媒体明确提供。不得在生产 job
-  中改词，也不为 TTS 新建第六份创作文档。表演要求来自这句台词的括注和上下文：执行端接受自然语言语气时，
+  中改词，也不为 TTS 另建创作文档。表演要求来自这句台词的括注和上下文：执行端接受自然语言语气时，
   写成一句语气说明放在台词前（「憋屈地压低声音，咬着牙应一声：是。」），同一角色每句挂同一段参考音色；
   只接受枚举情绪时映射到最近的一档，再用强度、音调细调。只给音色、不给语气时，短剧台词会念成播音腔。
 - **music**：读取 `视频提示词.md` 中创作者已确认的时间线音乐章节；主题曲使用已确认歌词，纯配乐
@@ -207,7 +207,7 @@ adapter 配置必须在项目外，只包含 argv 命令和超时；凭据由 ad
    派生自另一条媒体的，父媒体
    也必须仍是 approved。基准帧本身豁免（它就是标尺）。 **批准动作的时序**：`review → approve` 与提交一次连续做完；写词、改词的轮次只跑词侧闸门（正文结构检查），
    不要顺手对参考资产跑 `measure`/`--audit`——它会给已批准资产追加 `pending`、把 `approved` 打成 `unknown`，
-   提交时被 `ref_gate` 拒收，只能重走一遍独立验收才能恢复（EP004 重制实测：此污染两次打断提交流程）。批准状态的字段语义（追加 `pending`、旧批准失效、`ref_gate` 拒收规则）见 `short-drama-review/SKILL.md` 画风段，本节不复述。
+   提交时被 `ref_gate` 拒收，只能重走一遍独立验收才能恢复（EP004 重制实测：此污染两次打断提交流程）。批准状态的字段语义（追加 `pending`、旧批准失效、`ref_gate` 拒收规则）见 `../short-drama-review/SKILL.md` 画风段，本节不复述。
 
 创作者亲手放进 `输入/` 的原始资产（不带生成器标记、也不是任何运行交付过的字节）不受第 2 项限制。
 
@@ -220,7 +220,7 @@ adapter 配置必须在项目外，只包含 argv 命令和超时；凭据由 ad
 Magpie MCP 三条路径都走同一个 `ref_gate`，因此都会自动生效。
 
 需要逐角色核对时，在 job 的 `parameters` 里写 `cast`（本镜出场角色名）、`cast_required: true`，
-并用 `cast_aliases` 补齐画面代称与简称（例如「角色C」↔「咕角色C嘎」），否则别名对不上会误报。
+并用 `cast_aliases` 补齐画面代称与简称（例如「角色C」↔「示例角色C」），否则别名对不上会误报。
 确属没有身份可辨的镜头（只有手、剪影、空镜），写 `cast_exempt` 并给出 ≥8 字符的具体理由；
 理由会回显在 `prepare` 预览与闸门返回里，静默跳过不受理。
 
@@ -242,9 +242,9 @@ adapter 侧可用 `SHORT_DRAMA_REF_GATE` 显式覆盖共享副本路径，`produ
 `missing_look_baseline` 表示缺少基准或设计资产未声明；`reference_not_accepted` 表示生成物未获批复用；
 `cast_identity_plate_missing` 表示整组没带身份板；`cast_identity_reference_missing` 表示某个出场角色缺身份图；
 `input_error` 表示项目根或路径不可读。不要用一个通用“参考图被拒”代替具体 code。Magpie MCP 的短剧调用只用 `h3_generate_project_image` /
-`h3_generate_project_video`；原始生图/生视频工具不用于短剧项目。`produce/scripts/ref_gate.py` 是单技能
+`h3_generate_project_video`；原始生图/生视频工具不用于短剧项目。`scripts/ref_gate.py` 是单技能
 独立运行使用的同字节分发副本，以 review 下脚本为源，仅在共享路径不可用时兜底；修改后必须同步并由
-`test_ref_gate.py` 核对。
+`scripts/selftest.py` 核对。
 
 不要为了满足构图、道具数量或状态，用脚本拼贴、贴图、矢量重画或局部修改去制造参考图；这种图即使
 写明“只控制构图”，模型也会把它的平涂和光影一起学走。需要的状态改不出来时，按审查技能 REV-17

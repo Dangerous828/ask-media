@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
-"""Static-validate a graph against the live /object_info before submitting."""
+"""Static-validate a graph against the live /object_info before submitting.
+
+直连 ComfyUI 127.0.0.1:8199（默认端口 8188，8199 为渲染机本机自定义端口），
+但**只读 /object_info、不提交任何任务**，因此不违反 h3q 队列纪律；用于提交前
+静态核对节点是否注册、输入是否齐全、连线是否可达 Save*。真正的提交仍走 h3q。
+"""
 import json
 import sys
+import urllib.error
 import urllib.request
 
 BASE = "http://127.0.0.1:8199"
@@ -19,9 +25,19 @@ def walk(obj):
 
 
 def main(path):
-    d = json.load(open(path, encoding="utf-8"))
+    try:
+        with open(path, encoding="utf-8") as fh:
+            d = json.load(fh)
+    except (OSError, ValueError) as e:
+        print("VALIDATE_FAIL: 读不到图 %s: %s" % (path, e))
+        return 1
     g = d.get("graph") or d
-    objs = json.loads(urllib.request.urlopen(BASE + "/object_info", timeout=30).read())
+    try:
+        with urllib.request.urlopen(BASE + "/object_info", timeout=30) as r:
+            objs = json.loads(r.read())
+    except (urllib.error.URLError, OSError, ValueError) as e:
+        print("VALIDATE_FAIL: 取不到 /object_info: %s" % e)
+        return 1
     problems = []
 
     nodes = {}
@@ -59,8 +75,10 @@ def main(path):
                     problems.append("node %s [%s]: input '%s' links to missing node %s"
                                     % (nid, ct, name, val[0]))
 
-    # unreachable-to-output check: every node must feed SaveVideo
-    outputs = [nid for nid, n in nodes.items() if n["class_type"].startswith("Save")]
+    # unreachable-to-output check: every node must feed a Save* or a PreviewImage
+    # (草稿图以 PreviewImage 结尾，没有 Save*，不能判「全部节点孤儿」)。
+    outputs = [nid for nid, n in nodes.items()
+               if n["class_type"].startswith("Save") or n["class_type"] == "PreviewImage"]
     reach = set()
     stack = list(outputs)
     while stack:
@@ -73,16 +91,19 @@ def main(path):
                 stack.append(val[0])
     orphans = sorted(set(nodes) - reach, key=lambda x: int(x) if x.isdigit() else 0)
     if orphans:
-        problems.append("orphan nodes (not reachable from any Save*): %s" % orphans)
+        problems.append("orphan nodes (not reachable from any Save*/PreviewImage): %s" % orphans)
 
     if problems:
         print("VALIDATE_FAIL")
         for p in problems:
             print("  -", p)
         return 1
-    print("VALIDATE_OK  %d nodes, %d reachable from Save*" % (len(nodes), len(reach)))
+    print("VALIDATE_OK  %d nodes, %d reachable from Save*/PreviewImage" % (len(nodes), len(reach)))
     return 0
 
 
 if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("用法: python validate.py <graph.json>")
+        sys.exit(2)
     sys.exit(main(sys.argv[1]))

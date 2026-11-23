@@ -10,13 +10,13 @@
 >
 > 判别：用户说“学这个动作”“照着做”“动作参考视频”“极乐净土那种”“音频也加进去”→ 本文；说“拆镜”“反推分镜表”“写 MOTION 提示词”→ 文字复刻。拿不准时问一句：“是把视频直接喂给模型，还是把动作拆成文字写进词里？”
 >
-> **实例（EP003）**：项目 `example-project`，成片与动作源在 NAS，与 EP001/EP002 同一层级：`~/Documents/NAS-MOUNT/example-project/EP003/`
+> **实例（EP003）**：项目 `example-project`，成片与动作源在 NAS，与 EP001/EP002 同一层级：`<NAS项目目录>/example-project/EP003/`
 >
 > | 文件（NAS，相对 `EP003/`） | 内容 |
 > |---|---|
 > | `EP003-dance-345f-videoref-audio.mp4` | 成片，512×896 / 345f / 14.375s / AAC |
 > | `EP003-dance-345f-x2.mp4` | 成片硬切重复两次，28.75s |
-> | `动作源/source.mp4` | B 站 BV1Pz4h6wES5 原片（猫耳金发女仆，无台词，14.03s） |
+> | `动作源/source.mp4` | B 站 BV-示例 原片（猫耳金发女仆，无台词，14.03s） |
 > | `动作源/action_ref.mp4` | 传给 ComfyUI 的动作源（原速，720×1280 / 337f，带 AAC 原声） |
 > | `文档/EP003_dance_videoref_audio.json` | 填好占位符的实际提交图 |
 > | `文档/投递单-EP003-动作驱动.md`、`验收-EP003-动作驱动.md`、`视频提示词.md`、`EP003_ref2va_prompt_345f.txt`、`EP003-dance-345f-videoref-audio.meta.json` | 投递单、验收、词稿、送检件、运行记录 |
@@ -57,7 +57,7 @@
 
 | 字段 | 位置 | 规则 |
 |---|---|---|
-| `length` | 节点 5 | 帧数，必须 17k+5（345=17×20+5；243=17×14+5）。**取动作视频真实帧数换算后向下取最近的 17k+5**，EP003 的 337f 源片取 345 |
+| `length` | 节点 5 | 帧数，必须 17k+5（345=17×20+5；243=17×14+5）。**取动作视频真实帧数换算后向上取最近的 17k+5**：EP003 的 337f 源片取 345（向下取是 328，会截掉动作尾段）。向上取会使生成比源片多几帧（此处 +8f），多出的尾部靠动作自然收束补齐，不回放源片开头；时序对齐按 §4 的拍点秒数为准，不按帧号一一对应 |
 | `width`/`height` | 节点 5 | 16G 卡实测 512×896 可跑 345 帧（峰值 15.55GiB）。更大分辨率先降帧数 |
 | `noise_seed` | 节点 6 | 任意整数 |
 | `ref_image_size` | 节点 5 | `match`。身份板是多视图拼板时脸可能偏弱，脸漂再改 `max` 或换单张正面图重投 |
@@ -68,6 +68,7 @@
 - **音轨参考**：`31` 的输出槽 **1**（audio）→ 节点 5 的 `ref_video_audios.ref_video_audio_0`。**是槽 1，不是槽 2。** 不接这个槽就是「只拿动作、声音让 H3 自己生成」。
 - 动作修复：`UNETLoader(1)` 经 `LoraLoaderModelOnly(4)` 挂 `Motion_Repair_V2.safetensors`，强度 0.7，再进 `KSamplerAdvanced(6)`。
 - 模型：`minimax_h3_ref2va_pruned_int8_convrot.safetensors`，20 步，`res_multistep` / `simple`，cfg 1.0。
+- 负向槽（节点 3 `CLIPTextEncode`，text 留空）仅为满足采样器的 required 输入而**占位**；cfg 1.0 下没有负向分支，该段不参与采样（见 h3-video-gate G29）。不要往节点 3 里写 `low quality, blurry, distorted` 之类内容——在 cfg 1.0 下不会生效，只会制造"配了负向"的错觉。
 
 ## 4. 提交前
 
@@ -84,7 +85,7 @@ runner：`../templates/video_motion_drive_runner.py`。它提交一次、轮询 
 
 要点：
 
-- **runner 必须脱离 SSH 会话**。EP003 实测 runner 进程随 SSH 子进程回收而退出（`status` 停在 submitted），产物不丢（ComfyUI 仍在跑），但回收要改由 Mac 侧轮询。用 `../templates/launch_detached.ps1`（路径相对本文件所在的 `references/`；下同）启动（2026-11-22 实测：SSH 退出后进程继续运行到结束）：
+- **runner 必须脱离 SSH 会话**。EP003 实测 runner 进程随 SSH 子进程回收而退出（`status` 停在 submitted），产物不丢（ComfyUI 仍在跑），但回收要改由 Mac 侧轮询。用模板脚本启动（下文命令里的 `templates/...` 相对 `h3-queue/` 技能根；正文里的 `../templates/...` 相对本文件所在的 `references/`，两者指向同一文件）：
   ```
   scp templates/launch_detached.ps1 templates/video_motion_drive_runner.py <渲染主机SSH别名>:/path/to/motion_drive_delivery/
   ssh <渲染主机SSH别名> 'powershell -NoProfile -ExecutionPolicy Bypass -File <ComfyUI根目录>\motion_drive_delivery\launch_detached.ps1 -Script <ComfyUI根目录>\motion_drive_delivery\video_motion_drive_runner.py -WorkDir <ComfyUI根目录>\motion_drive_delivery -Log <ComfyUI根目录>\motion_drive_delivery\runner.log'

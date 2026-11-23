@@ -60,8 +60,11 @@ def parse_srt(txt):
         tl = next((i for i, l in enumerate(lines) if "-->" in l), 0)
         body = " ".join(l for i, l in enumerate(lines)
                         if i != tl and not (i < tl and re.fullmatch(r"\d+", l))).strip()
-        h, mm, rest = m.group(1).replace(",", ".").split(":"); t0 = int(h) * 3600 + int(mm) * 60 + float(rest)
-        h, mm, rest = m.group(2).replace(",", ".").split(":"); t1 = int(h) * 3600 + int(mm) * 60 + float(rest)
+        try:
+            h, mm, rest = m.group(1).replace(",", ".").split(":"); t0 = int(h) * 3600 + int(mm) * 60 + float(rest)
+            h, mm, rest = m.group(2).replace(",", ".").split(":"); t1 = int(h) * 3600 + int(mm) * 60 + float(rest)
+        except (ValueError, TypeError):
+            continue   # 畸形时间戳跳过，不让整段转写崩在 srt 解析上
         if body: items.append((t0, t1, body))
     return items
 
@@ -97,17 +100,19 @@ def local_rows(video, a):
         return out
 
     try:
-        model = _load(device)
-        print(f"[信息] 本地引擎  设备: {device}  模型: {a.model}")
-        rows = _run(model)
-    except Exception as e:
-        if device != "cpu":   # 老卡（如 GTX 970）/缺 cublas 时退 CPU int8
-            print(f"[警告] {device} 失败，退回 CPU int8: {e}")
-            model = _load("cpu")
+        try:
+            model = _load(device)
+            print(f"[信息] 本地引擎  设备: {device}  模型: {a.model}")
             rows = _run(model)
-        else:
-            raise
-    os.remove(wav)
+        except Exception as e:
+            if device != "cpu":   # 老卡（如 GTX 970）/缺 cublas 时退 CPU int8
+                print(f"[警告] {device} 失败，退回 CPU int8: {e}")
+                model = _load("cpu")
+                rows = _run(model)
+            else:
+                raise
+    finally:
+        os.remove(wav)
     return rows
 
 
@@ -143,7 +148,11 @@ def doubao_rows(video, a, cfg):
 # ---------- 云端引擎（OpenAI 兼容 /audio/transcriptions） ----------
 
 def providers_path():
-    """skill 副本位于 .codex/skills/video-previs/scripts/，向上找 workbench/providers.json。"""
+    """向上查找 workbench/providers.json（仓外可选配置，不在本公开仓内）。
+
+    公开仓 clone 下必然找不到，云端链路不可用；本地 faster-whisper 引擎不依赖它。
+    详见 references/environment_setup.md 第 4 节。
+    """
     here = os.path.dirname(os.path.abspath(__file__))
     for up in (4, 3, 2, 1):
         cand = os.path.normpath(os.path.join(here, *[".."] * up, "workbench", "providers.json"))
@@ -153,8 +162,10 @@ def providers_path():
 
 def vendor_cfg(vid):
     p = providers_path()
-    if not p: raise SystemExit("[错误] 找不到 workbench/providers.json")
-    for v in (json.load(open(p, encoding="utf-8")).get("vendors") or []):
+    if not p: raise SystemExit("[错误] 找不到 workbench/providers.json（云端配置不在本仓，见 references/environment_setup.md 第 4 节）")
+    with open(p, encoding="utf-8") as fh:
+        cfg = json.load(fh)
+    for v in (cfg.get("vendors") or []):
         if v.get("id") == vid: return v
     raise SystemExit(f"[错误] providers.json 中无厂商 {vid}")
 
@@ -193,7 +204,7 @@ def cloud_rows(video, a):
     base = (cfg.get("base_url") or "").rstrip("/")
     key = cfg.get("api_key") or ""
     if not base or not key:
-        raise SystemExit(f"[错误] 厂商 {a.vendor} 未配置 base_url/api_key（到 ⑧ 环境页配置）")
+        raise SystemExit(f"[错误] 厂商 {a.vendor} 未配置 base_url/api_key（云端链路配置不在本仓，见 references/environment_setup.md 第 4 节）")
     if not cfg.get("enabled"):
         print(f"[警告] 厂商 {a.vendor} 未启用，仍按当前配置尝试调用")
 
@@ -208,8 +219,10 @@ def cloud_rows(video, a):
         seg_end = min(seg_start + CHUNK_SEC, t1) if t1 > 0 else seg_start + CHUNK_SEC
         wav = extract_wav(video, seg_start, seg_end)
         print(f"[信息] 云端转写 {a.vendor}/{a.model}  分片 {seg_start:.0f}-{seg_end:.0f}s", flush=True)
-        srt = post_transcription(base, key, a.model, wav, a.lang)
-        os.remove(wav)
+        try:
+            srt = post_transcription(base, key, a.model, wav, a.lang)
+        finally:
+            os.remove(wav)
         if not srt.strip().startswith("1") and "-->" not in srt:
             raise SystemExit(f"[错误] 响应不是 srt（该厂商可能不支持 /audio/transcriptions）: {srt[:200]}")
         for (x0, x1, text) in parse_srt(srt):

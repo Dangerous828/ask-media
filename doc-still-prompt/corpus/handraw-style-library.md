@@ -1,6 +1,6 @@
 # 风格图鉴库-handraw-style-001
 
-- 验证状态：**本地 Qwen 抽测 3 条通过**（2026-11-07，1344×768 / seed 42，产物 `research/handraw-corpus-20261107/test-*.png`）；368 条全库未逐条测。当时通道条件已变更，当前缺省档见 `h3-queue` 出图章节（`cfg=3.5`、`loras=none`）
+- 验证状态：**本地 Qwen 抽测 3 条通过**（2026-11-07，1344×768 / seed 42；出图证据仅本地验证，对比图未随公开版发布）；368 条全库未逐条测。当时通道条件已变更，当前缺省档见 `h3-queue` 出图章节（`cfg=3.5`、`loras=none`）
 - 来源：[yang0/handraw-style](https://github.com/yang0/handraw-style)（MIT + 署名要求，作者 yang0），主分支 `master`
 - 取材方式：只取**文字**。图片仅用于观察与 OCR 核对，不入库、不搬运
 - 用法定位：**选款菜单，不是写作规范**。它回答"想要哪一种画法"，不回答"这一帧怎么受光、怎么接触"
@@ -39,7 +39,7 @@
 
 原 traits：`极细钢笔线、小人物大空间、大量留白、温柔法式都市幽默。`
 
-实际英文（节选，见 `p1-AA.txt`）：
+实际英文（节选）：
 ```
 drawn with an extremely fine steel-pen line that varies in weight and occasionally breaks
 Two thirds of the sheet stays untouched white paper
@@ -57,7 +57,7 @@ black ink, one pale silver-grey wash and a single warm red accent confined to th
 
 原 traits：`80年代末日本黑暗赛博朋克OVA赛璐珞动画风、锐利手绘勾线、浓郁阴郁的丙烯手绘背景、高对比度硬光影、冷艳魅惑的女性肖像与黄金时代动画胶片质感。`
 
-实际英文（节选，见 `p2-FG.txt`）：
+实际英文（节选）：
 ```
 a flat pale cel tone with one hard-edged shadow plane down the centre of the face and neck; the shadow edge is completely crisp, no gradient
 the background is hand-painted acrylic on board: dark teal and indigo, coarse brush texture
@@ -75,7 +75,7 @@ the wall never brighter than the lit side of her face
 
 原 traits 已写成规定（头身比、线条构成、五官形状），是全库少见的**可执行规格**。
 
-实际英文（节选，见 `p3-STICK.txt`）：
+实际英文（节选）：
 ```
 a small circle head about one third of the body height, limbs and torso formed by single thin black lines meeting at simple angles
 The posture reads through the tilt of the spine and the direction of the four limbs rather than through anatomy

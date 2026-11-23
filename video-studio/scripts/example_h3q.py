@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""gugu_h3q.py — 把角色C的 build_qwen_workflow 参数转成**队列**调用。
+"""example_h3q.py — 把角色C的 build_qwen_workflow 参数转成**队列**调用。
 
 为什么需要这层
 --------------
@@ -14,56 +14,99 @@
 远端主机与目录全部来自环境变量，未配置直接报错，避免静默连错机器。
 
 用法（替换原来的 submit_and_wait）：
-    from gugu_h3q import render_via_h3q
+    from example_h3q import render_via_h3q
     render_via_h3q(
         prompt_text=prompt,
         ref_images=["kf_s04_anime_sunlit.png", ...],   # ComfyUI input/ 里的文件名
         out_name="kf_s05_v2_surprised.png",
         seed=2040,
-        steps=0,          # 0 = 队列默认（8步 + Turbo LoRA）；传 45 则显式 --steps 45 --cfg 4.0
+        steps=0,          # 0 = 队列默认；传 45 则显式 --steps 45 --cfg 3.5（对齐 h3-queue SKILL 默认 CFG）
     )
 
 命令行：
-    python3 gugu_h3q.py --prompt-file p.txt --out o.png [--refs a.png,b.png] [--seed 42]
-    python3 gugu_h3q.py ... --dry-run      # 只打印将执行的命令，不提交
+    python3 example_h3q.py --prompt-file p.txt --out o.png [--refs a.png,b.png] [--seed 42]
+    python3 example_h3q.py ... --dry-run      # 只打印将执行的命令，不提交
 
 本脚本不直接连 ComfyUI，只通过环境变量指定的渲染机上的 `h3qc.py` 提交队列。
 """
 import json
 import os
+import re
 import shlex
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
-# 远端环境全部走环境变量：H3Q_HOST / H3Q_SCRIPTS / H3Q_PY / H3Q_TMP / H3Q_OUT。
+# 远端环境全部走环境变量。主名 H3Q_SSH_HOST / H3Q_REMOTE_PY（与 transcard、adapter 一致），
+# 旧名 H3Q_HOST / H3Q_PY 仍作兼容别名：读取顺序 新名 → 旧名。
 # 未配置时在提交入口报错，不内置任何默认主机。
-HOST = os.environ.get("H3Q_HOST", "")
+HOST = os.environ.get("H3Q_SSH_HOST") or os.environ.get("H3Q_HOST", "")
 REMOTE_SCRIPTS = os.environ.get("H3Q_SCRIPTS", "")
-REMOTE_PY = os.environ.get("H3Q_PY", "")
+REMOTE_PY = os.environ.get("H3Q_REMOTE_PY") or os.environ.get("H3Q_PY", "")
 REMOTE_TMP = os.environ.get("H3Q_TMP", "")
 REMOTE_OUT_DIR = os.environ.get("H3Q_OUT", "")
-LOCAL_OUT_DIR = os.environ.get("GUGU_OUT", "./generated")
+LOCAL_OUT_DIR = os.environ.get("EXAMPLE_OUT", "./generated")
 
 
 def _require_env() -> None:
+    """检查远端环境变量。主名 H3Q_SSH_HOST/H3Q_REMOTE_PY，旧名 H3Q_HOST/H3Q_PY 兼容。"""
     missing = [k for k, v in [
-        ("H3Q_HOST", HOST), ("H3Q_SCRIPTS", REMOTE_SCRIPTS),
-        ("H3Q_PY", REMOTE_PY), ("H3Q_TMP", REMOTE_TMP),
+        ("H3Q_SSH_HOST/H3Q_HOST", HOST), ("H3Q_SCRIPTS", REMOTE_SCRIPTS),
+        ("H3Q_REMOTE_PY/H3Q_PY", REMOTE_PY), ("H3Q_TMP", REMOTE_TMP),
         ("H3Q_OUT", REMOTE_OUT_DIR),
     ] if not v]
     if missing:
         sys.exit(
             f"缺少远端环境变量: {', '.join(missing)}。\n"
             "请先设置渲染机的 SSH 主机与目录，例如:\n"
-            "  export H3Q_HOST=<渲染主机>            # ssh 可达的渲染机\n"
+            "  export H3Q_SSH_HOST=<渲染主机>          # ssh 可达的渲染机（旧名 H3Q_HOST 仍兼容）\n"
             "  export H3Q_SCRIPTS=<渲染机脚本目录>   # 含 h3qc.py\n"
-            "  export H3Q_PY=<渲染机 python 路径>\n"
+            "  export H3Q_REMOTE_PY=<渲染机 python 路径>  # 旧名 H3Q_PY 仍兼容\n"
             "  export H3Q_TMP=<渲染机临时目录>\n"
             "  export H3Q_OUT=<渲染机产物目录>\n"
-            "  export GUGU_OUT=<本地产物目录>       # 可选，默认 ./generated"
+            "  export EXAMPLE_OUT=<本地产物目录>       # 可选，默认 ./generated"
         )
+
+
+def _job_state_done(out: str) -> bool:
+    """从 h3qc --wait 输出里取 job JSON 的 state 字段，精确判断是否 done。
+
+    不用 '"state": "done"' 子串匹配：远程输出里出现同字串（日志/提示词）会误判；
+    Out-String 还可能按控制台宽度折行，故先去掉 JSON 片段内的换行空白再解析。
+    """
+    for i, ch in enumerate(out):
+        if ch != "{":
+            continue
+        depth = 0
+        in_str = False
+        esc = False
+        for j in range(i, len(out)):
+            c = out[j]
+            if in_str:
+                if esc:
+                    esc = False
+                elif c == "\\":
+                    esc = True
+                elif c == '"':
+                    in_str = False
+                continue
+            if c == '"':
+                in_str = True
+            elif c == "{":
+                depth += 1
+            elif c == "}":
+                depth -= 1
+                if depth == 0:
+                    frag = re.sub(r"\s+", " ", out[i:j + 1])
+                    try:
+                        obj = json.loads(frag)
+                    except ValueError:
+                        break
+                    if isinstance(obj, dict) and obj.get("state") == "done":
+                        return True
+                    break
+    return False
 
 
 def _ssh(ps_body: str, timeout: int = 900) -> tuple[int, str]:
@@ -76,10 +119,12 @@ def _ssh(ps_body: str, timeout: int = 900) -> tuple[int, str]:
         ps1 = Path(td) / "run.ps1"
         ps1.write_text(ps_body, encoding="utf-8-sig")
         remote_ps1 = f"{REMOTE_TMP}/h3q_run.ps1"
-        subprocess.run(["scp", "-o", "ConnectTimeout=20", str(ps1), f"{HOST}:{remote_ps1}"],
+        subprocess.run(["scp", "-o", "ConnectTimeout=20", "-o", "StrictHostKeyChecking=accept-new",
+                        str(ps1), f"{HOST}:{remote_ps1}"],
                        check=True, capture_output=True)
         cmd = f'powershell -ExecutionPolicy Bypass -File "{remote_ps1}"'
-        p = subprocess.run(["ssh", "-o", "ConnectTimeout=20", HOST, cmd],
+        p = subprocess.run(["ssh", "-o", "ConnectTimeout=20", "-o", "StrictHostKeyChecking=accept-new",
+                            HOST, cmd],
                            capture_output=True, text=True, timeout=timeout)
         return p.returncode, (p.stdout or "") + (p.stderr or "")
 
@@ -87,28 +132,33 @@ def _ssh(ps_body: str, timeout: int = 900) -> tuple[int, str]:
 def _scp_up(local: Path) -> str:
     """上传到远端临时目录，返回远端路径。"""
     remote = f"{REMOTE_TMP}/{local.name}"
-    subprocess.run(["scp", "-o", "ConnectTimeout=20", str(local), f"{HOST}:{remote}"],
+    subprocess.run(["scp", "-o", "ConnectTimeout=20", "-o", "StrictHostKeyChecking=accept-new",
+                    str(local), f"{HOST}:{remote}"],
                    check=True, capture_output=True)
     return remote
 
 
 def _scp_down(remote_name: str, local: Path) -> None:
     local.parent.mkdir(parents=True, exist_ok=True)
-    subprocess.run(["scp", "-o", "ConnectTimeout=20",
+    subprocess.run(["scp", "-o", "ConnectTimeout=20", "-o", "StrictHostKeyChecking=accept-new",
                     f"{HOST}:{REMOTE_OUT_DIR.replace(chr(92), '/').rstrip(chr(47))}/{remote_name}", str(local)],
                    check=True, capture_output=True)
 
 
+# 默认画布与 h3-queue/SKILL.md 示例（1344x768）对齐；1376x768 是早期角色C实测用尺寸，
+# 同为 32 倍数，需要复现那批产物时显式传 --size 1376x768。
 def render_via_h3q(prompt_text: str, ref_images: list[str], out_name: str,
-                   seed: int = 42, steps: int = 0, size: str = "1376x768",
-                   label: str = "h3q/gugu", timeout: int = 900,
+                   seed: int = 42, steps: int = 0, size: str = "1344x768",
+                   label: str = "h3q/example", timeout: int = 900,
                    dry_run: bool = False) -> dict:
-    _require_env()
     """通过 h3q **队列**出图。返回 {ok, out, raw}。
 
     steps：0 = 队列默认（8 步 + Turbo LoRA）
-           其他 = 显式 --steps N --cfg 4.0（对齐角色C原脚本的 45 步）
+           >0 = 显式 --steps N --cfg 3.5（CFG 与 h3-queue/SKILL.md 默认档一致）
     """
+    if steps < 0:
+        sys.exit("--steps 不能为负数: %d" % steps)
+    _require_env()
     with tempfile.TemporaryDirectory() as td:
         pf = Path(td) / f"{Path(out_name).stem}.txt"
         pf.write_text(prompt_text, encoding="utf-8")
@@ -124,12 +174,12 @@ def render_via_h3q(prompt_text: str, ref_images: list[str], out_name: str,
             f"--label '{label}'",
             # idem-key 必须含 seed 与 out 名：同 prompt 换 seed 是不同活，
             # 只按 label 去重会静默吞掉后续提交（实测踩过）
-            f"--idem-key 'gugu-{Path(out_name).stem}-s{int(seed)}'",
+            f"--idem-key 'example-{Path(out_name).stem}-s{int(seed)}'",
         ]
         if refs:
             args.append(f"--refs '{refs}'")
         if steps and steps != 8:
-            args += [f"--steps {int(steps)}", "--cfg 4.0"]
+            args += [f"--steps {int(steps)}", "--cfg 3.5"]
 
         py_args = " ".join(args)
         ps = (
@@ -141,8 +191,8 @@ def render_via_h3q(prompt_text: str, ref_images: list[str], out_name: str,
                     "out": str(Path(LOCAL_OUT_DIR) / out_name)}
         rc, out = _ssh(ps, timeout=timeout)
 
-    # 队列成功判据：h3qc --wait 返回 0 且 job 记录 state=done
-    ok = (rc == 0 and '"state": "done"' in out)
+    # 队列成功判据：h3qc --wait 返回 0 且 job JSON 的 state 字段精确等于 done
+    ok = (rc == 0 and _job_state_done(out))
     result = {"ok": ok, "out": str(Path(LOCAL_OUT_DIR) / out_name), "raw": out.strip()}
     if ok:
         try:
@@ -162,8 +212,8 @@ def main() -> int:
     ap.add_argument("--refs", default="")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--steps", type=int, default=0)
-    ap.add_argument("--size", default="1376x768")
-    ap.add_argument("--label", default="h3q/gugu")
+    ap.add_argument("--size", default="1344x768", help="采样画布；默认对齐 h3-queue 示例，复现早期角色C产物传 1376x768")
+    ap.add_argument("--label", default="h3q/example")
     ap.add_argument("--dry-run", action="store_true", help="只打印远端命令，不提交")
     args = ap.parse_args()
 

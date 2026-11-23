@@ -1,6 +1,7 @@
 ---
 name: video-previs
 version: 1.0.3
+license: MIT
 description: >
   为对话/短剧场景做 2D 白模(animatic/blocking previs)：抽帧拉片+切点检测、
   台词提取（OCR烧录字幕 + ASR语音，两路并行）、storyboard JSON、自动正反打/越肩/
@@ -95,7 +96,8 @@ description: >
 
 ### 4. 渲染出片
 - `python scripts/dialogue_engine.py <storyboard.json> out/白模.mp4`
-- 转通用编码：`ffmpeg -i in.mp4 -c:v libx264 -pix_fmt yuv420p -movflags +faststart out.mp4`
+- 引擎经 ffmpeg 管道直出 H.264/yuv420p/faststart，产物即通用编码，无需再转码。
+  找不到 ffmpeg 会明确报错，不会用 mp4v 冒充成品；本机需先装 ffmpeg（见 references/environment_setup.md）。
 - 抽帧与原片并排核对；只改 JSON 秒级重渲。
 
 ### 5. 深度动作捕捉（白模之后）
@@ -146,7 +148,7 @@ previs 产物（白模、2D 灰盒、贴图粗糙的 animatic、接触印片）*
 - 走位/动作白模（含 path 走位、yaw+pitch 姿态）：`scripts/previs_engine.py`；配套校验 `scripts/validate_storyboard.py`。
 - 分镜建议（台词→wide/ots/cu）：`scripts/plan_coverage.py`。
 - 导出：`export_storyboard_xlsx.py`（Excel）、`export_dialogue.py`（带时间戳 srt/txt）。
-- 一键：`run_dialogue_pipeline.py <json>`（校验→渲染→Excel→台词→H.264）。
+- 一键：`run_dialogue_pipeline.py <json>`（校验→渲染 H.264→Excel→台词；校验失败即停）。
 
 ## 学习向产物
 - 关键镜头讲解（为什么这么拍）按 `references/critical_shots_template.md` 三段式：叙事潜台词 / 场景美术 / 镜头语言动机 + 可迁移判断准则。
@@ -157,9 +159,9 @@ previs 产物（白模、2D 灰盒、贴图粗糙的 animatic、接触印片）*
   不要只靠 `cam` 类型隐含。
 
 ## 可视化工作台（dashboard）
-- 入口：`dashboard/server.py`（自包含 Web 工作台）。启动：`python dashboard/launch.py 11872` 或 `python dashboard/server.py 11872`，浏览器开 http://127.0.0.1:11872 。
+- 入口：`dashboard/server.py`（自包含 Web 工作台）。默认端口 11872：启动 `python dashboard/launch.py 11872` 或 `python dashboard/server.py 11872`，浏览器开 http://127.0.0.1:11872 。服务只绑 127.0.0.1 回环、无鉴权，勿转发到公网。
 - 功能：浏览 projects/ 各项目产物（拉片/台词/分镜/白模/讲解），点标签分阶段查看，文本卡内嵌全文+点击弹窗，视频支持 Range 拖动；后端 `/api/run` 调用本 Skill 脚本。
-- 自包含：dashboard 自动向上查找 projects/，脚本优先用同 Skill 的 `scripts/`，可独立运行。
+- 自包含：dashboard 自动向上查找 projects/，脚本优先用同 Skill 的 `scripts/`（详见 `dashboard/README.md` 的目录结构与新建方法），可独立运行。仓库不含 projects/，首次用前按 README 建 `projects/<项目名>/`，否则页面列表为空。
 
 ## 可选增强（需配置/外部程序）
 - **3D 白模（Blender）**：scripts/blender_previs.py <json> 生成 Blender 构建脚本 gen_<slug>.py，经 Blender MCP/Blender 内执行，做真三维走位推演。配置见 references/environment_setup.md。

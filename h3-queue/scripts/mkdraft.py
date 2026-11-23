@@ -41,6 +41,15 @@ def walk(obj):
             yield from walk(v)
 
 
+def _alloc_ids(g, count):
+    """从 300 起分配 count 个连续且未被占用的节点号，避免覆盖模板已有节点。"""
+    used = {int(k) for k in g if str(k).isdigit()}
+    cand = 300
+    while any((cand + i) in used for i in range(count)):
+        cand += 1
+    return [str(cand + i) for i in range(count)]
+
+
 def add_upscale(g):
     """Insert latent-upscale + partial-denoise pass. Returns the new sampler id."""
     ids = {}
@@ -53,10 +62,13 @@ def add_upscale(g):
     if miss:
         raise SystemExit("template is missing nodes: %s" % miss)
 
-    g["300"] = {"class_type": "LTXVSeparateAVLatent",
+    n300, n301, n302, n303, n304 = _alloc_ids(g, 5)
+    g[n300] = {"class_type": "LTXVSeparateAVLatent",
                 "inputs": {"av_latent": [ids["SamplerCustomAdvanced"], 0]}}
-    g["301"] = {"class_type": "MinimaxH3LatentUpscaler3D",
-                "inputs": {"latent": ["300", 0],
+    # 权重名（fp16 / bf16）在本仓与 latent-upscale.md 记录不一致；渲染机实际文件名
+    # 以实际部署为准（核对 models/latent_upscale_models/），不符时改这里再出图。
+    g[n301] = {"class_type": "MinimaxH3LatentUpscaler3D",
+                "inputs": {"latent": [n300, 0],
                            "model_name": "minimax_h3_latent_upscaler_3d_fp16.safetensors",
                            "mode": "target dimensions",
                            "mode.width": W2, "mode.height": H2,
@@ -64,23 +76,23 @@ def add_upscale(g):
                            "enable_temporal_chunking": True,
                            "force_unload": True,
                            "device": "cuda", "precision": "fp16"}}
-    g["302"] = {"class_type": "LTXVConcatAVLatent",
-                "inputs": {"video_latent": ["301", 0], "audio_latent": ["300", 1]}}
-    g["303"] = {"class_type": "MiniMaxH3PDDAccScheduler",
+    g[n302] = {"class_type": "LTXVConcatAVLatent",
+                "inputs": {"video_latent": [n301, 0], "audio_latent": [n300, 1]}}
+    g[n303] = {"class_type": "MiniMaxH3PDDAccScheduler",
                 "inputs": {"nfe": "8", "denoise": 0.5}}
-    g["304"] = {"class_type": "SamplerCustomAdvanced",
+    g[n304] = {"class_type": "SamplerCustomAdvanced",
                 "inputs": {"noise": [ids["RandomNoise"], 0],
                            "guider": [ids["BasicGuider"], 0],
                            "sampler": [ids["KSamplerSelect"], 0],
-                           "sigmas": ["303", 0],
-                           "latent_image": ["302", 0]}}
+                           "sigmas": [n303, 0],
+                           "latent_image": [n302, 0]}}
     for _nid, n in g.items():
         if not isinstance(n, dict):
             continue
         ct = n.get("class_type")
         if ct in ("VAEDecode", "VAEDecodeAudio"):
-            n["inputs"]["samples"] = ["304", 0]
-    return "304"
+            n["inputs"]["samples"] = [n304, 0]
+    return n304
 
 
 def main():

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """dialogue 分镜 JSON -> 分镜脚本 Excel（汇总表）
-sheet1「分镜脚本」: 镜号/时长/景别/运镜/角度/场景/机位/动作/台词/提示词
+sheet1「分镜脚本」: 镜号/场景/景别(cam)/时长/内容/动作/声音/机位(视角)/运镜(move)/光影/器械/镜头/台词/提示词
 sheet2「台词汇总」: 镜号/时间(镜内)/角色/台词
+字段按 dialogue 契约：景别取 cam，运镜取 move；台词优先 lines[]，无则回退顶层 line/speaker。
 默认输出: <分镜目录>/<分镜名>_分镜脚本.xlsx
 """
 import sys, json, os
@@ -15,6 +16,8 @@ except Exception:
 
 
 def main():
+    if len(sys.argv) < 2:
+        sys.exit("用法: python export_storyboard_xlsx.py <storyboard.json> [out.xlsx]")
     src = sys.argv[1]
     cfg = json.load(open(src, encoding="utf-8"))
     shots = cfg.get("shots") or []
@@ -44,17 +47,25 @@ def main():
             dist = f"{((look[0]-pos[0])**2 + (look[2]-pos[2])**2) ** 0.5:.1f}m"
             return f"{h or ang}·{dist}"
         return ang
+    def name_of(sid):
+        return (actors.get(sid, {}) or {}).get("name", sid) if sid else ""
+    def lines_of(s):
+        """台词行列表：优先镜内 lines[]，无则回退顶层 line/speaker（对白契约与模板的主写法）。"""
+        out = [(l.get("at", 0), l.get("speaker"), l.get("line", ""))
+               for l in (s.get("lines") or [])]
+        if not out and (s.get("line") or s.get("speaker")):
+            out = [(0, s.get("speaker"), s.get("line", ""))]
+        return out
+    def dlg_text(s):
+        return " / ".join(f"【{name_of(sp)}】{tx}" for _, sp, tx in lines_of(s) if tx)
     for s in shots:
-        lines = s.get("lines") or []
-        dlg = " / ".join(f"【{(actors.get(l.get('speaker'), {}) or {}).get('name', l.get('speaker'))}】{l.get('line','')}"
-                         for l in lines)
         ws.append([
-            s.get("id", ""), s.get("scene", ""), s.get("shot_size", ""),
+            s.get("id", ""), s.get("scene", ""), s.get("cam", ""),
             round(float(s.get("dur") or 0), 1),
-            s.get("content", ""), s.get("action", ""), s.get("sound", ""),
-            view_of(s), s.get("camera_move", ""), s.get("lighting", ""),
+            s.get("content") or s.get("prompt_cn", ""), s.get("action", ""), s.get("sound", ""),
+            view_of(s), s.get("move") or s.get("camera_move", ""), s.get("lighting", ""),
             s.get("rig", ""), s.get("lens", ""),
-            dlg, s.get("prompt", ""),
+            dlg_text(s), s.get("prompt") or s.get("prompt_cn", ""),
         ])
     widths = [7, 7, 8, 7, 30, 28, 22, 12, 9, 22, 8, 8, 36, 40]
     for i, w in enumerate(widths, 1):
@@ -68,10 +79,8 @@ def main():
     for c in ws2[1]:
         c.fill = hdr_fill; c.font = hdr_font
     for s in shots:
-        for l in s.get("lines") or []:
-            ws2.append([s.get("id", ""), l.get("at", 0),
-                        (actors.get(l.get("speaker"), {}) or {}).get("name", l.get("speaker")),
-                        l.get("line", "")])
+        for at, sp, tx in lines_of(s):
+            ws2.append([s.get("id", ""), at, name_of(sp), tx])
     for i, w in enumerate([7, 10, 10, 70], 1):
         ws2.column_dimensions[chr(64 + i)].width = w
     for row in ws2.iter_rows(min_row=2):

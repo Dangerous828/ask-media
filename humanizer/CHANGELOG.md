@@ -8,7 +8,7 @@
 
 - `detect.py` 新增 `ACADEMIC_DEMOTE` / `ACADEMIC_PAPER_CHECKS` / `effective_levels()` 与 `--genre {general,academic}`。
 - academic 档把 6 条与学术语体冲突的规则降为 C 只报告：提示语冒号、顿号并列≥3、过长前置定语、前置话题壳、句首连接词、当…时从句。翻案腔与起手式**保留 A 级**（论文里同样是空话）。X 级已否决项两档都不变。
-- 追加「论文核查」清单（引用真实性 / 数据自洽 / 贡献可验证 / 可复现性 + 术语一致性 + 引用绑定），明确写出脚本查不到、报告不等于已通过核查。同义轮换段在 academic 档改称「术语核对」，禁止为求自然给术语换叫法。
+- 追加「论文核查」4 项清单（引用真实性 / 数据自洽 / 贡献可验证 / 可复现性），明确写出脚本查不到、报告不等于已通过核查。术语一致性归入改写纪律：术语表内的词一律不改，不为求自然给术语换叫法。
 - `report.py` 的 md/html 报告按存档里的 `levels` 分组，追加同一核查清单；旧存档（无 `levels`）回落通用档。
 - **证据边界**：降级是工程判读，上游 520 万字语料不含学位论文；参考值仍是新闻自媒体语料，在论文里没有统计意义。写在 `references/academic-paper.md` 与报告头部。
 - **回归测试** `tests/test_academic_genre.py`（13 项，标准库）：general 档等级表逐项等于上游、academic 恰好降 6 条、X 级恒定、核查清单只在 academic 出现、两档报告都能出、候选抽取不受影响。
@@ -21,11 +21,11 @@
 
 新增 `references/research-pipeline.md`：检索 → 精读证据包 → 成稿 → 去 AI 味 → 投稿，四道手各定交接物与完成判据；上游没交出产物就报缺口。`AGENTS.md` 文字创作表新增「论文全流程」一行指向它。
 
-**注意**：`tensorreading` / `tensorreading-deep-read` 已于 2026-11-15 22:20 由另一会话移除（提交 `90309ad`，备份 `~/.skills/backups/tensorreading-removed-20261115/`）。流水线文档已如实标注状态并写成不依赖这两个技能是否安装；本轮未擅自恢复。
+**注意**：论文流水线的环节 1（库检索）与环节 2（精读证据包）不在本仓提供，由作者用自己的文献管理工具完成并交出同形状交接物。本档已写成不依赖特定工具，未擅自补入任何工具。
 
 **4. 上游 [PR #13](https://github.com/larashero3-dotcom/lieflat-less-ai-tone/pull/13) 迁移预案**
 
-上游拟把 SKILL.md / DETECT.md / references/ / scripts/ 移进 `lieflat-less-ai-tone/` 子目录，尚未合并。**本地暂不跟进**：Hub 发布器与 13 端软链都要求 `SKILL.md` 在技能根目录，提前重构会断路径。迁移清单见 `references/upstream-pr13.md`。
+上游拟把 SKILL.md / DETECT.md / references/ / scripts/ 移进 `lieflat-less-ai-tone/` 子目录，尚未合并。**本仓不跟进**：这里以 `humanizer/` 平铺发布，根级路由与仓内相对引用都指向 `humanizer/SKILL.md`，重构会断路径且无收益。若上游合并，只同步规则正文与脚本行为变化，不照搬布局，见 `references/upstream-pr13.md`。
 
 **许可**：公开版 [CC BY-NC 4.0](./LICENSE)，学位论文 / 个人投稿属非商业使用，够用；商业交付与产品集成需另购 [lieflat.work](https://lieflat.work/skills/less-ai-tone/#pricing) 授权，本轮未购买。
 
@@ -40,7 +40,7 @@
 
 ## v2.0.0 — 2026-11-12
 
-**整体替换为 lieflat-less-ai-tone v2 公开版。** 旧版 v1.1.0 备份在 `~/.skills/backups/humanizer-v1.1.0-20261112/`。
+**整体替换为 lieflat-less-ai-tone v2 公开版。** 旧版 v1.1.0 不再保留在本仓。
 
 ### 换掉了什么
 
@@ -61,7 +61,7 @@ v1.1.0 是自写的词表 + 规则清单，没有测量依据。v2 带两轮实�
 ### 本仓改动（相对上游公开版）
 
 1. 目录名保持 `humanizer`，frontmatter `name` 对齐为 `humanizer`——`AGENTS.md` 路由、`write-article`、`write-tweet` 的既有引用不断。
-2. `SKILL.md` 顶部加来源说明与旧版备份路径。
+2. `SKILL.md` 顶部加来源说明与商业授权提示。
 3. 新增 `references/academic-paper.md`（论文 / 学位论文语体档）。
 4. `AGENTS.md`「文字创作与发布」表新增论文一行。
 

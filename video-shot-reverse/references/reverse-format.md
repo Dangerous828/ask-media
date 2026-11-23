@@ -29,7 +29,7 @@
       "transition_in": "",
       "transition_out": "",
       "visible_text": [{"text": "", "position": "", "evidence": "observed|inferred|unclear"}],
-      "visible_audio": {"dialogue": "", "sfx": "", "music": "", "evidence": "observed|inferred|unclear"},
+      "audio": {"dialogue": "", "sfx": "", "music": "", "evidence": "observed|inferred|unclear"},
       "props": [{"item": "", "state": "", "evidence": "observed|inferred|unclear"}],
       "confidence": "high|medium|low",
       "notes": ""

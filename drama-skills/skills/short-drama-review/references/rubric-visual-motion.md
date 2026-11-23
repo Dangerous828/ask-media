@@ -215,8 +215,8 @@ ellipsis, dream, or deliberate disorientation.
 
 短剧生产中需要防范的文字风险或获授权观察包括：
 
-- on-screen text or subtitle residue despite a declared no-text constraint;
-- a text-bearing reference admitted under no-text or exact-readable policy
+- on-screen text or subtitle residue despite a declared no_readable_text constraint;
+- a text-bearing reference admitted under no_readable_text or exact_readable policy
   without an allowed surface or a crop, clean, mask, or replace decision;
 - background music implied where the audio boundary allows sound effects only;
 - wardrobe or look drift against the bound reference (re-describing clothes the

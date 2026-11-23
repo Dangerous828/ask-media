@@ -1,6 +1,6 @@
 # 参数对比-加油站场景板-qwen50vs标准档-001
 
-- 验证状态：本地 h3q 实测（2026-11-06，对比图 `ab-param/ab-gas-plate-qwen50-vs-v2.png`）
+- 验证状态：仅本地验证，对比图未随公开版发布（2026-11-06，本地 h3q 实测）
 - 来源：家庭实测，同一 IMG-GAS-PLATE 正文＋同一参考（REF-STYLE-MALE-001）＋同一 seed 42
 - 目标通道：本地 Qwen Image 2.1（h3q 队列）
 - 通道状态：本条目结论描述的是无 LoRA 档的调参行为。当前缺省档即无 LoRA（`cfg=3.5`、`loras=none`，见 `h3-queue` 出图章节），所以这些观察直接适用；Turbo LoRA 档已归档，不再作为可选路径

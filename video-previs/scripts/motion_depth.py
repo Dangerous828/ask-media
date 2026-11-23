@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """单目深度图视频：近亮远暗，全场景灰阶。
 用法: motion_depth.py <video> --start S --end E --out o.mp4 [--fps 12]
-  --enhance stretch|clahe|none   对比增强(默认 stretch)
+  --enhance stretch|clahe|none   对比增强(默认 none)
   --color none|inferno           伪彩
   --global-norm                  全段统一归一化(两遍,尺度稳定)"""
 import sys,os,argparse,cv2,numpy as np

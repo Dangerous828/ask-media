@@ -93,6 +93,8 @@ def validate(cfg):
     return errors,warnings
 
 if __name__=="__main__":
+    if len(sys.argv)<2:
+        sys.exit("用法: python validate_storyboard.py <storyboard.json>")
     cfg=json.load(open(sys.argv[1],encoding="utf-8"))
     errs,warns=validate(cfg)
     for w in warns: print("  [警告]",w)

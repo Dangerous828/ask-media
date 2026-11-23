@@ -131,7 +131,7 @@ python3 {技能目录}/scripts/episode_intake.py index <多集整稿> --out <epi
 - `项目开发/adaptation-map.jsonl`（长材料改编时；只保留输入 locator/span、
   去引用的功能摘要、候选去向与未决项，不复制原文；例见
   [adaptation-map.example.jsonl](assets/adaptation-map.example.jsonl)）
-- `项目开发/series-arc.json`（项目需要时）
+- `项目开发/series-arc.json`（项目需要时；全剧跨集走向索引，结构由 develop owner 按项目需要定义）
 - `项目开发/episode-intake-index.json`（多集整稿接入时；可重建的机械索引，不是创作事实）
 - `项目开发/episode-map.jsonl`
 

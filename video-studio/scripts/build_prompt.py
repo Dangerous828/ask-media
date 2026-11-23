@@ -3,9 +3,15 @@
 
 只做两件事：
   ① profile 的正向锚词前置
-  ② 扫镜头描述，出现任何色彩词或画风词就报错退出（色彩权归 profile 独占）
+  ② 扫镜头描述，出现全局调色词就报错退出（色彩权归 profile 独占）
 
-拼接顺序：profile【正向锚词】 → 镜头层 → profile【规避】
+【定位】本脚本是**可选的自用拼装器**，不是提示词规范：实测散文首行写风格词
+有效、剥离成脚本前置锚词反而失效（`结论-提示词体系适用性.md` §二/§四）。
+因此**画风/风格词不拦**（R1 已废弃），只拦会整体改变画面调子的全局调色词；
+「实体+发光色」（金色粒子/霓虹蓝数据流）是描述发光实体，不在此列。
+
+拼接顺序：profile【正向锚词】 → 镜头层（【规避】不进词流，只作拦截规则）
+（R1b：cfg=1.0 无负向通道，规避清单拼进正向会引入被排除的概念。）
 
 用法：
     python3 build_prompt.py --profile 3d_anime --shot shot.txt
@@ -14,7 +20,7 @@
 
 退出码：
     0  成功
-    1  镜头层含禁用词（色彩/画风）
+    1  镜头层含全局调色词，或【可见光源】槽含暗类词
     2  参数或文件错误
 """
 import argparse
@@ -44,20 +50,14 @@ COLOR_WORDS = [
 # 实体 + 发光色：允许（不列入禁用）。示例：
 #   金色粒子 / 暖光 / 冷光 / 蓝色光带 / 霓虹 / 微光 / 亮起 / 透光
 # 判断标准：这个词描述的是「某个在发光的实体」，不是「整幅画面的调子」。
+#
+# 画风/风格词（3D / cartoon / style / cinematic / 写实 / 卡通 …）**不再拦截**：
+# 实测这类词写在散文首行正是真实项目出好图的关键，R1 禁令已废弃
+# （`结论-提示词体系适用性.md` §二/§四、`HANDOFF-接手必读.md` §三推翻 1）。
+# 把 profile 的【规避】真正并进「拦截表」的设想也未落地——规避清单只作审查提示，
+# 不参与本脚本的机械硬判，故此处不再保留一份画风词禁用表。
 
-STYLE_WORDS = [
-    # 中文
-    "赛璐璐", "手绘", "三维", "3D", "2D", "水墨", "水彩", "油画", "扁平",
-    "写实", "卡通", "动漫", "二次元", "国风", "黏土", "定格", "像素",
-    "画风", "风格化", "渲染", "质感", "电影感",
-    # 英文
-    "cel", "cel-shaded", "anime", "cartoon", "3d", "2d", "render",
-    "photorealistic", "realistic", "hand-drawn", "watercolor", "ink wash",
-    "flat design", "clay", "stop-motion", "pixel", "stylized",
-    "cinematic", "style", "aesthetic",
-]
-
-# 允许的例外：这些词在本项目里是「叙事事实」而非色彩/画风描述
+# 允许的例外：这些词在本项目里是「叙事事实」而非色彩/调色描述
 # 例如剧本要求"她穿红裙子"——这是角色设定，应从 profile 或资产设定走
 ALLOWLIST = [
     "红绿灯",      # 环境实体
@@ -128,7 +128,11 @@ def check_visible_light(shot_text: str) -> list[tuple[str, int]]:
         if "可见光源" not in line:
             continue
         for w in DARK_WORDS:
-            if w.lower() in line.lower():
+            # 英文词用词边界，避免 black 命中 blackboard / dark 命中 darkness 之外的误伤
+            if w.isascii() and re.search(r"[a-z]", w):
+                if re.search(rf"\b{re.escape(w.lower())}\b", line.lower()):
+                    hits.append((w, lineno))
+            elif w.lower() in line.lower():
                 hits.append((w, lineno))
     return hits
 
@@ -137,9 +141,8 @@ def check_visible_light(shot_text: str) -> list[tuple[str, int]]:
 
 
 def find_forbidden(shot_text: str) -> list[tuple[str, str, int]]:
-    """返回 [(词, 类别, 行号)]。"""
+    """返回 [(词, 类别, 行号)]。只拦全局调色词；画风词不在此列（R1 已废弃）。"""
     hits = []
-    allow = " ".join(ALLOWLIST)
     for lineno, line in enumerate(shot_text.splitlines(), 1):
         scan = line
         for w in ALLOWLIST:
@@ -147,15 +150,10 @@ def find_forbidden(shot_text: str) -> list[tuple[str, str, int]]:
         low = scan.lower()
         for w in COLOR_WORDS:
             if w.lower() in low:
-                # 英文词要求词边界，避免 "black" 命中 "blackboard" 之类误报
+                # 英文词要求词边界，避免 "filter" 命中 "filtered" 之类误报
                 if w.isascii() and not re.search(rf"\b{re.escape(w)}\b", low):
                     continue
                 hits.append((w, "色彩", lineno))
-        for w in STYLE_WORDS:
-            if w.lower() in low:
-                if w.isascii() and not re.search(rf"\b{re.escape(w)}\b", low):
-                    continue
-                hits.append((w, "画风", lineno))
     return hits
 
 
@@ -175,9 +173,9 @@ def strip_slot_labels(shot_text: str) -> str:
         # 【画幅】整行丢弃（渲染参数）
         if re.match(r"^【画幅】", line):
             continue
-        # 其余槽标签剥掉，保留内容
+        # 其余槽标签剥掉，保留内容。标签可能出现在行首或行中（写词人夹在句中），两处都剥。
         for lab in SLOT_LABELS:
-            line = re.sub(rf"^【{lab}】[：:]?\s*", "", line)
+            line = re.sub(rf"【{lab}】[：:]?\s*", "", line)
         if line:
             out.append(line)
     return "；".join(out)
@@ -189,9 +187,10 @@ def strip_slot_labels(shot_text: str) -> str:
 def build(profile: dict, shot_text: str) -> str:
     """profile 正向锚词 → 镜头层。
 
-    【规避】不参与拼接。cfg=1.0 没有负向通道，任何否定文本都会被按正向渲染
+    【规避】不参与拼接、也不被脚本读取。cfg=1.0 没有负向通道，任何否定文本都会被按正向渲染
     （实测：删掉一句 `not empty darkness but`，亮度 24.2→65.4）。
-    profile 的【规避】改为并进禁用词表，由脚本拦截，不进词流。
+    profile 的【规避】只作人工审查提示；脚本只拦内置的全局调色词表（find_forbidden / COLOR_WORDS），
+    不把 avoids 并进词表，也不进词流。
     """
     shot = strip_slot_labels(shot_text)
     parts = [profile["anchors"], shot]
@@ -232,18 +231,18 @@ def main() -> int:
 
     hits = find_forbidden(shot_text)
     if hits:
-        print("FAIL: 镜头层含禁用词（色彩权归 profile 独占）", file=sys.stderr)
+        print("FAIL: 镜头层含全局调色词（色彩权归 profile 独占；画风词不拦）", file=sys.stderr)
         for w, kind, ln in hits:
             print(f"  行{ln}  [{kind}]  {w}", file=sys.stderr)
         print(
-            "\n改法：把色彩/画风描述从镜头层删掉，改由 profile 提供；\n"
-            "      需要具体颜色时，写「可见光源」「环境密度」等实体描述。",
+            "\n改法：把全局调色词从镜头层删掉，改由 profile 提供；\n"
+            "      描述「金色粒子 / 霓虹蓝光带」这类发光实体不受限。",
             file=sys.stderr,
         )
         return 1
 
     if args.check_only:
-        print(f"PASS: 镜头层无禁用词（profile={args.profile}）")
+        print(f"PASS: 镜头层无全局调色词（画风词不拦；profile={args.profile}）")
         return 0
 
     prompt = build(profile, shot_text)

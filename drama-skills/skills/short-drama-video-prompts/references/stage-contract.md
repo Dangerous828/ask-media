@@ -26,7 +26,7 @@
 | VID-07 | taste_option | Camera may be locked or moving; audio/lip-sync detail follows the chosen production profile. |
 | VID-08 | reviewed_invariant | Structured motion names this shot's exact subjects, actions, contacts, and results rather than reusable placeholders; when a performance path is present, it names only the actors and visible changes this shot actually carries. |
 | VID-09 | structural_invariant | The next start names an existing `SHOT-...` or is explicitly unresolved; never invent a hidden source key, record or hash. |
-| VID-10 | craft_default | Resolve one accepted production profile for the current delivery scope; local variants may coexist when their range and precedence are explicit, without overriding source coverage or exact-readable obligations. |
+| VID-10 | craft_default | Resolve one accepted production profile for the current delivery scope; local variants may coexist when their range and precedence are explicit, without overriding source coverage or exact_readable obligations. |
 | VID-11 | reviewed_invariant | A selective transform names its trigger, exact target scope, end geometry/state, and preserve set so non-target people, props, text surfaces, and spatial anchors do not change with it. |
 | VID-12 | reviewed_invariant | A pickup or alternate names stable `MOTION-...` IDs and maps each source requirement to this version, the master, another pickup, or a requested storyboard revision; it never silently replaces the master. |
 | VID-13 | structural_invariant | A multi-shot delivery group contains contiguous shots from one scene with one geography/asset chain. Its duration equals the sum of member shots, and grouping changes neither shot boundaries nor per-shot reviewability. |

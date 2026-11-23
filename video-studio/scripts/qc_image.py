@@ -55,7 +55,7 @@ PROFILES = {
         "dark_gray_max": 15.0,
         "midtone_min": 55.0,   # 角色C P50 74.1，留余量
         "highlight_min": 5.0,
-        "highlight_max": 28.0, # 角色C P50 16.0、P75 35.3，取 28 覆盖多数
+        "highlight_max": 28.0, # 角色C P50 16.0（P75 35.3 高于此线，故 28 只覆盖半数左右，按项目基准复核）
     },
     "interior": {              # 室内中近景（数据不足，暂用宽松档）
         "dead_black_max": 10.0,
@@ -64,7 +64,7 @@ PROFILES = {
         "highlight_min": 2.0,
         "highlight_max": 30.0,
     },
-    # 以下两档来自《咕角色C嘎》EP01 v4 的 9 段成片实测（1312x736，各段首帧+中帧）。
+    # 以下两档来自《示例项目》EP01 v4 的 9 段成片实测（1312x736，各段首帧+中帧）。
     # 教训：单一全局档会把「场景本身的性质」当成缺陷——
     #   S01 客厅逆光窗 高光 32.1%（合法，窗就是过曝的）
     #   S08 航拍远山   暗灰 17.5-24.3%（合法，山体背光面）
@@ -139,16 +139,21 @@ def hybrid_check(bands: dict, base_bands: dict) -> dict:
     return checks
 
 
+# 仅作 measure()/基准加载的函数默认参数值；main() 要求显式给 --qc-profile 或 --baseline，
+# 不会静默套用。保留常量是为了兼容直接调用 measure() 的旧脚本，不代表存在「默认档」。
 DEFAULT_PROFILE = "virtual-void"
 
-# 灾难线（任何档都必须过）：死黑 ≤40% 且熵 ≥5.0
+# 灾难线（任何档都必须过）：死黑 ≤40%。熵不作门控，只作记录。
 CATASTROPHE_DEAD_BLACK = 40.0
-CATASTROPHE_ENTROPY = 5.0
-# 熵不作门控。实测熵 vs 死黑 r=-0.836、vs 亮度 +0.831、vs 中间调 +0.788，
-# 它和明暗分布是同一根轴，只留作记录与灾难线。
+# 实测熵 vs 死黑 r=-0.836、vs 亮度 +0.831、vs 中间调 +0.788，
+# 它和明暗分布是同一根轴：熵低不是因为「平」，而是因为「暗」。故不设熵门控。
 
 # 画幅：H3 canvas 边长须为 32 倍数
 CANVAS_MULTIPLE = 32
+
+# 目标图与基准图共用同一扩展名集合；基准加载曾接受 .jpeg/.webp 而目录扫描只认 .png/.jpg，
+# 导致同目录下的 .jpeg 基准图被静默漏检。
+IMG_EXT = {".png", ".jpg", ".jpeg", ".webp"}
 
 # 边框黑边归因环带宽度（占短边比例）。仅记录，不做门控。
 BORDER_RING_FRACTION = 0.06
@@ -204,7 +209,7 @@ def measure(path: Path, profile: str = DEFAULT_PROFILE) -> dict:
                       "max": T["highlight_max"],
                       "ok": T["highlight_min"] <= highlight <= T["highlight_max"]},
         "catastrophe": {"value": round(dead, 2),
-                        "ok": not (dead > CATASTROPHE_DEAD_BLACK or entropy < CATASTROPHE_ENTROPY)},
+                        "ok": dead <= CATASTROPHE_DEAD_BLACK},
         "canvas_w32": {"value": w, "ok": w % CANVAS_MULTIPLE == 0},
         "canvas_h32": {"value": h, "ok": h % CANVAS_MULTIPLE == 0},
     }
@@ -252,7 +257,7 @@ def main() -> int:
     for t in args.targets:
         p = Path(t)
         if p.is_dir():
-            files += sorted(p.glob("*.png")) + sorted(p.glob("*.jpg"))
+            files += sorted(q for q in p.iterdir() if q.suffix.lower() in IMG_EXT)
         elif p.is_file():
             files.append(p)
         else:
@@ -267,8 +272,7 @@ def main() -> int:
     base_bands = None
     if args.baseline:
         bdir = Path(args.baseline)
-        bfiles = (sorted(q for q in bdir.iterdir()
-                         if q.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"})
+        bfiles = (sorted(q for q in bdir.iterdir() if q.suffix.lower() in IMG_EXT)
                   if bdir.is_dir() else ([bdir] if bdir.is_file() else []))
         if not bfiles:
             print(f"ERROR: 基准路径无图: {bdir}", file=sys.stderr)
@@ -292,6 +296,11 @@ def main() -> int:
             return 2
         if base_bands is not None:
             hc = hybrid_check(r["bands"], base_bands)
+            # 混合判据只替换四带指标；画幅（32 倍数）与灾难线是通道级硬约束，必须保留，
+            # 否则 --baseline 模式下 canvas_w32/canvas_h32 检查会消失、非法画幅静默通过。
+            for k in ("canvas_w32", "canvas_h32", "catastrophe"):
+                if k in r["checks"]:
+                    hc[k] = r["checks"][k]
             r["checks"] = hc
             r["pass"] = all(c["ok"] for c in hc.values())
             r["qc_mode"] = "hybrid"

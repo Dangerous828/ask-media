@@ -220,4 +220,4 @@
 `reported_end` 只作比较；末镜没有真实下一镜时改用
 `next_start_locator`。附加参考为空时使用空数组；对白说话者与声音方向只有在已接受引用存在时才填写。
 母版、补拍和替代关系保留在同一规格文件内，替代决定由审查结论拥有。具体取舍按
-`references/motion-recipe.md` 与 `references/review-and-fixtures.md` 判断。
+`../references/motion-recipe.md` 与 `../references/review-and-fixtures.md` 判断。

@@ -1,51 +1,63 @@
 # -*- coding: utf-8 -*-
-"""对白白模一键流水线：校验 -> 渲染对白mp4 -> 导出分镜xlsx -> ffmpeg转H.264。
+"""对白白模一键流水线：校验 -> 渲染 H.264 mp4 -> 导出分镜xlsx -> 台词文件。
 用法: python run_dialogue_pipeline.py <storyboard.json> [--outdir DIR]
-依赖: numpy/Pillow/opencv/openpyxl/ffmpeg。脚本会自动在 engine/ 与 tools/ 找组件。"""
-import sys,os,subprocess,json,shutil,glob
+依赖: numpy/Pillow/opencv/openpyxl/ffmpeg；组件从本脚本同目录（scripts/）解析。
+渲染引擎直接输出 H.264/yuv420p，无需再转码。"""
+import sys,os,subprocess,json
 try: sys.stdout.reconfigure(encoding="utf-8")
 except Exception: pass
+
+HERE=os.path.dirname(os.path.abspath(__file__))
+
 def find_ffmpeg():
-    p=shutil.which("ffmpeg")
-    if p: return p
-    cands=glob.glob(os.path.expandvars(r"%LOCALAPPDATA%\Microsoft\WinGet\Packages\Gyan.FFmpeg_*\ffmpeg-*\bin\ffmpeg.exe"))
-    for c in cands:
-        if os.path.exists(c): return c
-    return None
+    """渲染引擎直出 H.264，本函数仅用于前置校验环境。"""
+    import shutil
+    return shutil.which("ffmpeg")
+
+def component(name):
+    f=os.path.join(HERE,name)
+    if not os.path.isfile(f):
+        sys.exit(f"[错误] 找不到组件 {name}（应在 {HERE}）")
+    return f
+
 def main():
+    if len(sys.argv)<2:
+        sys.exit("用法: python run_dialogue_pipeline.py <storyboard.json> [--outdir DIR]")
     jpath=os.path.abspath(sys.argv[1])
     cfg=json.load(open(jpath,encoding="utf-8")); proj=cfg["project"]
-    # 组件目录：优先 skill scripts，其次 previs_system
-    here=os.path.dirname(os.path.abspath(__file__))            # tools/
-    sysroot=os.path.dirname(here)                              # previs_system/
-    skill=os.path.join(sysroot,"..",".codex","skills","video-previs","scripts")
-    def pick(*rel):
-        for base in [skill, sysroot+os.sep+"engine", sysroot+os.sep+"tools", here]:
-            f=os.path.join(base,*rel) if not isinstance(rel,tuple) else os.path.join(base,*rel)
-            if os.path.exists(f): return os.path.abspath(f)
-        return None
-    eng=pick("dialogue_engine.py"); xlsx=pick("export_storyboard_xlsx.py"); dlg=pick("export_dialogue.py")
-    outdir=os.path.join(sysroot,"..","projects",proj,"白模")
+
+    # 0) 前置：渲染引擎需要 ffmpeg 出 H.264，缺失时明确报错而非改名冒充。
+    if not find_ffmpeg():
+        sys.exit("[错误] 找不到 ffmpeg：白模一律输出 H.264，请安装 ffmpeg 后重试")
+
+    # 1) 校验（失败即停）
+    val=component("validate_dialogue.py")
+    print("1) 校验 storyboard…")
+    r=subprocess.run([sys.executable,val,jpath])
+    if r.returncode!=0: sys.exit("校验未通过，流水线停止")
+
+    eng=component("dialogue_engine.py"); xlsx=component("export_storyboard_xlsx.py"); dlg=component("export_dialogue.py")
+
+    # 输出目录：默认与 storyboard 同项目下的 白模/，可由 --outdir 覆盖。
+    outdir=os.path.join(os.path.dirname(jpath),"白模")
     if "--outdir" in sys.argv: outdir=sys.argv[sys.argv.index("--outdir")+1]
-    os.makedirs(outdir,exist_ok=True)
+    outdir=os.path.abspath(outdir); os.makedirs(outdir,exist_ok=True)
     py=sys.executable
-    raw=os.path.join(outdir,proj+"_白模_raw.mp4"); mp4=os.path.join(outdir,proj+"_白模.mp4"); xl=os.path.join(outdir,proj+"_分镜表.xlsx")
-    def run(cmd,must=True):
-        print(">>>"," ".join(cmd)); r=subprocess.run(cmd)
-        if must and r.returncode!=0: sys.exit("步骤失败")
-    print("1) 渲染对白白模…")
-    run([py,eng,jpath,raw])
-    print("2) 导出分镜 Excel…")
-    run([py,xlsx,jpath,xl])
-    print("2b) 导出带时间戳台词(SRT/txt)…")
-    if dlg: run([py,dlg,jpath,outdir],must=False)
-    ff=find_ffmpeg()
-    if ff:
-        print("3) 转 H.264…")
-        run([ff,"-y","-loglevel","error","-i",raw,"-c:v","libx264","-pix_fmt","yuv420p","-movflags","+faststart","-an",mp4])
-        try: os.remove(raw)
-        except Exception: pass
-    else:
-        os.rename(raw,mp4); print("(未找到 ffmpeg，保留 mp4v 编码)")
+    mp4=os.path.join(outdir,proj+"_白模.mp4"); xl=os.path.join(outdir,proj+"_分镜表.xlsx")
+
+    print("2) 渲染对白白模（H.264）…")
+    run=[py,eng,jpath,mp4]
+    r=subprocess.run(run)
+    if r.returncode!=0: sys.exit("渲染失败，流水线停止")
+
+    print("3) 导出分镜 Excel…")
+    r=subprocess.run([py,xlsx,jpath,xl])
+    if r.returncode!=0: sys.exit("Excel 导出失败，流水线停止")
+
+    print("4) 导出带时间戳台词(SRT/txt)…")
+    r=subprocess.run([py,dlg,jpath,outdir])
+    if r.returncode!=0: print("[警告] 台词导出失败，但不影响已产物")
+
     print(f"完成：{proj}\n  {mp4}\n  {xl}")
+
 if __name__=="__main__": main()

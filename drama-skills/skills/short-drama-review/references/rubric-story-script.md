@@ -88,8 +88,8 @@ What is reportable:
   level held constant across episodes?
 - For authorized ability: is the cost visible and landed on something the protagonist
   cares about? Does the device offer options, or decide for them?
-- If the device uses an on-screen readable carrier, is the `exact-readable` obligation
-  stated instead of coexisting with a global no-text policy?
+- If the device uses an on-screen readable carrier, is the `exact_readable` obligation
+  stated instead of coexisting with a global no_readable_text policy?
 
 ## Entry, character, and serial memory
 

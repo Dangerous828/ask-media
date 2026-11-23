@@ -84,7 +84,7 @@ Character 拥有，换鞋、加厚外套、盘发都不改写它（那些属于 
 
 ## 可选声音方向：身份锚点不等于本场 delivery
 
-**`AST-07 · reviewed_invariant`**：项目需要跨集保持声音时，可在 Character 记录 `voice_direction`：语言/方言范围、
+**`reviewed_invariant · AST-07`**：项目需要跨集保持声音时，可在 Character 记录 `voice_direction`：语言/方言范围、
 **创作者授权的参考音频绑定**、用于选型与验收的判据、已接受的专名发音。紧张、淋雨、受伤、
 耳语、某句重音和临时音量属于场景/台词 delivery，不要固化成声音身份；变声、年龄跨度或
 伪装若跨段持续，则记录有来源和有效范围的变体。

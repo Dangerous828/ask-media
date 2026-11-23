@@ -1,6 +1,7 @@
 ---
 name: video-studio
 version: 1.1.1
+license: MIT
 description: 短剧/动画出图的验收与工程检查工具箱。当明确用 H3 写剧本或把现成剧本送入制作、需要判断画风适配并提出制作风险质疑，或开始规划连续段与生成分组、反馈分镜拆太散／拼接生硬，或要判定关键帧能不能用（四件套指标）、检查 H3 提示词工程一致性（Picture 引用/参考加载/术语统一/时序/台词超载）、给产物留可追溯 manifest、排查图片暗/空/发灰时使用。不代写剧本或规定提示词正文；按项目已验收写法执行。 短剧任务按正文读取对应阶段知识，本技能继续完成当前工作。
 ---
 
@@ -18,7 +19,7 @@ description: 短剧/动画出图的验收与工程检查工具箱。当明确用
 >
 > **本 skill 不规定提示词怎么写。** 详见 `结论-提示词体系适用性.md`。
 >
-> 实测结论：真实项目《咕角色C嘎》21 张关键帧（散文 + 首行风格声明 + `<Picture N>` 显式绑定）
+> 实测结论：示例项目 21 张关键帧（散文 + 首行风格声明 + `<Picture N>` 显式绑定）
 > 指标接近官方基准（死黑 1.5% / 中间调 70.0% / 熵 7.60），
 > 而本 skill 早期设计的「五槽拼装 + 风格权归 profile 独占」方案实测更差。
 >
@@ -30,12 +31,12 @@ description: 短剧/动画出图的验收与工程检查工具箱。当明确用
 > |---|---|
 > | `scripts/qc_image.py` | 四件套验收（**必须显式指定档位**，无默认档） |
 > | `scripts/qc_signals.py` | 介质信号（小亮块/最大亮块/高频比），**相对基准、默认只告警** |
-> | `scripts/ref_guard.py` | 参考图体检（71.9% 废片的输入源是"拼版被当构图模板"）。**图像判据只作提示**：2026-10-30 用本项目真实资产复测，AI 无缝四视图与带分栏资产板**均 0 检出**；真正拦得住的是 `--prompt` 里的版面压制句。`--chain still|ref2va|first_frame` 按链路给不同严重度：Ref2VA 里多视图是合法身份来源。**2026-11-01 起层1「贯穿线」判据已停用**（误杀门框/墙线/栏杆），任何链路都不再因长直线阻断 |
+> | `scripts/ref_guard.py` | 参考图体检（废片输入源："拼版被当构图模板"；小样本实测观察（样本与复现命令未随公开版发布））。**图像判据只作提示**：2026-10-30 用本项目真实资产复测，AI 无缝四视图与带分栏资产板**均 0 检出**；真正拦得住的是 `--prompt` 里的版面压制句。`--chain still|ref2va|first_frame` 按链路给不同严重度：Ref2VA 里多视图是合法身份来源。**2026-11-01 起层1「贯穿线」判据已停用**（误杀门框/墙线/栏杆），任何链路都不再因长直线阻断 |
 > | `scripts/story_check.py` | **剧本事件 ↔ 镜头 对账**（整镜丢失/降级成静态/穿越重复承担/动作链顺序） |
 > | `scripts/segment_guard.py` | **段内黑框自溶**帧级检查（外环死黑曲线；文本层查不出的那一半） |
 > | **`scripts/preflight.py`** | **提交前一键跑完 5 项检查**（ref_guard → story_check → segment_guard → qc_image → qc_signals），退出码三态 PASS/BLOCK/NOTCHK |
 > | **`scripts/h3qg.py`** | **h3qc 的闸门包装**：走队列前自动跑 ref_guard + h3_lint（不改常驻服务，零中断） |
-> | `scripts/gugu_h3q.py` | 角色C出图 → 队列（**走 h3qc，不直连 8199**） |
+> | `scripts/example_h3q.py` | 角色C出图 → 队列（**走 h3qc，不直连 8199**） |
 > | `scripts/h3_lint.py` | H3 提示词工程一致性 |
 > | `scripts/make_manifest.py` | 产物追溯 |
 > | `profiles/*.md` 第七节 | 20 条场景描写参考（供查阅，不参与拼接） |
@@ -84,7 +85,7 @@ description: 短剧/动画出图的验收与工程检查工具箱。当明确用
 | 要写视频提示词 | 视频提示词 | **`references/official/ref-en.txt`**（Ref2VA）或 **`base-en.txt`**（T2VA/I2VA/FL2VA/L2VA） |
 | 要选/换画风 | 风格 | `references/craft/visualStyles.md` → 落到 `profiles/` |
 | 要把分镜行翻译成单帧提示词 | 单帧 | `references/craft/imagePromptCraft.md` |
-| 要写通用首帧/首尾帧提示词 | 视频 | `references/craft/videoPromptCraft.md` |
+| 要写 v1.1.8 旧模板（Seedance/Wan/通用五段式） | 视频（非 H3） | `references/craft/videoPromptCraft.md`；写 H3 正文走 `references/official/` |
 | 要写某镜的画面/场景描写 | 场景 | `profiles/<画风>.md` 第七节「20 条场景骨架」 |
 | 要真出图 / 真出片 | 生产 | 本文 §四 |
 | 出的图/片有问题 | 排障 | 本文 §五 |
@@ -137,8 +138,10 @@ H3 的 negative 槽与正文否定须分开判断：单句否定与成串禁词�
 
 ### R3 必须命名 1–3 个「会过曝的光源实体」+ 受光面
 
-**不要再写「整个世界在发光」。** 那描述的是环境光弥散，模型照做就是全局抬底噪，
-像素全落进 16–50 带 —— 产出「均匀暗灰雾」而不是「被照亮的表面」。
+**不要靠「整个世界在发光」这类句式去救一个本身不发光的被摄体。** 对一个普通室内/人物场景，
+写环境光弥散会让模型全局抬底噪，像素落进 16–50 带 —— 产出「均匀暗灰雾」而不是「被照亮的表面」。
+但这不是句式禁令：当被摄体本身就是发光群体（整座灯塔城、成片灯火），这句是准确的描述，不是雾的成因。
+**判据在被摄体，不在句式**——详见本节末尾「权威裁决」与 `结论-提示词体系适用性.md` §五。
 
 #### 频带证据（本地复算，与外部复核逐位一致）
 
@@ -172,7 +175,15 @@ H3 的 negative 槽与正文否定须分开判断：单句否定与成串禁词�
 #### 保留的规则
 
 - **静帧槽位里少写抽象时间词**（夜/夜晚/夜色/深夜/黄昏）：Qwen 静帧单变量实验 −10.7pt。夜戏照拍，把“夜”写成具体发光实体（路灯、窗光、月光照在哪）；不适用 H3 视频正文。
-- **删掉**「每个场景必须有『整个世界在发光』的定义句」：它是 16–50 雾的直接成因。
+- **不设「每个场景必须有『整个世界在发光』定义句」这条硬规则**。它对普通场景会制造 16–50 雾；但被摄体本身是发光群体时照写无误。两种写法的解释见下。
+
+**权威裁决（2026-11-23；本条是「整个世界在发光」与五槽拼装的唯一口径）**：
+
+| 说法 | 裁决 |
+|---|---|
+| 「整个世界在发光」该不该删 | **按被摄体决定，不按句式一刀切**：普通室内/人物场景删（防 16–50 雾）；灯塔城/灯海这类本身发光的被摄体保留（tB 用它拿到当时全集最好成绩）。`MEASURED-第五轮.md` §4.1 的「删错了」与 `MEASURED-第三轮.md` §七的「已删」分别指这两类场景，不矛盾。 |
+| 五槽拼装 vs 散文 | 两者各有适用范围，不是谁取代谁：真实项目散文首行写法 21 张指标接近官方（`结论-提示词体系适用性.md` §一）；修掉两个 bug 后的五槽拼装产物 nx1_clean 四项全过（`MEASURED-第五轮.md` §3.1）。**选哪种按实测产物判定，不由本 skill 规定。** |
+| 本 skill 定位 | 工具组 + 排障规律，不规定提示词正文（见本文件开头定位与 `结论-提示词体系适用性.md` §七）。 |
 
 ### R3b 环境密度：给「画面四边」分配光源实体，但不许写成弥散
 
@@ -241,11 +252,11 @@ python3 scripts/qc_signals.py <图片或目录> --baseline <项目>/qc/baselines
 **分工**：四带判「这张图像不像话」（同题材同构图横向比 + 灾难线）；
 「词写进去了没有」要看**具体物件是否出现**（光柱、地平线、姿态、道具）。
 不要把四带当提示词好坏的判据。详见
-`~/projects/h3-demo-repro/wordlen_lab/RESULTS.md`。
+`<本地对比目录>/h3-demo-repro/wordlen_lab/RESULTS.md`。
 
 参照：官方 Gemini 基准 = 死黑 0.0% / 中间调 84.8% / 熵 7.67。
 
-**不要拿官方的 14.1% 当跨题材 KPI**——那是 Gemini 在「金色发光虚空」题材上的产物。
+**不要拿官方的 14.1% 当跨题材 KPI**——那是 Gemini 在「金色发光虚空」题材上的产物（14.1%＝作者留档的官方 9 格均值口径，量纲 gray<50；单格值与均值不得并列比较）。
 第 8 格（塔顶俯瞰）曾到 33.5%，说明旧指标奖励的是大景别+亮天空，继续优化会收敛成「全片大全景」。
 
 ### R3d 9 格批次稳定性未解决
@@ -320,7 +331,9 @@ A/B 两版同 PASS，真真切镜就这样漏过了闸门。现在 `check_fl2va_
 > **双帧三段式就整份漏过**（`h3_lint` 与 `h3_gate --strict` 双双 exit=0）——闸门又退回了
 > 「只认我以为的写法」。现已改为**结构判据**：非 Ref2VA 模式 + 同时加载 Picture 1/2 = FL2VA。
 > 同时 `h3-video-gate` 那边原先**根本没有**这条检查（三段式反而全绿），已补为 **G28**，
-> 两条脚本现在同判据；它们是格式自检，不是内容放行条件。
+> 两条脚本现在同判据（均按 FL2VA 结构判据 + 同一份硬切声明词表）；它们是格式自检，不是内容放行条件。
+> 「声明硬切 + 剧本事件清单里有对应 `transition` 事件」的白名单收紧仍是**待实现提案，尚未落地**
+> （见 `MEASURED-Opus六信号复验.md` §五），不要当作已生效判据。
 
 **判据要结构或相对，不要措辞或绝对阈值。** 同批踩过的坑：「首行有没有某个固定句式」漏判（上条）、
 「全局 mad > 25」把连续升摇误判成切、「接缝绝对值」在慢镜与推轨里结论相反。
@@ -355,7 +368,7 @@ A/B 两版同 PASS，真真切镜就这样漏过了闸门。现在 `check_fl2va_
 > 抢卡、不与队列互斥、看不到排队位次，也拿不到队列那道 VRAM 保护。
 > `h3q_img.py` 自己的 docstring 就写着「never by hand; direct only to debug one still」。
 >
-> SSH 通道按 `h3-queue` §2 选择（同网段优先 `<渲染主机SSH别名>`，远程走 `<渲染主机SSH别名>` 等），以当时实测可连为准。
+> SSH 通道按 `h3-queue` §2 选择（同网段优先 `<渲染主机SSH别名-直连>`，远程走 `<渲染主机SSH别名-中转>` 等），以当时实测可连为准。
 > 队列端口 8200 **只在 Windows 本机监听**，Mac 上查不到。
 
 ### 4.1 出图
@@ -471,7 +484,7 @@ projects/<剧名>/
 | `references/craft/h3-script-fit.md` | 明确用 H3 写剧本、现成剧本进入制作、选画风或质疑制作可行性（**写正文前读，只报实际风险**） |
 | `references/craft/visualStyles.md` | 选画风、建 profile、8 维度决策表 |
 | `references/craft/imagePromptCraft.md` | 分镜行 → 单帧提示词的字段映射 |
-| `references/craft/videoPromptCraft.md` | 通用首帧/首尾帧五段式 |
+| `references/craft/videoPromptCraft.md` | v1.1.8 旧模板合集（Seedance 三段式 / Wan 单首帧 / 通用五段式 / 多参），**非 H3 正文写法**；H3 以 `official/` 为准 |
 | [剧本格式规范](../drama-skills/skills/short-drama-write/references/screenplay-format.md) | 剧本规范（由 short-drama-write 持有） |
 | [镜头语言与拆解](../drama-skills/skills/short-drama-storyboard/references/production-shot-grammar.md) | 分镜拆解规范（由 short-drama-storyboard 持有） |
 | [资产三类规范](../drama-skills/skills/short-drama-assets/SKILL.md) | 角色/场景/道具三类规范（由 short-drama-assets 持有） |
@@ -482,26 +495,30 @@ projects/<剧名>/
 
 ---
 
-## 八、当前状态（截至 2026-10-22 第三轮）
+## 八、历史状态快照（截至 2026-10-22 第三轮；仅作当时记录）
+
+> ⚠️ **本节是历史快照，不代表当前状态。** 后续结果以 `MEASURED-第五轮.md`（nx1_clean 四项全过、
+> 归档归位 34 张）与 `MEASURED-闸门复验.md` 为准。下方「没有一张同时满足四项」「归档 46 张」
+> 均为第三轮当时实况，已被第五轮更新。
 
 ### 已就绪 ✅
 
 | 项 | 状态 |
 |---|---|
 | `references/official/base-en.txt` + `ref-en.txt` | ✅ 与本地 `~/.agents/skills/h3-prompt-writing` 逐字节相同 |
-| `references/craft/visualStyles.md` 等三份 | ✅ Toonflow 原始文件 |
+| `references/craft/visualStyles.md` 等三份 | 源自 Toonflow 风格方法（已改写）；原始文件与许可未随公开版发布、无从核实（见本节末尾说明） |
 | `references/craft/performance.md` | ✅ 10 条表演骨架（情绪→可见动作） |
 | `profiles/3d_anime.md` | ✅ 六槽 + 20 条场景骨架 |
 | `scripts/build_prompt.py` | ✅ 可运行（剥标签 / 不拼规避 / 双闸门） |
 | `scripts/qc_image.py` | ✅ 可运行（四件套：死黑/暗灰/中间调/高光） |
 | `scripts/make_manifest.py` | ✅ 可运行（profile+脚本+图片 SHA） |
-| 归档产物 | ✅ 46 张在 `projects/_archive/` |
+| 归档产物 | 当时记 46 张；第五轮已归位 34 张到 `projects/_archive/`（`MEASURED-第三轮.md` §七 / `MEASURED-第五轮.md`） |
 
 ### 未完成 ⬜
 
 | 项 | 为什么重要 |
 |---|---|
-| [五段式规范](references/craft/videoPromptCraft.md) | 五段式已在该文档；必填槽的**脚本校验**仍缺（规范散在散文里，尚未结构化到可校验） |
+| [v1.1.8 旧模板合集](references/craft/videoPromptCraft.md) | 含通用五段式，但属 Seedance/Wan 旧模板、非 H3 写法；H3 正文以 `official/` 为准，见文档头说明 |
 | 资产三类规范 | 已由 [short-drama-assets](../drama-skills/skills/short-drama-assets/SKILL.md) 承担，不再在本技能内另建副本 |
 | Qwen 后端标定 | 已由 [h3-queue 的档位实测](../h3-queue/references/still-standard-tier-20261105.md) 承担，不再在本技能内另建副本 |
 | profile 删「叙事世界」槽 | 现在写着「当代温暖都市」，是题材不是画风，做古装要新建 profile |
@@ -522,13 +539,17 @@ projects/<剧名>/
 | 旧 skill sk_grid03 | **0.7** | — | — | — | 死黑 ✓ |
 | 官方词+锚词 | 5.5 | 46.6 | 46.9 | 0.9 | 4 项全挂 |
 
-**没有一张同时满足四项。**
+**没有一张同时满足四项。**（第三轮当时实况；第五轮 nx1_clean 已四项全过，见 `MEASURED-第五轮.md` §3.1）
 
 ### ready 判据（外部建议，未执行）
 
-1. 9 格 × 3 seed = 27 张，四件套通过 ≥7/9，且无灾难格（死黑 >40%）
+1. 9 格 × 3 seed = 27 张；通过单位按**格**计：每格 3 seed 至少 2 张四件套通过才算该格通过，要求 ≥7/9 格通过，且无灾难格（死黑 >40%）
 2. 产物带 manifest
 3. ≥2 个 profile，其中 1 个在非赛博题材上跑过
 4. 五段式规范（[videoPromptCraft.md](references/craft/videoPromptCraft.md)）结构化到脚本可校验必填槽
 
 **当前 4 项均未满足**（第 2 项已实现脚本但未全面应用）。
+
+> **关于 Toonflow 来源**：`references/craft/visualStyles.md` 等风格方法文件的源头是 Toonflow 的风格方法（已改写），
+> 但原始文件、来源链接与许可说明均未随公开版发布，仓内无从核实；网络上的许可说法不一（有称 MIT、有称 AGPL-3.0）。
+> 引用时按「源自 Toonflow 风格方法（已改写）」表述，不冒称「原始文件」、不替它指定许可。

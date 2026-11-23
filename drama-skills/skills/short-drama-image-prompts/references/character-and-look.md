@@ -79,7 +79,7 @@ Look 描述一个有效区间内的整体：发型整理方式、服装单品与
 **`craft_default` · 架空写「像什么」不写「是架空的」**：架空朝代写 `Ming-inspired court robes`
 而不写 `fictional dynasty`——关于设定的话不进提示词，设定本身的可见特征才进。同理
 `early 20th century, Republican-era China` 优于 `historical`，`coarse indigo cotton tunic,
-southern Chinese river town` 优于 `traditional clothing`。（来源：船长仓 profile-pass.md 实测，
+southern Chinese river town` 优于 `traditional clothing`。（来源：内部语料来源 profile-pass.md 实测，
 2026-11 引入。）
 
 ## 4. Look/state variant

@@ -180,6 +180,29 @@ class StoryCheckRegressionTests(unittest.TestCase):
         self.assertIn("HANDOVER_DEGRADED",
                       {finding["kind"] for finding in degraded["findings"]})
 
+    def test_pure_chinese_action_chain_fingerprint(self):
+        """纯中文动作链必须能参与整镜丢失检查，不能静默跳过，也不能因分词粒度误判。"""
+        script = self.write_script(
+            """## SHOT-EP001-001 · 第一段
+- 唯一动作：林夏转身并抬起手。
+
+## SHOT-EP001-002 · 第二段
+- 唯一动作：林夏放下手。
+"""
+        )
+        # 两镜内容都在同一份纯中文提示词里 → 全过，不得因中文整串分词误报整镜丢失。
+        self.write_prompt("all.txt", "林夏转身并抬起手，随后放下手。")
+        result = story_check.check(script, self.prompts)
+        self.assertNotIn("SHOT_CONTENT_MISSING",
+                         {f["kind"] for f in result["findings"]})
+
+        # 第二镜内容真实丢失 → 必须判 error（中文指纹确实在工作，而非跳过）。
+        for p in self.prompts.glob("*.txt"):
+            p.write_text("林夏转身并抬起手。", encoding="utf-8")
+        lost = story_check.check(script, self.prompts)
+        self.assertIn("SHOT_CONTENT_MISSING",
+                      {f["kind"] for f in lost["findings"]})
+
     def test_unresolvable_handover_assets_are_notchk(self):
         script = self.write_script(
             """## SHOT-EP001-001 · 交接

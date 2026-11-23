@@ -1,7 +1,7 @@
 # 打光角度与阴影语言（灯光的"几何学"）
 
 > 来源：经典电影摄影教材体系（American Cinematographer Manual / Film Lighting: Talks with
-> Hollywood's Cinematographers 一脉的公共知识）+ ostris 1000 条 H3 语料实际词频。
+> Hollywood's Cinematographers 一脉的公共知识）+ 约千条 H3 提示词语料的词频观察（经验量级，未留统计口径）。
 > 与 lighting-presets.md（8 组成套预设）的关系：那份是"套餐"，本份是"单点语法"——
 > 预设不够用时，用这里的角度词 + 阴影词自己组。
 
@@ -61,7 +61,7 @@ shadowless flat light（无影）。大佬样例里"暗部保留层次"= open sh
 - 禁止：无来源的棚灯感（`studio lighting` 出现在纪实风里 = 出戏）
 - 大佬样例锚点：PROMPT 10 的"a narrow beam of window light"——一束窗光，这就是动机光。
 
-## 六、语料实测词频（ostris 1000 条，H3 模型"认识"的词）
+## 六、语料词频观察（约千条 H3 提示词语料，经验量级）
 
 灯光高频：silhouette(23+13) > sunlight(15) > backlight(14+8) > overcast light(10) >
 moonlight(7) > firelight(6) > key light(3) > golden hour(3) > candlelight(2) > high-key(2)

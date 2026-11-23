@@ -29,13 +29,15 @@ import sys
 import time
 import uuid
 
-HOST = os.environ.get("H3Q_SSH_HOST", "")
+# 主名 H3Q_SSH_HOST / H3Q_REMOTE_PY，旧名 H3Q_HOST / H3Q_REMOTE_PYTHON / H3Q_PY
+# 作兼容别名（新名优先，与 transcard / example_h3q 一致）。
+HOST = os.environ.get("H3Q_SSH_HOST") or os.environ.get("H3Q_HOST", "")
 
 
 def _require_host():
     missing = [k for k, v in [
-        ("H3Q_SSH_HOST", HOST),
-        ("H3Q_REMOTE_PYTHON", PYTHON),
+        ("H3Q_SSH_HOST/H3Q_HOST", HOST),
+        ("H3Q_REMOTE_PY/H3Q_REMOTE_PYTHON/H3Q_PY", PYTHON),
         ("H3Q_REMOTE_CLI", CLI),
         ("H3Q_REMOTE_REF_CLI", REF_CLI),
         ("H3Q_REMOTE_ROOT", REMOTE_ROOT),
@@ -47,20 +49,51 @@ def _require_host():
             "渲染机的 SSH 别名、python、队列 CLI、根目录与 ComfyUI input 目录"
             "全部由环境变量提供，本脚本不内置默认机器。"
         )
-PYTHON = os.environ.get("H3Q_REMOTE_PYTHON", "")
+PYTHON = (os.environ.get("H3Q_REMOTE_PY") or os.environ.get("H3Q_REMOTE_PYTHON")
+          or os.environ.get("H3Q_PY", ""))
 CLI = os.environ.get("H3Q_REMOTE_CLI", "")
 REF_CLI = os.environ.get("H3Q_REMOTE_REF_CLI", "")
 REMOTE_ROOT = os.environ.get("H3Q_REMOTE_ROOT", "")
 COMFY_INPUT = os.environ.get("H3Q_COMFY_INPUT", "")
-POLL_SECONDS = int(os.environ.get("H3Q_ADAPTER_POLL_SECONDS", "15"))
+# 轮询间隔延迟求值：环境变量写错不应让模块 import 失败；调用时取值，
+# 非法值回退到默认 15s，测试可在模块级覆盖 POLL_SECONDS=0。
+DEFAULT_POLL_SECONDS = 15
+POLL_SECONDS = None  # None=每次调用时读 H3Q_ADAPTER_POLL_SECONDS
+MAX_POLL_SECONDS = 3600  # 单次轮询总超时（production_tool 也有 3600s 兜底，adapter 自身再设一道防线）
+
+
+def _poll_seconds():
+    raw = POLL_SECONDS
+    if raw is None:
+        try:
+            raw = int(os.environ.get("H3Q_ADAPTER_POLL_SECONDS", str(DEFAULT_POLL_SECONDS)))
+        except (TypeError, ValueError):
+            raw = DEFAULT_POLL_SECONDS
+    try:
+        return max(0, int(raw))
+    except (TypeError, ValueError):
+        return DEFAULT_POLL_SECONDS
 # Existing dialogue safeguards retain their submit policy. Photography reminders
 # G34/G35 require shot/reference context; word matches cannot reject a legal
 # side-on tracking shot or an intentional screen presentation.
 BLOCKING_GATE_WARNINGS = {"G17", "G18"}
-VIDEO_GATE = os.environ.get(
-    "H3_VIDEO_GATE",
-    str(Path.home() / ".agents/skills/h3-video-gate/scripts/h3_gate.py"),
-)
+def _default_video_gate_path():
+    """闸门默认路径：优先本仓库同布局相对路径，再取技能中枢安装位置。
+
+    ~/.agents 只是历史同步目标，可能不存在或过期；显式 H3_VIDEO_GATE 优先。
+    """
+    candidates = (
+        Path(__file__).resolve().parents[2] / "h3-video-gate/scripts/h3_gate.py",
+        Path.home() / ".skills/hub/h3-video-gate/scripts/h3_gate.py",
+        Path.home() / ".agents/skills/h3-video-gate/scripts/h3_gate.py",
+    )
+    for candidate in candidates:
+        if candidate.is_file():
+            return str(candidate)
+    return str(candidates[0])
+
+
+VIDEO_GATE = os.environ.get("H3_VIDEO_GATE", _default_video_gate_path())
 def _ref_gate_path():
     """共享参考准入闸门。显式环境变量优先，否则取第一个存在的安装位置。"""
     explicit = os.environ.get("SHORT_DRAMA_REF_GATE", "").strip()
@@ -291,7 +324,7 @@ def multishot_argv(params):
     total = per * count - (count - 1)
     if total > 451 and video_workflow(params) != "multishot":
         raise RuntimeError(
-            "多镜容器总帧数 %d 超过 16GB 卡实测上限 451（两窗 226+226 正是跑满的 451 帧形状，"
+            "多镜容器总帧数 %d 超过 16GB 卡实测上限 451（两窗 226×2−1 正是跑满的 451 帧形状，"
             "峰值 15096 MiB / 设备 15.92 GiB）" % total)
     if total > 451:
         print(
@@ -373,7 +406,11 @@ def run(argv, check=True):
         argv, capture_output=True, text=True, encoding="utf-8", errors="replace"
     )
     if check and result.returncode:
-        raise RuntimeError(f"command failed with exit code {result.returncode}: {argv[0]}")
+        raise RuntimeError(
+            f"command failed with exit code {result.returncode}: "
+            f"{' '.join(str(a) for a in argv)}\n"
+            f"stdout: {(result.stdout or '')[:800]}\nstderr: {(result.stderr or '')[:800]}"
+        )
     return result
 
 
@@ -410,10 +447,14 @@ def write_handle(path, provider_job_id):
 def queue_show(provider_job_id):
     command = f'"{PYTHON}" -s "{CLI}" show {provider_job_id}'
     result = ssh(command, check=False)
+    # CLI 可能先打警告（含 "{"）再打 JSON；只从第一个 { 开始试解析，并容忍尾部杂文。
     start = result.stdout.find("{")
     if start < 0:
-        raise RuntimeError("h3q show returned no JSON")
-    return json.loads(result.stdout[start:])
+        raise RuntimeError("h3q show returned no JSON: %s" % (result.stdout or "")[:400])
+    try:
+        return json.JSONDecoder().raw_decode(result.stdout[start:].lstrip())[0]
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("h3q show returned invalid JSON: %s" % (result.stdout[start:])[:400]) from exc
 
 
 def prepare_reference(source, output_root, index, lossless=False, modality="video"):
@@ -781,9 +822,16 @@ def submit(job, workdir, prompt_remote, reference_args, gate_off=False):
         output_remote = None
     for key in (("seed",) if modality == "image" else ("seed", "steps", "cfg")):
         if params.get(key) not in (None, ""):
-            argv += [f"--{key}", str(params[key])]
+            # 数值参数做白名单校验，禁止把任意字符串拼进远端命令。
+            value = str(params[key])
+            if not re.fullmatch(r"-?\d+(?:\.\d+)?", value):
+                raise RuntimeError(f"参数 {key} 必须是数值, got {value!r}")
+            argv += [f"--{key}", value]
     for flag, value in reference_args.items():
         if value:
+            # 参考文件名由 safe_id 生成，仍再校验一次，防止跳出远端命令引用。
+            if not re.fullmatch(r"[A-Za-z0-9_.\-,]+", value):
+                raise RuntimeError(f"参考参数 {flag} 含不允许的字符: {value!r}")
             argv += [f"--{flag}", value]
     if gate_off:
         argv.append("--gate-off")
@@ -865,7 +913,16 @@ def main():
             role = binding.get("role")
             if role not in ("reference_image", "first_frame", "last_frame"):
                 raise RuntimeError(f"h3q adapter does not support reference role {role}")
-            source = project_root / binding["path"]
+            # binding path 必须留在 project_root 内：不允许绝对路径或 .. 越界。
+            raw_path = binding.get("path")
+            if not isinstance(raw_path, str) or not raw_path or Path(raw_path).is_absolute() \
+                    or ".." in Path(raw_path).parts:
+                raise RuntimeError(f"binding {index} path must be a relative path inside project_root: {raw_path!r}")
+            source = (project_root / raw_path).resolve()
+            if not source.is_relative_to(project_root.resolve()):
+                raise RuntimeError(f"binding {index} path escapes project_root: {raw_path!r}")
+            if not source.is_file():
+                raise RuntimeError(f"binding {index} path is not a file: {raw_path!r}")
             prepared = prepare_reference(
                 source, output_root, index, lossless=lossless_binding(binding),
                 modality=job["modality"],
@@ -974,6 +1031,7 @@ def main():
     else:
         output_remote = None
 
+    poll_started = time.monotonic()
     while True:
         state = queue_show(provider_job_id)
         status = state.get("state")
@@ -982,7 +1040,11 @@ def main():
             break
         if status in ("failed", "cancelled", "blocked_vram"):
             raise RuntimeError(f"h3q job ended in state {status}")
-        time.sleep(POLL_SECONDS)
+        if time.monotonic() - poll_started > MAX_POLL_SECONDS:
+            raise RuntimeError(
+                f"h3q poll timeout after {MAX_POLL_SECONDS}s (job {provider_job_id} "
+                f"still in state {status!r}; follow up with h3qc show)")
+        time.sleep(_poll_seconds())
 
     local_result = output_root / Path(outputs[0]).name
     scp(local_result, output_remote.replace("\\", "/"), upload=False)

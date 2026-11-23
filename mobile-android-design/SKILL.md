@@ -1,6 +1,7 @@
 ---
 name: mobile-android-design
 version: 1.0.0
+license: MIT
 description: Master Material Design 3 and Jetpack Compose patterns for building native Android apps. Use when designing Android interfaces, implementing Compose UI, or following Google's Material Design guidelines.
 ---
 

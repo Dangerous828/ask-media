@@ -1,6 +1,7 @@
 ---
 name: acting-beats-dual-track
 version: 1.0.2
+license: MIT
 description: 已有分镜后，为每一镜写演员表演节拍（意图 / 手势 / 表情，或 准备-反应-落点），并按项目画风区分 3D 动画态度轨与真人 FACS 轨时使用。只输出演员可控字段；不写整帧生图提示词（归 doc-still-prompt），不写 H3 视频提示词正文，不改台词、机位、走位与道具。
 ---
 
@@ -71,4 +72,4 @@ description: 已有分镜后，为每一镜写演员表演节拍（意图 / 手�
 - [ ] 动画轨有态度钩子；真人轨有中间态与拮抗证据？
 - [ ] 爽点镜 ≤3 拍，揭露前留了反应空白？
 
-来源：Slate workbench/skills/acting-dual-track.md、workbench/skills/actor-neutral.md、workbench/skills/actor-controlled.md（原卡保持不动，Slate 运行时仍加载原卡）
+来源：内部工作台的 workbench/skills/acting-dual-track.md、workbench/skills/actor-neutral.md、workbench/skills/actor-controlled.md（原卡保持不动，内部工作台运行时仍加载原卡）

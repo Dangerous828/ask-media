@@ -226,6 +226,8 @@ def main():
                     help='corpus/ 目录下已验证语料条目文件名；写词前复用已验证句式并对照观察陷阱')
     ap.add_argument('--context', action='append', default=[])
     ap.add_argument('--max-tokens', type=int, default=24000)
+    ap.add_argument('--temperature', type=float, default=1.0,
+                    help='采样温度，默认 1.0；确定性起草可下调以减少措辞漂移')
     ap.add_argument('--timeout', type=int, default=1800)
     ap.add_argument('--skip-gate', action='store_true', help='只写稿；结构检查记为未执行')
     ap.add_argument('--dry-run', action='store_true')
@@ -240,7 +242,7 @@ def main():
     messages = build_messages(skill_text, context, args.frame, args.duty, args.style, args.frame_kind,
                               args.audit, args.risk, args.generation_mode, corpus_text)
     payload = {'model': args.model, 'messages': messages, 'max_tokens': args.max_tokens,
-               'temperature': 1.0, 'stream': True}
+               'temperature': args.temperature, 'stream': True}
     if args.dry_run:
         print(json.dumps({'included': included, 'corpus': corpus_loaded, 'request': payload},
                          ensure_ascii=False, indent=2))

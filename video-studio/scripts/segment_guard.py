@@ -7,11 +7,11 @@
 查不出真正的自溶——因为自溶发生在**渲染过程内部**，提示词里根本看不见。
 EP01 的真事故形态：S02 写"推镜穿屏"、S03 只写"满幅"，两个文件各自都没错；
 错在 S03 又穿了一遍，于是黑框在没有动机的情况下**在段内自己溶解**，
-外环死黑 25.7% → 17.3% → … → 0.0% 单调递减。这段视频在提示词层是"合格"的。
+外环死黑 25.7%（文档头起始值；下表 ss03 用 p10 口径记 +31.8，两者统计口径不同，未复算）→ 17.3% → … → 0.0% 单调递减。这段视频在提示词层是"合格"的。
 
 ⇒ 只有帧级数据能证明。本脚本就是那个数据源。
 
-判据（2026-10-22 在 EP01 全部 25 条实渲素材 + 3 条合成反例上实测标定）
+判据（2026-10-22 在 EP01 实渲素材上实测标定；文档头写「25 条」，下表明细为 3+1+20=24 条，另 1 条未列入明细，未复算）
 ----------------------------------------------------------------------
 取画面四周 6% 环带（与 qc_image 的 BORDER_RING_FRACTION 同一口径）的死黑占比，
 沿时间轴画曲线。`drop = 首窗中位数 - 曲线低分位(p10，跳过尾部 10%)`：
@@ -209,6 +209,7 @@ def main() -> int:
 
     reports = []
     bad = []
+    notchecked = []   # 帧数不足/解不出：与 preflight 的 NOTCHK 哲学一致，未查成不能当通过
     for f in files:
         try:
             r = analyse(f)
@@ -216,12 +217,15 @@ def main() -> int:
             print("ERROR: ffmpeg 解不了 %s: %s" % (f, e), file=sys.stderr)
             return 2
         reports.append(r)
+        if not r.get("ok"):
+            notchecked.append(r["path"])
         if r.get("ok") and r["decay"]:
             bad.append(r)
 
     if args.json:
         print(json.dumps({"reports": reports,
                           "decay": [r["path"] for r in bad],
+                          "notchecked": notchecked,
                           "allow_decay": args.allow_decay},
                          ensure_ascii=False, indent=1))
     else:
@@ -259,9 +263,14 @@ def main() -> int:
                 print("  --allow-decay 已开启：仅报告，不阻断。")
         else:
             print("未检出段内黑框自溶。")
+        if notchecked:
+            print("NOTCHK %d 条未查成（帧数不足/解码为空）：%s"
+                  % (len(notchecked), ", ".join(Path(p).name for p in notchecked)))
 
     if bad and not args.allow_decay:
         return 1
+    if notchecked and not args.allow_decay:
+        return 2
     return 0
 
 

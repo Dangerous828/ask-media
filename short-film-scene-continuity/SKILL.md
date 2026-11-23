@@ -1,6 +1,7 @@
 ---
 name: short-film-scene-continuity
 version: 1.1.0
+license: MIT
 description: 任何时长的独立短片在大纲、分镜或拆场次阶段核"场景账"时使用：场景数是否超标、换景落在哪一拍及其叙事动机、同场空间锚点（地面/主光源/边界陈设）是否会漂移、跨景连续物、信息差三层账与悬疑伏笔回收。连续性不因片长缩短而豁免。只产出场景账与连续性核对，不写分镜表或镜头提示词（短剧分镜走 short-drama-storyboard，独立短片走 storyboard-30s），不代替 short-drama-write 写剧本。
 ---
 
@@ -79,4 +80,4 @@ description: 任何时长的独立短片在大纲、分镜或拆场次阶段核"
 - [ ] 每次生成任务拆分都有接缝的起止状态，不因拆分而重置人物或空间？
 - [ ] 每个转折有可见动作？信息差账至少揭示一层？
 
-来源：Slate workbench/skills/scene-spatial-design.md、workbench/skills/scene-progression.md、workbench/skills/continuity-gap.md、workbench/skills/suspense-timeline.md（原卡保持不动，Slate 运行时仍加载原卡）
+来源：内部工作台的 workbench/skills/scene-spatial-design.md、workbench/skills/scene-progression.md、workbench/skills/continuity-gap.md、workbench/skills/suspense-timeline.md（原卡保持不动，内部工作台运行时仍加载原卡）

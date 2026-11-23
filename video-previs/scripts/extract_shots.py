@@ -40,15 +40,17 @@ def extract_rep_evidence(video, bounds, rep_dir, prefix, ffmpeg):
         if r.returncode != 0 or not os.path.isfile(dst) or os.path.getsize(dst) == 0:
             raise RuntimeError("%s 中点 %.3fs 代表帧抽取失败：%s" % (
                 shot_id, midpoint, (r.stderr or "ffmpeg 未产出文件").strip()[-300:]))
+        # frame_path 用相对 shots.json 所在目录的路径，分享时不泄露本机绝对路径。
         records.append({"id": shot_id, "start": round(start, 6), "end": round(end, 6),
                         "duration": round(end - start, 6), "midpoint": round(midpoint, 6),
-                        "frame_path": os.path.abspath(dst)})
+                        "frame_path": "./" + filename})
     manifest = os.path.join(rep_dir, "shots.json")
     with open(manifest, "w", encoding="utf-8") as fo:
-        json.dump({"video": os.path.abspath(video), "shots": records}, fo,
+        # video 同样用相对 shots.json 所在目录的路径，避免泄露本机绝对路径。
+        json.dump({"video": os.path.relpath(video, rep_dir), "shots": records}, fo,
                   ensure_ascii=False, indent=2)
         fo.write("\n")
-    lines = ["# 原片拆解", "", "- 来源原片：%s" % os.path.abspath(video),
+    lines = ["# 原片拆解", "", "- 来源原片：%s" % os.path.relpath(video, rep_dir),
              "- 镜数：%d" % len(records), "",
              "> 自动证据仅含入出点、中点代表帧与镜数；其余字段须核对原片、OCR 与 ASR 后填写。", ""]
     for rec in records:

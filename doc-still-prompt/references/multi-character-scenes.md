@@ -13,7 +13,7 @@
 
 先清楚指认各区域的主体，再沿动作目标、接触与受光组织英文。态度贴着对应角色表达；不规定句数、主语数量或固定段落顺序。
 
-例如，若上游确定现实中的 Gungun 看电视，电视内是 Gugu 与 Doro，则草帽、绒毛与草甸轮廓光继续归属于屏内人物，不能转写成现实房间中独立站着的两个身体。
+例如，若上游确定现实中的 角色C 看电视，电视内是 角色A 与 角色B，则草帽、绒毛与草甸轮廓光继续归属于屏内人物，不能转写成现实房间中独立站着的两个身体。
 
 ## 同一实体的指代与属性
 
@@ -28,21 +28,21 @@
 独立 doc-still 布局可在身份库中登记：
 
 ````markdown
-## Gugu
-> identity: Gugu
-> presence: Gugu
+## 角色A
+> identity: 角色A
+> presence: 角色A
 ```text
-Gugu wears a black penguin hood, a white belly patch and orange slippers.
+角色A wears a black penguin hood, a white belly patch and orange slippers.
 ```
 ### 背面锚点
-> identity: Gugu
+> identity: 角色A
 > view: rear
 ```text
-Gugu wears a black penguin hood and orange slippers.
+角色A wears a black penguin hood and orange slippers.
 ```
 ````
 
-对应帧的裁决写 `身份视图：Gugu=rear`，正文逐字引用所选锚点，并在场面关系中说明背向。视角段仍指向同一角色，不是额外人物；`presence` 只是查找辅助，不能替代实例核对。
+对应帧的裁决写 `身份视图：角色A=rear`，正文逐字引用所选锚点，并在场面关系中说明背向。视角段仍指向同一角色，不是额外人物；`presence` 只是查找辅助，不能替代实例核对。
 
 缺合适视角时，先按权威设定在同库登记可见版本并完成核对，再用于正文。不能为通过完整段引用把脸、眼、鞋补回局部画面，也不能借裁切更换衣色或改脸。已有项目沿用真实身份库，不另造平行文件。登记格式与当前检查器支持范围不一致时，报告具体缺口，不用错误身份段迁就检查器。
 
@@ -61,4 +61,4 @@ Gugu wears a black penguin hood and orange slippers.
 
 诊断复制或串属性时，保存正文、有序参考及内容哈希、画布、seed、模型/编码器/VAE、LoRA、步数、CFG与采样方式。更换参考是一次输入干预；相同输入可作明确目的的复跑控制。小样本不能证明单视图普遍消重、最佳字数或模型排名。
 
-历史记录中，Qwen Image 2.1、Turbo 8步、CFG1、seed5071的一轮ABC对照，统一Doro整板只改善一个方案第一镜，其他复杂镜头仍有复制或区域错误；三个未改输入控制逐像素复现。此记录限定于该组设置，不构成当前通道配方、固定尺寸阈值或减少人物的理由。
+历史记录中，Qwen Image 2.1、Turbo 8步、CFG1、seed5071的一轮ABC对照，统一角色B整板只改善一个方案第一镜，其他复杂镜头仍有复制或区域错误；三个未改输入控制逐像素复现。此记录限定于该组设置，不构成当前通道配方、固定尺寸阈值或减少人物的理由。

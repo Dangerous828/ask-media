@@ -10,19 +10,20 @@
 
 主要技能：
 
-- **链路入口**：`ask-media`
+- **链路入口**：`ask-media`、`creative-dna-cards`
 - **短剧套件**：`drama-skills/`（第三方，MIT；12 个 `short-drama-*` 技能，管项目事实、阶段边界与连续性，实际位置在 `drama-skills/skills/*` 两层深）
-- **静帧与分镜**：`doc-still-prompt`、`anim3d-still-pitfalls`、`storyboard-30s`、`video-previs`、`director-style-presets`
+- **静帧与分镜**：`doc-still-prompt`、`anim3d-still-pitfalls`、`storyboard-30s`、`short-film-scene-continuity`、`video-previs`
+- **导演与表演**：`director-style-presets`、`acting-beats-dual-track`
 - **视频提示词与闸门**：`h3-prompt-writing`、`h3-video-gate`
 - **生产与验收**：`h3-queue`、`video-studio`、`concat-video`、`narration-route`
-- **复刻**：`shortvideo-understand`（第三方，MIT）、`video-shot-reverse`
+- **复刻**：`shortvideo-understand`（自研 skill；`lib/chubby_common` 复用 Chubby 代码，MIT）、`video-shot-reverse`
 - **写作与设计**：`write-article`、`write-tweet`、`grab-article`、`humanizer`（第三方，CC BY-NC 4.0，**仅限非商业使用**）、`frontend-design`、`mobile-ios-design`、`mobile-android-design`、`ui-ux-pro-max`、`tailwind-design-system`、`web-design-guidelines`
 
 `AGENTS.md` 是根级路由与纪律约定。
 
 ## 安装
 
-前提：一个支持 Agent Skills（`SKILL.md`）的客户端，例如 Claude Code、Codex、OpenCode、pi；部分脚本需要 Python 3.9+。
+前提：一个支持 Agent Skills（`SKILL.md`）的客户端，例如 Claude Code、Codex、OpenCode、pi；部分脚本需要 Python 3.9+。用 `npx skills add` 安装需要 Node.js 22.20+（Node 20 会直接崩）。
 
 ### 方法一：skills 命令（推荐）
 
@@ -40,8 +41,11 @@ npx skills add Dangerous828/ask-media -y -g
 git clone https://github.com/Dangerous828/ask-media.git && cd ask-media
 mkdir -p "$HOME/.claude/skills"
 
-# 顶层技能：一个循环全链上
-for skill in */; do ln -s "$PWD/$skill" "$HOME/.claude/skills/$skill"; done
+# 顶层技能：只链含 SKILL.md 的目录，排除 scripts/ 与 drama-skills/ 容器
+for skill in */; do
+  [ -f "$skill/SKILL.md" ] || continue
+  ln -s "$PWD/$skill" "$HOME/.claude/skills/$skill"
+done
 
 # 嵌套技能：drama-skills 的 12 个 short-drama-* 单独一轮，否则链路 1-10 阶段会缺 owner
 for skill in drama-skills/skills/*/; do ln -s "$PWD/$skill" "$HOME/.claude/skills/$(basename "$skill")"; done
@@ -50,7 +54,7 @@ for skill in drama-skills/skills/*/; do ln -s "$PWD/$skill" "$HOME/.claude/skill
 不同客户端的技能目录：
 
 - Claude Code：`~/.claude/skills/<技能名>/`
-- Codex：`${CODEX_HOME:-$HOME/.codex}/skills/<技能名>/`
+- Codex：`~/.agents/skills/<技能名>/`（项目级用 `.agents/skills/`；`${CODEX_HOME:-$HOME/.codex}/skills/` 为旧版兼容路径）
 - OpenCode：`~/.config/opencode/skills/<技能名>/`
 
 每个技能都是独立安装单元，只用其中几个时，只链接对应目录即可。
@@ -66,9 +70,13 @@ for skill in drama-skills/skills/*/; do ln -s "$PWD/$skill" "$HOME/.claude/skill
 
 - **Agent 运行**：桌面 Agent（Alma）经本地聚合网关路由多家模型——日常对话、文档写作与路由判读用 flash 档快模型，跨文档联动与双轴审查等重活用旗舰档。
 - **视频生成**：MiniMax H3（H3-Video）。本地 ComfyUI 经 h3q 队列串行提交，模式含 Ref2VA（参考图）、I2VA（首帧）、FL2VA（首尾帧）、Multishot（多窗一次生成），档位与帧网格见 `h3-queue/`。
-- **图像生成**：本地 Qwen Image 2.1（ComfyUI，8 步 Turbo LoRA）为主，H3-Image 作二次采样；云端混元（OpenAI-compatible 接口）作无 GPU 时的补充通道。
+- **图像生成**：本地 Qwen Image 2.1 为主（Qwen Research License，仅限研究与评估，商用需另行向 Qwen 申请许可）；H3-Image 作二次采样（MiniMax-H3-Image Community License）；云端混元（OpenAI-compatible 接口）作无 GPU 时的补充通道。参数档位见下方「出图口径」。
 - **画质增强**：SeedVR2 事后超分与 latent 放大（`h3_upscale_video`，成品帧回编码、不重采样）。
 - **语音转写**：本地 whisper-large-v3（Apple Silicon 权重），全程离线零上传。
+
+## 出图口径
+
+出图的默认档、回退档、权重文件名与默认尺寸的**唯一权威位置**是 [`h3-queue/references/still-standard-tier-20261105.md`](h3-queue/references/still-standard-tier-20261105.md) 与 [`h3-queue/references/delivery-specs.md`](h3-queue/references/delivery-specs.md)。其余各处（README、`video-studio/SKILL.md`、`example_h3q.py` docstring、`still-api-params.md`、`doc-still-prompt/CHANGELOG`）只引用该口径，不再各自写数字；仍有分歧的实测值标「待实测确认」。
 
 ## 说明
 
@@ -77,12 +85,16 @@ for skill in drama-skills/skills/*/; do ln -s "$PWD/$skill" "$HOME/.claude/skill
 - 内部项目名、路径、主机名与用户名已替换为占位符（如 `<渲染机脚本目录>`、`角色A-D`、`example-project`）；实测记录保留测量数值本身。
 - 部分文档引用的渲染机脚本（`h3qc.py` 等）与内部工程档案不在本仓库中，文中已注明。
 - 完整能力依赖具体运行环境；文档描述方法与判据，不附带这些环境配置。
-- 文档引用可用 `scripts/check_references.py` 校验（当前 0 断链）。
+- 文档引用可用 `scripts/check_references.py` 校验（退出码 0 表示全部引用可解析；同名兜底采用唯一匹配规则，同名多于一处视为断链，需写清相对路径）。
 
 ## 许可
 
 - 本仓库自有技能：[MIT License](LICENSE)，Copyright (c) 2026 Dangerous828。
 - 随仓附带的三方技能保留各自许可：
-  - `drama-skills/`：MIT，Copyright (c) 2026 drama-skills contributors（上游 [zenstory-ai/drama-skills](https://github.com/zenstory-ai/drama-skills)）
-  - `shortvideo-understand/`：MIT，Copyright (c) 2026 Chubby
-  - `humanizer/`：CC BY-NC 4.0，Copyright (c) 2026 shiujan，仅限非商业使用；商用授权见 [lieflat.work](https://lieflat.work/skills/less-ai-tone/)
+  - `drama-skills/`：MIT，Copyright (c) 2026 drama-skills contributors。本地改写分叉，上游 [zenstory-ai/drama-skills](https://github.com/zenstory-ai/drama-skills)，vendored 时点未记录。
+  - `shortvideo-understand/`：自研 skill；`lib/chubby_common` 复用 Chubby 代码（MIT，Copyright (c) 2026 Chubby）。
+  - `humanizer/`：CC BY-NC 4.0，Copyright (c) 2026 shiujan，仅限非商业使用；商用授权见 [lieflat.work](https://lieflat.work/skills/less-ai-tone/)。
+  - `frontend-design/`：Apache-2.0，来源 [anthropics/skills](https://github.com/anthropics/skills)。
+  - `web-design-guidelines/`：来源 vercel（[vercel-labs/web-interface-guidelines](https://github.com/vercel-labs/web-interface-guidelines)）；上游许可未随 vendored 记录，以官方仓库为准。
+  - `ui-ux-pro-max/`：来源未记录，不声称许可。
+- MiniMax 官方文档逐字节转载：`video-studio/references/official/base-en.txt`、`video-studio/references/official/ref-en.txt`、`h3-prompt-writing/references/base-en.txt`、`h3-prompt-writing/references/ref-en.txt` 转自 [MiniMax-AI/MiniMax-H3](https://github.com/MiniMax-AI/MiniMax-H3) 官方 skill（`base-en.txt` 222 行、SHA256 前 12 位 `2cfebc096a6e`；`ref-en.txt` 341 行、`1e574f356716`）。MiniMax-H3 仓库根目录没有 LICENSE 文件，转载条款以官方仓库为准。原先照搬的官方索引 `h3-prompt-writing/OFFICIAL_SKILLS_INDEX.md` 已改写为本仓本地索引，仅保留官方仓库绝对链接。

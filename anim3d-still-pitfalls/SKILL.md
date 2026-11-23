@@ -1,6 +1,7 @@
 ---
 name: anim3d-still-pitfalls
 version: 1.2.0
+license: MIT
 description: 3D 动画 / Q 版（竖屏或横屏）的关键帧或角色设定图（依赖垫图出图）出现漏盖漏汤、道具失忆、爬桌悬空、水平腰斩、身份漂移、表情呆或僵时的排障清单，作为 doc-still-prompt 的补充使用。整帧写作与改词由doc-still-prompt完成，不用于真人写实，不用于视频提示词。 短剧任务按正文读取对应阶段知识，本技能继续完成当前工作。
 ---
 
@@ -36,7 +37,7 @@ description: 3D 动画 / Q 版（竖屏或横屏）的关键帧或角色设定�
 2. **一次只修命中项**：没有把容器、远景或表演故障时，对应页为 NA。占比、字长、态度句、形变、遮挡和参考数量均不设通用配额。
 3. **参考按故障选用**：文字声明反复被同一通路推翻，或现有参考带有相反状态时，才调整/补充相应局部参考；不是所有关键状态都必须另做局部垫图。
 4. **正向描述可见关系**：病例中的否定句可改写为位置、接触、数量与状态。改写是否有效仍以实际通路结果为准，不把词面命中当作修复证据。
-5. **实测带条件**：标“实测”的结论只代表所注模型、参考与参数组合；换模型或输入需重测。项目例子见 [外卖短剧 / 角色D原型线](references/examples-gungun.md)，只借诊断结构。
+5. **实测带条件**：标“实测”的结论只代表所注模型、参考与参数组合；换模型或输入需重测。项目例子见 [外卖短剧 / 角色D原型线](references/examples-example-character.md)，只借诊断结构。
 
 ## 回填与验收边界
 
@@ -52,11 +53,11 @@ description: 3D 动画 / Q 版（竖屏或横屏）的关键帧或角色设定�
 | [grounding-framing.md](references/grounding-framing.md) | 非预期悬空/踩桌、横向切割、远景回拉或复杂交互崩坏 |
 | [performance-anim-track.md](references/performance-anim-track.md) | 3D 表演不可读，或表演词引起姿态/材质故障 |
 | [identity-tested.md](references/identity-tested.md) | 可见身份漂移、参考职责冲突或身份与构图互相回退 |
-| [examples-gungun.md](references/examples-gungun.md) | 需要查看上述诊断的项目原例；不是新项目填空模板 |
+| [examples-example-character.md](references/examples-example-character.md) | 需要查看上述诊断的项目原例；不是新项目填空模板 |
 
 ## 来源档案
 
-以下真实相对指针指向保留的 Slate 原卡，仅供追溯病例；原卡保持不动：
+以下真实相对指针指向保留的内部工作台原卡，仅供追溯病例；原卡保持不动：
 
 - [container-stack.md](references/container-stack.md)
 - physical-grounding / performance-dual-track / identity-anchor / doc-still-qban-doctrine 四张原卡存内部备份档案（未随公开版发布），文件名保留于此仅供追溯。

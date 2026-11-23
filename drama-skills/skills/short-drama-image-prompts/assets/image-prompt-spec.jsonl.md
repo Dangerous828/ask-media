@@ -183,5 +183,5 @@
 [`lookdev-frame-spec.jsonl.md`](lookdev-frame-spec.jsonl.md)，避免普通人物、地点和道具规格加载
 风格帧专属字段。
 每条参考只声明一个用途，多参考的 `slot_id` 稳定且 `order` 显式。类型取舍、文字政策与
-参考准入由技能按 `references/common-recipe.md` 判断。候选与已接受对象分开发布；自然语言修改先形成
+参考准入由技能按 `../references/common-recipe.md` 判断。候选与已接受对象分开发布；自然语言修改先形成
 候选和内容差异，不直接覆盖原记录。

@@ -2,7 +2,7 @@
 
 - 验证状态：MiniMax 官方出品（技能随 H3 官方仓库分发）；本地 h3q 未逐条实测
 - 来源：[MiniMax-AI/MiniMax-H3](https://github.com/MiniMax-AI/MiniMax-H3) `skills/handdrawn-live-video-generator` 与 `skills/brand-promo-video-generator`
-- 官方仓库还有 8 个同规格技能未逐个吸收（3d-animation 已在 h3-prompt-writing 里、co-op-game-intro、minimalist-product-ad、music-video-subtitle、paper-collage-explainer、papercraft-stop-motion 等），列表见其 skills/README.md
+- 官方仓库共 9 个技能（1 个 prompt-writing + 8 个风格技能，见 [OFFICIAL_SKILLS_INDEX.md](../OFFICIAL_SKILLS_INDEX.md)）；其中 prompt-writing、3d-animation 与本文覆盖的 handdrawn、brand 已吸收，**其余 5 个同规格风格技能未逐个吸收**（co-op-game-intro、minimalist-product-ad、music-video-subtitle、paper-collage-explainer、papercraft-stop-motion），列表见其 skills/README.md
 
 ## 手绘实拍融合的写法（观察到的手法，非规则）
 

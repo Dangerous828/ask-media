@@ -1,7 +1,7 @@
 # 色彩与调色（color & grade）——颜色是情绪的语法
 
 > 颜色不靠形容词堆（"美丽""氛围感"），靠**具体色名 + 相互关系**。
-> ostris 语料启示：H3 对 palette 罗列响应好（charcoal, umber, muted burgundy, warm ivory）。
+> 提示词语料观察（约千条，经验量级）：H3 对 palette 罗列响应好（charcoal, umber, muted burgundy, warm ivory）。
 
 ## 一、写颜色的三层法
 

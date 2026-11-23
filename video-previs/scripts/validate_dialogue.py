@@ -17,6 +17,10 @@ def _err(code, path, message, severity="error"):
 # 保留说话人：旁白/画外音。不是角色，不要求出现在 actors，也禁止为其建 actors 记录。
 RESERVED_SPEAKERS = {"narrator"}
 
+# beats[] 允许的可见表演字段（与 storyboard_schema.md 契约一致）。
+ALLOWED_BEAT_FIELDS = {"at", "duration", "intent", "posture", "gaze",
+                       "gesture", "expression", "voice"}
+
 
 def validate_document(board):
     errors, warnings = [], []
@@ -48,7 +52,22 @@ def validate_document(board):
         try: dur = float(shot.get("dur"))
         except (TypeError, ValueError): dur = 0
         if not math.isfinite(dur) or dur <= 0: errors.append(_err("DUR_INVALID", path + ".dur", "dur 必须是有限正数"))
-        if shot.get("cam") not in cams: errors.append(_err("CAM_INVALID", path + ".cam", "cam 不在对白契约词表"))
+        # pos/look 显式机位优先于自动机位，合法时可豁免 cam（1:1 复刻镜头）。
+        pos, look = shot.get("pos"), shot.get("look")
+        def coord_ok(v):
+            return (isinstance(v, list) and len(v) == 3 and
+                    all(isinstance(x, (int, float)) and math.isfinite(x) for x in v))
+        explicit_cam = coord_ok(pos) and coord_ok(look)
+        if not explicit_cam and shot.get("cam") not in cams:
+            errors.append(_err("CAM_INVALID", path + ".cam", "cam 不在对白契约词表（无合法 pos/look 时必填）"))
+        # 机位所需指向字段：near 必填 focus，two 必填 host/target（引擎否则崩溃或无意义）。
+        cam = shot.get("cam")
+        if cam == "near" and not shot.get("focus"):
+            errors.append(_err("NEAR_MISSING_FOCUS", path + ".focus", "cam=near 必须配 focus=角色ID"))
+        if cam == "two":
+            for key in ("host", "target"):
+                if not shot.get(key):
+                    errors.append(_err("TWO_MISSING_ROLE", path + "." + key, "cam=two 必须配 host 与 target"))
         for key in ("speaker", "host", "target", "focus"):
             if shot.get(key) and shot[key] not in actors and shot[key] not in RESERVED_SPEAKERS:
                 errors.append(_err("ACTOR_REF", f"{path}.{key}", f"角色 {shot[key]} 不在 actors"))
@@ -67,10 +86,47 @@ def validate_document(board):
             if not math.isfinite(ld) or ld <= 0: errors.append(_err("LINE_DUR_INVALID", lp + ".dur", "台词时长必须为正数"))
             if dur > 0 and (at > dur or at + ld > dur + 1e-6):
                 errors.append(_err("LINE_OUT_OF_SHOT", lp, "台词起止必须落在镜头时长内"))
+        # 演员表演层（契约承诺的四条校验）
+        perf = shot.get("performance")
+        if perf is not None:
+            pp = path + ".performance"
+            if not isinstance(perf, dict):
+                errors.append(_err("PERF_TYPE", pp, "performance 必须是对象"))
+            else:
+                state = str(perf.get("status") or "")
+                if perf.get("packet") is not None:
+                    packet = perf["packet"]
+                    if not isinstance(packet, dict):
+                        errors.append(_err("PACKET_TYPE", pp + ".packet", "packet 必须是对象"))
+                    else:
+                        if str(packet.get("shot_id") or "") != sid:
+                            errors.append(_err("PACKET_SHOT_ID", pp + ".packet.shot_id",
+                                               "packet.shot_id 必须等于本镜 id"))
+                        for k, act in enumerate(packet.get("actors") or []):
+                            apth = f"{pp}.packet.actors[{k}]"
+                            for b, beat in enumerate(act.get("beats") or []):
+                                bpth = f"{apth}.beats[{b}]"
+                                extra = set(beat) - ALLOWED_BEAT_FIELDS
+                                if extra:
+                                    errors.append(_err("BEAT_FIELD", bpth,
+                                                       "beats[] 含非可见表演字段：" + ",".join(sorted(extra))))
+                                try:
+                                    bat = float(beat.get("at")); bdu = float(beat.get("duration"))
+                                except (TypeError, ValueError):
+                                    errors.append(_err("BEAT_TIME", bpth, "beat 的 at/duration 必须是数字")); continue
+                                if not math.isfinite(bat) or not math.isfinite(bdu) or bdu <= 0:
+                                    errors.append(_err("BEAT_TIME", bpth, "beat 的 at/duration 必须有限且 duration 为正")); continue
+                                if bat < 0 or bat + bdu > dur + 1e-6:
+                                    errors.append(_err("BEAT_OUT_OF_SHOT", bpth, "beat 必须完整落在镜头 dur 内"))
+                if state and state != "ready":
+                    warnings.append(_err("PERF_DRAFT", pp + ".status",
+                                         "status 不是 ready 的草稿不得进入预演/图生视频产物", severity="warning"))
     return {"errors": errors, "warnings": warnings}
 
 
 def main():
+    if len(sys.argv) < 2:
+        sys.exit("用法: python validate_dialogue.py <storyboard.json>")
     path = sys.argv[1]
     board = json.load(open(path, encoding="utf-8"))
     result = validate_document(board)

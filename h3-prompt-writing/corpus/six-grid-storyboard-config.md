@@ -1,4 +1,4 @@
-# 六宫格配置驱动分镜-灯火之城EP01-001
+# 六宫格配置驱动分镜-示例项目EP01-001
 
 - 验证状态：来源项目实际产物（DM-001 完整跑完 25 集，含分镜图、角色图与成片提交）；本地通道未测
 - 来源：[zhaihao118/Micro-Drama-Skills](https://github.com/zhaihao118/Micro-Drama-Skills) `projects/DM-001_dhgt/episodes/EP01/storyboard_config.json`，目标通道 Seedance（图片走 Gemini API）

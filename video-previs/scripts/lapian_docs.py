@@ -2,7 +2,10 @@
 """
 拉片文档生成器（确定性）：切点 cuts.txt -> 拉片切点表.md + 分镜骨架.json
 前置：先跑 extract_shots.py（其产物 frames_<名>/cuts.txt）。
-骨架 JSON 可直接被 export_docs.py 导出 md/xlsx，或人工填台词/机位后渲染白模。
+骨架 JSON 已按 mode 同步写入 cam，可直接被 export_storyboard_xlsx.py 导出 xlsx，
+或人工填台词/机位后用 dialogue_engine.py 渲染白模。
+目录布局假设：视频位于 <工作区>/projects/<项目>/拉片素材/（视频上两级为项目根），
+产物写到项目根下的 拉片/ 与 分镜/。
 用法: python lapian_docs.py <video>
 """
 import sys,os,json,argparse,re
@@ -35,7 +38,8 @@ def main():
     md.append("\n> 备注：内容备注列人工填写；快切段（<1s）可合并。")
     mdpath=os.path.join(lap,f"{base}_拉片切点.md")
     open(mdpath,"w",encoding="utf-8").write("\n".join(md))
-    # ③ 分镜骨架 json（供 export_docs / dialogue_engine 消费，人工润色后可用）
+    # ③ 分镜骨架 json（供 export_storyboard_xlsx / dialogue_engine 消费，人工润色后可用）
+    # cam 与 mode 同名写入，否则 dialogue_engine 读 sh.get("cam") 得 None 会全镜落 wide 兜底。
     cfg={
       "project":slug(base),"title":base,"scene":"street_stall","w":960,"h":540,"fps":24,
       "actors":{
@@ -43,7 +47,7 @@ def main():
              "path":[[0.0,-1.0,2.0],[max(r[1] for r in rows)+1,-1.0,2.0]]},
         "v":{"name":"对手","shirt":[120,82,60],"apron":None,"scale":1.0,"static":True,"pos":[1.6,0.6]}
       },
-      "shots":[{"id":"S%02d"%i,"shot":"全景","mode":"wide","dur":round(e-s,2),
+      "shots":[{"id":"S%02d"%i,"shot":"全景","mode":"wide","cam":"wide","dur":round(e-s,2),
                 "line":"","prompt_cn":f"第{i}段（{s:.1f}-{e:.1f}s）待填画面描述"}
                for i,(s,e) in enumerate(rows,1)]
     }

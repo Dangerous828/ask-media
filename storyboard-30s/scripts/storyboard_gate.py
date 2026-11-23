@@ -5,19 +5,23 @@
     python3 storyboard_gate.py <分镜文件.md> [--skill <技能目录或 SKILL.md>]
 
 为什么要有这个脚本：分镜表的翻车方式与单帧提示词同构——"承认该填的栏，然后跳过"。
-文字要求可以被自述绕过，退出码不行。**退出码 0 才允许交稿。**
+文字要求可以被自述绕过，退出码不行。**这是交稿硬闸：退出码 0 才允许交稿，任一 FAIL 都必须改到 0 再交。**
 
-校验项（与 SKILL.md 硬规则、自检清单一同源）：
+校验项（只覆盖能机械判定的结构与字数，与 SKILL.md 硬规则同源但不包含主观表演项）：
   1. 片头四项：【场景】【角色】【道具】【节拍】齐不齐（【改编来源】可选）；
   2. 逐镜表：镜N + 时间区间写法合法，区间首尾相接、无重叠无空隙，
      累计满【节拍】声明的总时长；镜数与【节拍】中的显式声明一致（不设默认镜数配额）；
   3. 每镜景别、运镜取自词库逐字（允许"运镜｜起幅…｜落幅…｜动机…"或"运镜，从景别A至景别B"组合）；
-  4. 每镜台词字数 ≤ 该镜时长上限（≤2s:6 / 3-4s:12 / 5-7s:20 / 8-10s:30 / >10s:4字每秒+2）；
+     若用 ｜ 分隔，必须同时写出起幅、落幅与动机三段；
+  4. 每镜台词字数上限按公式 `字数 ≤ int((镜长秒 - 0.5) × 4.1)`（与 h3-video-gate G18 同口径）：
+     2s→6 字 / 3s→10 字 / 4s→14 字 / 5s→18 字 / 7s→26 字 / 10s→38 字；
   5. 「分镜总表」节存在，六列齐全（镜/职责/台词/道具进出/生成方式/跨镜连续物），
      每个镜号已登记，道具进出格式 名（进场镜→退场镜），生成方式取值合法；
   6. 「切点契约表」「生成单元表」「连续性账」三节齐全，字段无空栏，生成单元覆盖全部镜号，
      切点连接方式必须是视线/声音/动作/反应接之一；
-  7. 自检清单逐条 yes/no/NA（条目号从 SKILL.md 动态解析），判 no 的抄出证据。
+  7. 自检清单逐条 yes/no/NA（条目号从 SKILL.md 动态解析）：判 no 直接 FAIL，
+     NA 必须给理由/证据。自检里的 dB 数值、音频四段内容、光影动机等主观项本脚本不判，
+     由人按 SKILL 自检 16/17/27 逐条核对；"与自检一同源"指条目号与是否作答，不指替人判主观项。
 """
 import io
 import os
@@ -127,6 +131,12 @@ def check_shots(shots, total, declared, problems):
             first = re.split(r"[，,｜|]", move)[0].strip()
             if first not in MOVES:
                 problems.append("镜%d 运镜「%s」不在运镜词库（%s）" % (n, first, "/".join(MOVES)))
+            # ｜ 分隔写法必须写全「起幅→落幅→动机」三段；只写词库词不算设计（SKILL 运镜硬规则 1）
+            if "｜" in move or "|" in move:
+                missing = [k for k in ("起幅", "落幅", "动机") if k not in move]
+                if missing:
+                    problems.append("镜%d 运镜用了 ｜ 分隔却缺 %s（要求：词库词｜起幅…｜落幅…｜动机…）"
+                                    % (n, "、".join(missing)))
         line = field(block, "台词")
         if line is None:
             problems.append("镜%d 缺「台词：」栏（无台词也要写 无）" % n)
@@ -294,13 +304,21 @@ def check_acceptance(text, skill_path, problems):
         if not line.strip().startswith("|"):
             continue
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        if len(cells) < 2 or not re.match(r"^\d+$", cells[0]):
+        if len(cells) < 3 or not re.match(r"^\d+$", cells[0]):
             continue
         answered.add(cells[0])
-        if re.match(r"^(no|NA|n/a)", cells[1].lower()) or re.match(r"^(no|NA|n/a)", cells[2].lower() if len(cells) > 2 else ""):
-            why = " ".join(cells[2:]) or " ".join(cells[1:2])
+        # 列序固定：第 0 列编号 / 第 1 列检查项文本 / 最后一列才是答案。
+        # 旧实现把第 1 列（检查项文本）当答案列，文本里出现 "no…" 就会误报。
+        answer = cells[-1].strip()
+        low = answer.lower()
+        if low == "no" or low.startswith("no ") or low in ("否", "n"):
+            problems.append("自检第 %s 条判 no —— 任何一条 no 都必须改到 yes 再交" % cells[0])
+        elif low.startswith("na") or low.startswith("n/a"):
+            rest = re.sub(r"^n/?a\s*", "", answer, flags=re.I).strip()
+            extra = " ".join(cells[3:]) if len(cells) > 3 else ""
+            why = (rest + " " + extra).strip()
             if len(why) < 8 and "`" not in why:
-                problems.append("自检第 %s 条判 no/NA 却没给理由或证据" % cells[0])
+                problems.append("自检第 %s 条判 NA 却没给理由或证据" % cells[0])
     missing = [i for i in ids if i not in answered]
     if missing:
         problems.append("自检漏答 %d 条：%s（不适用的也要写 NA＋理由）"

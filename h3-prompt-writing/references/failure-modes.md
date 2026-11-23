@@ -12,10 +12,10 @@
 | "冲破/打碎玻璃" | 玻璃碎片 | 水波涟漪 / 金色漩涡 |
 | "身躯半透明化" | 肢体融化 | 只写轮廓金光+粒子，实体保持不透明 |
 | 多人同一时间窗说话 | 串音 | 错开发声时间窗 |
-| 不出场角色的身份描述写进正文 | **没挂参考也会被画出来**（实测 S12 Doro） | 出场治理三件套（下） |
+| 不出场角色的身份描述写进正文 | **没挂参考也会被画出来**（实测 S12 角色B） | 出场治理三件套（下） |
 | 同一实体多时间态并写（before/after 动作并列） | 两实体并存 / 过渡帧残影（实测画出两只猫） | 一时刻一实体；连续变化写动量链 |
 | 方向性短语写肢体（`his chubby right forearm reaches forward from the lower left`） | 被画成**独立第三条手臂**（实测成人前臂脱离身体） | 写"右臂从他自己肩头伸出"，删方向性短语 |
-| 人数只写数字（"三个人"） | 画成四个 / 物种错 | 给可数结构："恰好 N 个、手拉手：左一粉发白衣女孩/中间企鹅服 gugu/右一黄衣 gungun"逐一点名 |
+| 人数只写数字（"三个人"） | 画成四个 / 物种错 | 给可数结构："恰好 N 个、手拉手：左一粉发白衣女孩/中间企鹅服 角色A/右一黄衣 角色C"逐一点名 |
 | `clear whisper` 这类自相矛盾音频标签 | 发音清晰度被 whisper 拉低 | `soft, sweet, clearly enunciated` |
 | "完全物理隔绝"却保留可闻笑声 | 声轨自相矛盾 | `low-pass filtered, fading, subjective sound audible to the audience` |
 | **要求无可见接缝的换景**却写 `the camera cuts to` / `the shot transitions to` | 留下可见硬切点；后期必须加转场（真要硬切时照常写这句，见下文第 4 条与 G28） | 改用**遮挡扫过**：`<具体遮挡物> sweeps across the lens from <方向> and swallow the frame, and the camera travels on through that sweep, one unbroken move, as <遮挡物> clears: <原场景> becomes <新场景>`（见 SKILL.md「Occlusion Transitions」） |
@@ -27,12 +27,12 @@
 | **想让某角色离场，只写"她走掉了"**（或干脆不提） | 该角色**瞬移**到画面中央、且**换装**（实测 v5-07：角色C挤进画面变蓝花帽） | 两种正解：①**留她在场**——写清固定站位（`behind the boy on his left, feet planted`）+ 造型逐项复述 + `stays in that spot for the whole shot`；②真要离场就写**连续位移**：`turned and walked away with her back to the camera, passing out of the picture behind the grass slope within the first second`。绝不能靠"不提"来让她消失 |
 | 尾帧里没有的角色，却要求该镜"她全程在场" | 首帧有、尾帧无 → H3 让中间帧强行安排她的位置，必然瞬移或复制 | 云端 FL2VA：尾帧图必须画出全部在场角色。**本地 h3q 走 Ref2VA（不带尾帧）时同样适用**：每镜重挂全部在场角色的身份图，并在正文写明各自站位与全程在场 |
 | 台词只写 `<d>中文</d>`，不写说话人身份/是否在画内 | 该说话（实测父母拍屏段整段没声音）；或写成画内人开口导致口型乱动 | 画外音照官方语法：`An off-screen adult woman with a desperate trembling voice (S1) says in an off-screen voiceover: <d>[Chinese] 角色D！快出来！</d> while the two hands and the three figures inside the screen all keep their lips completely closed.` |
-| 台词字数按 4.1 字/秒算不下就当"再调调" | 闸门 G18 报超时/重叠；硬塞会被截断 | 先按 17k+5 网格定帧数（110 帧不是合法值，应 107/124），再排台词时间码；成人急促呼喊可用 `--rate 5.5~6.0` 复核，仍超就精简台词 |
-| **FL2VA 锁首尾帧，却想要快切节奏**（用同帧回锚去桥接本应硬切的两个镜头） | 尾帧被钉死 ⇒ **尾部运动谷**（EP01 v5 实测 8/8 FL2VA 段全塌，尾部 prof 均值 0.145；唯一不锁尾帧的 I2VA 段 = 1.064）；观感就是"首尾帧一模一样，但还是卡" | 先给每个剪辑点**判型**——续接与硬切是互斥的两条路：同场续接才挂帧锚（用 I2VA 单锚，别锁尾帧；锚帧必须来自已通过画风验收并获准复用的上一段，本地 h3q 默认独立起链，见 `short-drama-video-prompts` H3 方言）；判为硬切就**一律不挂尾帧**，改靠同向运镜 / 遮挡匹配 / 换主体（`mv-subtitle-skill-confirmed/SKILL.md:94`、toonflow `workflow/SKILL.md:672-675` 三条件） |
+| 台词字数算不下就当"再调调" | 闸门 G18 报超时/重叠；硬塞会被截断 | 时长按 `h3-video-gate` 同口径估：**默认 4.1 字/秒**（儿童／哭腔／拖音 3–3.5，成人快语速可上调，均以 `--rate` 传给闸门复核）；先按 17k+5 网格定帧数（110 帧不是合法值，应 107/124），再排台词时间码，仍超就精简台词 |
+| **FL2VA 锁首尾帧，却想要快切节奏**（用同帧回锚去桥接本应硬切的两个镜头） | 尾帧被钉死 ⇒ **尾部运动谷**（EP01 v5 实测 8/8 FL2VA 段全塌，尾部 prof 均值 0.145；唯一不锁尾帧的 I2VA 段 = 1.064）；观感就是"首尾帧一模一样，但还是卡" | 先给每个剪辑点**判型**——续接与硬切是互斥的两条路：同场续接才挂帧锚（用 I2VA 单锚，别锁尾帧；锚帧必须来自已通过画风验收并获准复用的上一段，本地 h3q 默认独立起链，见 `short-drama-video-prompts` H3 方言）；判为硬切就**一律不挂尾帧**，改靠同向运镜 / 遮挡匹配 / 换主体（外部社区资料未随仓库收录，行号无法在本地核验） |
 | **急刹/急停只写动作词**（`brakes hard`、`skids to a stop`） | 上半身塌下去、双手撑地，整个人变成**四肢着地**（实测 EP01 M02 draft1，6 岁小孩写成四足动物） | 把承重结构写出来：`she stays upright and standing the whole time, her knees bend deep to absorb the stop, her leading slipper digs into the turf, her torso leans forward from the hips`；并追一句 `stays standing on both <鞋> ` 锁住脚 |
 | **静→动跨越大、又要求一镜到底的长段**（赠礼→拥抱→转身→牵手→奔跑→升高，13s+） | 静段之后模型开始**重建角色**：同一角色出两份、运镜指令（升高、后拉）被吞（实测 EP01 M05 328 帧 draft1 崩；压到 243 帧、补一句人数与连续体声明后成立） | 按**事件密度**而不是时长上限压缩：把过渡节拍写实（转身要有过渡帧，不许瞬转）、加一句 `Exactly N people are in this scene, the same N from first frame to last, and each stays one single continuous body`，并在结尾动作里把运镜写成必须发生的动作而非形容词。这一例是本通道一次实测，不当作通用硬上限 |
-| **非英语台词用英文拼写**（`Orange~` 想读成日语/西语） | 按英语音位读出来（实测 EP01 Doro 的 `Orange~` 读成英文） | 台词里写**目标语言的原字形**并标语言：`<d>[Japanese] オレンジ~</d>`；同时给说话人音色描述，别让模型自己挑嗓音 |
-| **全片要求"小孩声音"却没写总声明** | 成品是成人配音腔或播报腔；同片不同镜音色漂移 | 正文开头加一句总约束，再逐个说话人补音色：`All of the children speak in young child voices, Gugu in a bright piping child's voice, Doro in a small high girl's voice, Gungun in a soft babbling toddler's voice.` 声线靠这条声明生成，不要用后期 TTS 覆盖 |
+| **非英语台词用英文拼写**（`Orange~` 想读成日语/西语） | 按英语音位读出来（实测 EP01 角色B 的 `Orange~` 读成英文） | 台词里写**目标语言的原字形**并标语言：`<d>[Japanese] オレンジ~</d>`；同时给说话人音色描述，别让模型自己挑嗓音 |
+| **全片要求"小孩声音"却没写总声明** | 成品是成人配音腔或播报腔；同片不同镜音色漂移 | 正文开头加一句总约束，再逐个说话人补音色：`All of the children speak in young child voices, 角色A in a bright piping child's voice, 角色B in a small high girl's voice, 角色C in a soft babbling toddler's voice.` 声线靠这条声明生成，不要用后期 TTS 覆盖 |
 | **角色/动作描述里写数值**（`25 or 26 years old`、`three children`、`two fifths of the frame`） | 数值被当成最「可引用」的那句**渲染进画面**（实测连撞三次：先「他没有拔剑」、再「二十五六岁」、再「行了个礼」都被画出来；删掉即消失，因果明确） | 描述一律不用数值：`in his mid-twenties` / `a young man` / `an older man`；人数与画面占比改可数结构或名词关系，不写阿拉伯/中文数字 |
 | 正文尾部写「画面无文字无水印」（`no text, no subtitle, no watermark, no logos`） | **完全无效**；同一实测三版都写着这句，照样出文字。cfg=1 下没有独立负向分支，这句只是给了一个可渲染的名词串 | 正文不写否定句；压制文字靠**正向场景写法**（无标识墙面、纯色布景、明确遮挡），生成后跑伪字幕 OCR 扫描再挑片 |
 | 旁白/解说原句直接抄进正文 | 该句被画进画面（`他没有拔剑` 成为画面内容） | 旁白与画面描述分离；台词只走 `<d>` 标签并在画外音句里写明说话人身份 |
@@ -54,7 +54,7 @@
 | **往已验证的动作链里加心理氛围词**（给跑通的落座/交接正文追加 `competitor / standoff / chin lifts / contest accepted` 这类情绪形容） | 情绪词吃掉动作词：模型自由发挥成隔桌前倾对峙、已验证的落座动作整段跳过、机位自作主张推近（EP005 002b v10，2026-11-20 实测） | 跑通的动作链只做外科手术式微调：钩子用可见事件写（某角色提前一拍已在画内、转头对视），情绪用动作动词表达（gaze locks / leans in），不加心理形容词；氛围冲突靠站位与视线，不靠氛围词 |
 | **改动幅度做不满一拍**（两版只差几帧入场时机或一处措辞） | 帧级差异创作者看不见：并发对比证实仅早 5 帧入画，verdict 原话"没看出区别"（EP005 002b v11，2026-11-20 实测） | 钩子或改动要么不做、要做满一拍以上：入场提前一个可见节拍、动作幅度差一档；提交前先抽两版同位帧并排自检差异肉眼可辨，不可辨就别交 |
 | 镜头正对出入口看屋里的人，要求"主角走出去、其余人留下" | **其余人跟着走出门**（EP001 S01：丈夫出画后三人一路走过门槛站到走廊） | 不要靠加词锁人。改参考图几何和机位，见下文「案例：主角走出去，其余人被一起带出门」 |
-| **构图参考图写成 `opening composition` / `begins from <Picture 1>`**，而图里是镜内后段的状态（他已俯身到她耳边） | 同一条正文既说"第 0 秒就是这张图"、又让图里的人 1.4 秒才入画；模型两头听，第 0 秒出现不该在的人或接缝处跳变（midnight-cream-veil MOTION-003） | 构图帧写 `composition anchor` 并带对应时刻；只有 `用途：起始帧` 的图才写 first frame。见 SKILL.md *Body Consistency Rules* 第 1 条 |
+| **构图参考图写成 `opening composition` / `begins from <Picture 1>`**，而图里是镜内后段的状态（他已俯身到她耳边） | 同一条正文既说"第 0 秒就是这张图"、又让图里的人 1.4 秒才入画；模型两头听，第 0 秒出现不该在的人或接缝处跳变（example-project MOTION-003） | 构图帧写 `composition anchor` 并带对应时刻；只有 `用途：起始帧` 的图才写 first frame。见 SKILL.md *Body Consistency Rules* 第 1 条 |
 | **给 ref2va 挂"终点态"参考图，指望模型从起点演过去**（把镜内落位状态——他已坐定/她已在怀里——做成参考图入 refs，正文写好起点与过渡） | **frame 0 直接落位到 end 态**：起点状态被吞，"THE FIRST FRAME 必须是 XX"这类硬约束文字压不动——参考图的落位语义强于正文（EP005 002b 六版实测：v6 写"站立不可协商"，ref2va 仍开场即坐） | 要过程感就别给终点图：用起点态图当起始帧，终点交给正文时间码；或拆镜——先做一小镜把"到位"动作演完，两侧缝都落在同一状态。终点图如确要展示，标 `composition anchor` 带对应时刻，不承担第 0 秒语义 |
 | **反应早于触发**（她 3.4 秒肩胛锁住，他 5.0 秒才贴到耳边开口） | 动作顺序被模型照字面执行，戏的因果倒置；时间码倒退还会被 G11 警告 | 时间线单调；反应排在触发之后；每个动作落在分镜 reads 对应的时间窗里 |
 | **绝对词与动作互相打架**（"左手平放桌沿"……"左腕全程贴着下巴"） | 同一对象两个互斥的状态，模型取其一或做出怪姿势 | 绝对词只给整段真不变的事实；会动的按时刻写 `… until 00:05.2, then …`。G38 会列出 |
@@ -72,7 +72,7 @@
 2. 未出场角色禁止以任何形式入画（含背景/剪影/虚化）。排除靠**不写**（见第 3 条），不靠负面声明：填负面槽在 cfg 1 下不参与采样（官方 guide §8），写进正文点名他反而会把他引进画面；
 3. **未出场角色连身份定义都不写**——文字描述会反向引导模型"脑补"出他。
 
-远景无身份参考的小人影二选一：挂身份图并写明远景小比例；或写剪影、不绑定 Subject、声音改后期配音。正文不写名字（`tiny distant colorful figures`）。详见 `h3-route.md` §3。
+远景无身份参考的小人影二选一：挂身份图并写明远景小比例；或写剪影、不绑定 Subject、声音改后期配音。正文不写名字（`tiny distant colorful figures`）。（原指向的 `h3-route.md` §3 为外部资料，未随仓库收录，本地无法核验。）
 
 ## 什么时候来查这张表
 

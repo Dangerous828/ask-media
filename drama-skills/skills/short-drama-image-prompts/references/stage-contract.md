@@ -21,7 +21,7 @@
 | IMG-04 | reviewed_invariant | Location plates preserve geography, orientation, anchors, material, and light, normally without cast. |
 | IMG-05 | reviewed_invariant | Prop plates preserve scale, shape, material, wear, function, and text policy. |
 | IMG-06 | structural_invariant | Edit prompts declare exact target, changes, preserve set, and expected continuity impact. |
-| IMG-07 | structural_invariant | Readable text cannot coexist with a global no-text constraint. |
+| IMG-07 | structural_invariant | Readable text cannot coexist with a global no_readable_text constraint. |
 | IMG-08 | reviewed_invariant | A claim about reference pixels requires a creator/reference-owner description or authorized input-reference observation bound to the inspected bytes; otherwise admission stays unresolved, and a negative prompt cannot stand in for evidence. |
 | IMG-09 | reviewed_invariant | Each reference states its purpose, what may be copied, and what must not be copied; a composition-, scale-, or effect-only reference cannot redefine identity, content, text, or story state. |
 | IMG-10 | reviewed_invariant | Views of one Location in the same time/weather state share key-light source, colour-temperature relation, and contrast direction; any difference cites a recorded cause and its delta. |

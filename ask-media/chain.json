@@ -21,11 +21,9 @@
       "nodes": [
         {
           "skill": "short-drama-write"
-        },
-        {
-          "skill": "short-film-scene-continuity"
         }
-      ]
+      ],
+      "notes": "short-film-scene-continuity 不是本阶段 owner；本阶段的场景账与连续性核对读它，见 SHORT-DRAMA-ROUTING.md。"
     },
     {
       "no": 3,
@@ -57,11 +55,9 @@
       "nodes": [
         {
           "skill": "short-drama"
-        },
-        {
-          "skill": "video-previs"
         }
-      ]
+      ],
+      "notes": "video-previs 是场记的上游输入（白模/拉片产物用来写场记账），非本阶段 owner。"
     },
     {
       "no": 6,
@@ -73,11 +69,9 @@
         },
         {
           "skill": "storyboard-30s"
-        },
-        {
-          "skill": "acting-beats-dual-track"
         }
-      ]
+      ],
+      "notes": "分镜定稿后读 acting-beats-dual-track 补演员表演节拍；它不写分镜表，非本阶段 owner。"
     },
     {
       "no": 7,

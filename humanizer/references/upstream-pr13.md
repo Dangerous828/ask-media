@@ -1,30 +1,33 @@
-# 上游 PR #13 迁移预案
+# 上游 PR #13 布局差异说明
 
-> [PR #13](https://github.com/larashero3-dotcom/lieflat-less-ai-tone/pull/13)（open，未合并）拟把 `SKILL.md`、`DETECT.md`、`references/`、`scripts/` 移进 `lieflat-less-ai-tone/` 子目录，让安装时只装 skill 本体、不带 README/RESEARCH/图片。**本地暂不跟进。**
+> [PR #13](https://github.com/larashero3-dotcom/lieflat-less-ai-tone/pull/13)（上游仓库，未合并）拟把 `SKILL.md`、`DETECT.md`、`references/`、`scripts/` 移进 `lieflat-less-ai-tone/` 子目录，让安装时只装 skill 本体、不带 README/RESEARCH/图片。**本仓不跟进该目录重构。**
 
-## 为什么现在不动
+## 为什么本仓保持平铺
 
-中枢发布器 `publish_hub_skills.py` 的 `prepare()` 要求 `SKILL.md` 在技能目录根；13 个 Agent 端的软链也指向 `../SKILL.md`。提前重构会让打包校验直接失败，各端技能不可触发。等 PR 合并、确认上游定稿布局后再整体迁移。
+本仓是公开文档仓，技能以 `humanizer/` 目录平铺发布：`SKILL.md` 在目录根，引用 `./references/`、`./scripts/`、`./DETECT.md` 等相对路径。根级 [AGENTS.md](../../AGENTS.md) 的「文字创作与发布」路由表、`write-article` / `write-tweet` 的引用都指向 `humanizer/SKILL.md`。若把正文移进子目录，这些引用与仓库内相对路径都要改写，对读者与路由没有收益。
 
-## 合并后迁移清单
+## 若上游合并后需要同步
 
-1. 从上游重新 clone 定稿版本，先与本地 2.1.0 的改动做 diff，确认哪些需要重放：
-   - `detect.py`：`ACADEMIC_DEMOTE` / `ACADEMIC_PAPER_CHECKS` / `effective_levels()` / `--genre` / `fmt_report` 分档 / 5 脚本 UTF-8 补丁
-   - `report.py`：`levels_of()` / `paper_check_section*` / 两处分级循环
-   - `tests/test_academic_genre.py`：整目录带走
-   - `academic-paper.md`、`research-pipeline.md`、`upstream-pr13.md`：整目录带走
-   - `SKILL.md` frontmatter（version / description 里的两个指针）与「第一步」「第四步」命令
-   - `CHANGELOG.md`、`../../AGENTS.md` 的文字创作表
-2. 决定中枢里的目录形态：若上游子目录布局与 Hub 根目录要求冲突，保留平铺，在 metadata 里注明「上游已改子目录，本地为兼容 Hub 保持平铺」。
-3. 重跑 `python3 tests/test_academic_genre.py`，13 项须全绿。
-4. 跑 `publish_hub_skills.py --dry-run --only humanizer`，确认打包通过。
-5. 跑 `sync-skills.sh`，确认 13 端软链与 Hub 入库都成功。
-6. 版本号 bump 到 2.2.0，CHANGELOG 记迁移。
+只同步**规则正文与脚本的行为变化**，不照搬目录布局。按下列清单逐项 diff，确认哪些重放到本仓的平铺文件：
+
+- `scripts/detect.py`：`ACADEMIC_DEMOTE` / `ACADEMIC_PAPER_CHECKS` / `effective_levels()` / `--genre` / `fmt_report` 分档 / UTF-8 输出补丁
+- `scripts/report.py`：`levels_of()` / `paper_check_section*` / 两处分级循环
+- `tests/test_academic_genre.py`：回归测试
+- `references/academic-paper.md`、`references/research-pipeline.md`：本仓自有文档，以上游为参考，不整目录覆盖
+- `SKILL.md` frontmatter（version / description 指针）与「第一步」「第四步」命令示例
+- `CHANGELOG.md`、根级 `AGENTS.md` 的文字创作表
+
+同步后重跑：
+
+```bash
+python3 tests/test_academic_genre.py   # 13 项须全绿
+python3 scripts/check_references.py    # 从仓库根运行，断链应为 0
+```
 
 ## 其他开放 PR
 
-| PR | 内容 | 本地状态 |
+| PR | 内容 | 本仓状态 |
 |---|---|---|
 | [#11](https://github.com/larashero3-dotcom/lieflat-less-ai-tone/pull/11) | 日文 README | 不需要 |
-| [#12](https://github.com/larashero3-dotcom/lieflat-less-ai-tone/pull/12) | Windows GBK 输出修复 | **已本地先行**，见 CHANGELOG 2.1.0 |
-| [#13](https://github.com/larashero3-dotcom/lieflat-less-ai-tone/pull/13) | 目录重构 | 本预案，等合并 |
+| [#12](https://github.com/larashero3-dotcom/lieflat-less-ai-tone/pull/12) | Windows GBK 输出修复 | 已先行，见 CHANGELOG 2.1.0 |
+| [#13](https://github.com/larashero3-dotcom/lieflat-less-ai-tone/pull/13) | 目录重构 | 不跟进，见上 |

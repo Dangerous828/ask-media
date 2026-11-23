@@ -81,7 +81,7 @@ pending_creator_text`。本 skill 只为当前道具板选择下列呈现方式�
 
 预留清楚、无遮挡、透视可跟踪的区域；描述面积、位置、方向、材质和光线，实际字后期添加。可在 creator note 记录精确文字，但 generic image prompt 不要求生成它。
 
-**`structural_invariant`**：单个文字承载面不能同时选择互斥政策；`readable` 与全局 no-text 冲突时必须先解决。
+**`structural_invariant`**：单个文字承载面不能同时选择互斥政策；`readable` 与全局 no_readable_text 冲突时必须先解决。
 
 ## 5. 输出与审查
 
@@ -90,7 +90,7 @@ pending_creator_text`。本 skill 只为当前道具板选择下列呈现方式�
 - 只说“古老钥匙、精致盒子”，没有比例、形制和材料；
 - 打开/关闭、完好/断裂、空/装满同时存在；
 - 可动件不知如何连接，功能靠抽象标签；
-- 文字内容由 prompt 作者临时编造，或 `readable` 被 no-text 否定；
+- 文字内容由 prompt 作者临时编造，或 `readable` 被 no_readable_text 否定；
 - 道具主人被画成 plate 主体，或不同视图中尺寸/损伤位置漂移。
 
 ### 检查

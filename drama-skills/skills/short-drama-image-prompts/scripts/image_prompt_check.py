@@ -343,7 +343,7 @@ def validate_asset_spec(
             text(treatment, "exact_text", f"{label}.text_handling.render_treatment")
             negatives = " ".join(str(item) for item in record.get("negative_constraints", []))
             if NO_TEXT_CONSTRAINT.search(negatives):
-                raise ValidationError(f"{label}: readable text conflicts with a no-text constraint")
+                raise ValidationError(f"{label}: readable text conflicts with a no_readable_text constraint")
 
 
 def validate_lookdev_spec(

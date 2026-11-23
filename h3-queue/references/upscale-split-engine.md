@@ -21,7 +21,7 @@
 **SeedVR2 事后超分（B 路径，与二采互补）**：已装 `seedvr2_videoupscaler`（numz，`inference_cli.py` 可脱离 ComfyUI 直接跑）+ 权重 `models/SEEDVR2/`（3B fp8 3.2GB + ema_vae fp16 478MB）。ComfyUI 节点 `SeedVR2*` 系列同步可用。实测：draft4（896×512）前 72 帧 → 1260×720，184s（0.39 fps，fp8 无 Sage/FlashAttention）。CLI 必须带 `PYTHONUTF8=1`（GBK 崩 emoji）。适用：救已认可内容的 draft 素材、成片最后一道；产出仍要走 look_check（它是重绘细节的修复模型，不是无损放大）。
 
 **本机环境坑（2026-11-03 实录）**：
-1. win 侧 pip/git 配了 `127.0.0.1:7897` 代理且代理常不在——pip 装 包要 `cmd /c "set HTTP_PROXY=& set HTTPS_PROXY=& ... -i https://pypi.tuna.tsinghua.edu.cn/simple"`；GitHub 大文件从 Mac clone 后 tar + scp 过去（同网段走 `<渲染主机SSH别名>` mDNS 直连，**别走 <渲染主机SSH别名>**，3.7GB 会断）。
+1. win 侧 pip/git 配了 `<本地代理端口>` 代理且代理常不在——pip 装 包要 `cmd /c "set HTTP_PROXY=& set HTTPS_PROXY=& ... -i https://pypi.tuna.tsinghua.edu.cn/simple"`；GitHub 大文件从 Mac clone 后 tar + scp 过去（同网段走 `<渲染主机SSH别名-直连>` mDNS 直连，**别走 <渲染主机SSH别名-中转>**，3.7GB 会断）。
 2. 装/换 opencv 类包会被运行中的 ComfyUI 锁 `cv2.pyd`（WinError 5）：先停 ComfyUI 再装。
 3. 重启 ComfyUI 用计划任务 `schtasks /run /tn H3-ComfyUI`；队列服务是 `H3-Queue`（h3q.py 8200，watchdog 自动拉 ComfyUI）。**别手动 Start-Process 抢端口**。
 4. **`gpu.ps1 claim` 的 preempt 会顺带杀掉 h3q 队列进程**（见 19:09 事故，stopping pid … preempted by …，队列 8200 直接死，需要手动 `schtasks /run /tn H3-Queue` 拉回）。手工跑 GPU 任务（如 SeedVR2 CLI）持租约期间，队列渲染会 blocked_vram 等待——任务做完立即 release。

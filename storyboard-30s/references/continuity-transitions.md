@@ -1,6 +1,6 @@
 # 连镜与转场（镜头之间怎么"接"）
 
-> 来源：经典剪辑教材公共知识（cut 语法 / 180° 轴线 / J-cut & L-cut）+ ostris 语料实测。
+> 来源：经典剪辑教材公共知识（cut 语法 / 180° 轴线 / J-cut & L-cut）+ 提示词语料观察（样本约千条，经验量级、未留统计口径）。
 > 大佬材料只给了单镜内部的写法，本文件补"镜头与镜头之间"的规则。
 
 ## 一、剪辑点类型（按频率排序，H3 语料实测）
@@ -55,7 +55,7 @@ the shot changes to / the shot switches to`；dissolve/fade/wipe 仅在用户明
 | 5 | 服装道具连续？ | H3 官方指南明确要求 wardrobe/objects 跨镜一致 |
 | 6 | 运镜方向不打架？ | 刚向左横移，下一镜别立刻向右（除非刻意对冲） |
 
-## 七、语料启示（ostris 1000 条）
+## 七、语料启示（约千条提示词语料，经验量级）
 
 - 高频运镜动词：pushes in(118) > arcs around(94) > static shot(91) > handheld(89) >
   trucks left(70) > pans right(55) > zooms in(39) > tilts up(37) > tracking shot(33) > POV(29)

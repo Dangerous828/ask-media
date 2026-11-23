@@ -4,7 +4,7 @@
 为什么需要
 ----------
 实测：本地 Qwen Image 2.1 在「短词（264 字）+ 挂拼版参考图（角色四视图 + 场景板）」
-条件下，**71.9% 出现「人脸贴片」**——模型把参考图的**版面**当成了构图模板复现。
+条件下曾观察到「人脸贴片」——模型把参考图的**版面**当成了构图模板复现（小样本实测观察（样本与复现命令未随公开版发布））。
 换长词、去掉参考图、或改宫格结构都能消除，但**最省事的是别把拼版图喂进去**。
 本脚本就做这一件事：在提交前把拼版图拦下来。
 
@@ -18,12 +18,12 @@
 **2026-11-01 创作者裁决：层1「贯穿线」判据停用**
 --------------------------------------------
 门框、墙线、栏杆等画面自身的长直线会被误判成拼版分割线（本项目 001 门口场景板实测误拦）。
-创作者要求彻底去掉该判据，视频模态也不例外。`span_lines()` 仅作为历史代码保留，
-不再参与判定，返回的 `span_lines` 恒为 0。现在只剩「多主体面板」告警（不阻断）。
+创作者要求彻底去掉该判据，视频模态也不例外。相关历史代码与对外字段均已删除，
+不再参与判定，也不再展示恒为 0 的计数。现在只剩「多主体面板」告警（不阻断）。
 
 **2026-10-30 现场复测（本机真实资产，两条判据均失效）**
 ----------------------------------------------------------------
-拿本项目实际在用的两张图跑：`gungun_turnaround_v1.jpg`（AI 无缝四视图）与一张
+拿本项目实际在用的两张图跑：`example_turnaround_v1.jpg`（AI 无缝四视图）与一张
 带明显分栏的场景资产板（2560×1440）——**贯穿线 0 条、多主体面板 0 个，三条链路全部 PASS**。
 结论：这套图像判据对"AI 生成的无缝拼版"基本不产生信号。它拦得住的只是**官方那种带显式
 分割线的拼版**（下表 81% 那一行），而那类图在短剧项目里极少当参考喂。
@@ -41,10 +41,10 @@
 
 | 样本集 | n | 层1 贯穿线（阻断） | 层2 多主体面板（告警） | 两层合计 |
 |---|---|---|---|---|
-| 官方带线拼版（props/characters/grid） | 227 | **184 = 81.1%** | 8 = 3.5% | 186 = 81.9% |
+| 官方带线拼版（props/characters/grid） | 227 | **184 = 81.1%** | 8 = 3.5% | 186 = 81.9%（两层合计，按去重计） |
 | **AI 生成的无缝三视图 / 表情板** | 18 | **0 = 0%** ⚠️ | **11 = 61.1%** | 11 = 61.1% |
 | 单张成品 / 关键帧（不该命中） | 12 | 0 | 0 | **0（无误报）** |
-| example-project 其他产物（不该命中） | 506 | 20 = 4.0% | 41 = 8.1% | 57 = 11.3% |
+| example-project 其他产物（不该命中） | 506 | 20 = 4.0% | 41 = 8.1% | 57 = 11.3%（两层合计，按去重计） |
 
 ⇒ 关键结论：**贯穿线只对「带显式分割线的拼版」有效（81%）；
 对「AI 生成的无缝三视图」全军覆没（0/18）。**
@@ -68,7 +68,7 @@
 | example-project S09（单帧）        |   0    | 放 ✓ |
 | **场景四视图（拼版）**      | **0**  | **漏 ⚠️** |
 
-误拦的 16/488 来源：画面自身的长直线（电视边框、墙线、天花板灯带、上下黑边 banner），
+（旧稿此处写「16/488」，为另一统计窗口；以本文件上方实测表的 20/506 为准，两次统计窗口不同，未复算。）误拦来源：画面自身的长直线（电视边框、墙线、天花板灯带、上下黑边 banner），
 不是分割线 —— 单靠几何直线**无法区分**这两者。
 
 判据试错记录（全部否决，别重走）
@@ -132,15 +132,19 @@ for _s in (sys.stdout, sys.stderr):
     except (AttributeError, ValueError):
         pass
 
-import cv2
-import numpy as np
+try:
+    import cv2
+    import numpy as np
+except ImportError as e:
+    sys.stderr.write(
+        "ERROR: 缺少依赖 %s。ref_guard 需要 opencv-python + numpy，"
+        "请先 pip install opencv-python-headless numpy 再运行。\n" % e.name
+    )
+    sys.exit(2)
 
 IMG_EXT = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tif", ".tiff"}
 
-SPAN_RATIO = 0.80        # 【已停用 2026-11-01】贯穿线长度阈值；span_lines() 不再参与判定
-SPAN_THICK = 0.03        # 视为「近似水平/垂直」的厚度容差
 LONG_SIDE_MAX = 768      # 参考图长边上限
-EDGE_BAND = 0.02         # 贴边检测的边框带宽
 
 
 def _load(path: Path):
@@ -154,40 +158,6 @@ def _load(path: Path):
     return img
 
 
-def span_lines(gray):
-    """找贯穿画幅的近似水平/垂直线——拼版分割线的特征。"""
-    h, w = gray.shape
-    edges = cv2.Canny(gray, 50, 150)
-    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, threshold=100,
-                            minLineLength=int(min(h, w) * SPAN_RATIO), maxLineGap=8)
-    hits = []
-    if lines is None:
-        return hits
-    for l in np.asarray(lines).reshape(-1, 4):
-        x1, y1, x2, y2 = (int(v) for v in l)
-        dx, dy = abs(x2 - x1), abs(y2 - y1)
-        if dx > w * SPAN_RATIO and dy < h * SPAN_THICK:
-            hits.append({"dir": "H", "len": dx, "of": w})
-        elif dy > h * SPAN_RATIO and dx < w * SPAN_THICK:
-            hits.append({"dir": "V", "len": dy, "of": h})
-    return hits
-
-
-def edge_contact(gray: np.ndarray) -> float:
-    """画面四边的窄带里，非背景（与画面中位亮度差 >25）像素占比。
-
-    弱提示：主体被画框切到（半张脸/半个身子）时该值会偏高。
-    """
-    h, w = gray.shape
-    b = max(1, int(min(h, w) * EDGE_BAND))
-    med = float(np.median(gray))
-    bands = [gray[:b, :], gray[-b:, :], gray[:, :b], gray[:, -b:]]
-    vals = []
-    for band in bands:
-        vals.append(float((np.abs(band.astype(np.float32) - med) > 25).mean() * 100))
-    return max(vals) if vals else 0.0
-
-
 def multi_subject_panels(gray: np.ndarray,
                          min_pct: float = 0.02,
                          cv_max: float = 0.35,
@@ -199,7 +169,7 @@ def multi_subject_panels(gray: np.ndarray,
       · 主体数 ≥ 2
       · 面积变异系数 σ/μ < cv_max（各面板**几乎等大** → 是摆版，不是构图）
       · 合计占画幅 > sum_min_pct
-    三条同时成立才告警。只告警、不阻断——非拼版仍有 6.3% 命中（见文件头实测表）。
+    三条同时成立才告警。只告警、不阻断——非拼版仍有 8.1% 命中（41/506，见文件头实测表）。
     """
     h, w = gray.shape
     qh, qw = max(1, h // 12), max(1, w // 12)
@@ -245,16 +215,18 @@ def check(path: Path, target_aspect=None, chain="still", prompt_text="") -> dict
     issues = []
     warns = []
 
-    # 2026-11-01：层1「贯穿线」阻断判据已按创作者要求移除（误杀门框/墙线/栏杆等
-    # 画面自身长直线）。span_lines() 保留但不再参与判定，span_lines 恒为 0。
-    hits = []
+    # 2026-11-01：层1「贯穿线」判据已按创作者要求整体移除（误杀门框/墙线等），
+    # 相关死代码与对外恒 0 字段一并删除。现在只剩多主体面板告警。
     ms = multi_subject_panels(gray)
 
     if ms.get("panel"):
         msg = (f"画面里有 {ms['n']} 个**大小相近**的主体（面积变异系数 {ms['cv']}，"
                f"合计占画幅 {ms['sum_pct']}%）→ 疑似无缝拼接的多视图面板")
         if chain == "first_frame":
-            issues.append(msg + "；作首帧/尾帧时并排多主体会被直接画进画面")
+            # 文档自认非拼版的双人/群体/道具同框仍有 8.1% 面板命中，硬阻断会误拦正常双人帧。
+            # 降为强告警 + 人工确认，不再直接 BLOCK。
+            warns.append(msg + "；【强告警】首帧应是单画面，但双人/群体同框亦有 8.1% 命中，"
+                              "请人工确认是否真为拼版，确认后放行")
         elif chain == "still":
             warns.append(msg + "（历史实测：贯穿线判据对这种图 0/18 全漏，靠本条兜；仍不阻断，请人眼确认）")
         else:
@@ -262,15 +234,16 @@ def check(path: Path, target_aspect=None, chain="still", prompt_text="") -> dict
 
     # 图像判据对 AI 无缝拼版实测 0 检出（本机四视图与资产板各测一次，贯穿线均为 0），
     # 所以真正的抓手在正文：挂了参考就核对"有没有说明用途/压制版面"。
-    if chain in ("ref2va", "first_frame"):
-        if prompt_text:
-            if not prompt_suppresses_layout(prompt_text):
-                warns.append("正文里没有版面压制句（no grid lines / no split screen / "
-                             "one continuous frame）。若这批图含多视图板或分镜板，"
-                             "模型可能把版面画进画面；单张人物图可忽略本条")
-        else:
-            warns.append("未传 --prompt：无法核对正文是否说明了参考用途与版面压制。"
-                         "挂多视图板或分镜板时这条必须查（图像判据漏检率极高）")
+    # still 是静帧拼版复现风险最高的链路（h3qg.py 图片提交走 still），同样核对。
+    # 任何链路只要传了 --prompt，就核对版面压制句。
+    if prompt_text:
+        if not prompt_suppresses_layout(prompt_text):
+            warns.append("正文里没有版面压制句（no grid lines / no split screen / "
+                         "one continuous frame）。若这批图含多视图板或分镜板，"
+                         "模型可能把版面画进画面；单张人物图可忽略本条")
+    else:
+        warns.append("未传 --prompt：无法核对正文是否说明了参考用途与版面压制。"
+                     "挂多视图板或分镜板时这条必须查（图像判据漏检率极高）")
 
     if target_aspect:
         try:
@@ -296,7 +269,6 @@ def check(path: Path, target_aspect=None, chain="still", prompt_text="") -> dict
     return {
         "path": str(path),
         "size": [w, h],
-        "span_lines": len(hits),
         "chain": chain,
         "issues": issues,
         "warns": warns,
@@ -352,7 +324,7 @@ def main() -> int:
     else:
         for r in results:
             w, h = r["size"]
-            print(f"{Path(r['path']).name}  ({w}x{h})  贯穿线 {r['span_lines']}  "
+            print(f"{Path(r['path']).name}  ({w}x{h})  "
                   f"{'PASS' if r['pass'] else 'REJECT'}")
             for i in r["issues"]:
                 print(f"   ✗ {i}")

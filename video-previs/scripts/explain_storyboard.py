@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-镜头语言讲解生成器（无AI，规则拼接）：读 storyboard JSON -> 出讲解 Markdown。
+镜头语言讲解生成器（默认规则拼接，可选 --ai 用 GLM 深化）：读 storyboard JSON -> 出讲解 Markdown。
 逐镜头解释景别/机位模式/时长/台词，并附节奏小结。输出默认写到项目 拉片/ 目录。
 用法: python explain_storyboard.py <storyboard.json> [--out out.md]
 """

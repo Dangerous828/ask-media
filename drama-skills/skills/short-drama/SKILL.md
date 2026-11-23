@@ -9,7 +9,7 @@ license: MIT
 
 本技能负责项目初始化、跨阶段路由、制作形态与 Dashboard。各阶段正文由对应 owner 完成。
 
-**与专项技能协作**：资产/分镜 owner持有正式条目，doc-still提供单帧成文与事实核对方法；当前写作者回填同一实际正文。h3-prompt-writing负责实际H3词，工程技能继续其检查与执行。本套件提供项目文档、阶段事实和连续性规则；明确专项任务只读匹配子技能，本主路由用于跨阶段、状态与初始化。不重建既有项目、不循环转派。新项目启用导演中间层；旧项目只有补齐《导演.md》后才进入新契约。
+**与专项技能协作**：资产/分镜 owner持有正式条目，doc-still-prompt 提供单帧成文与事实核对方法；当前写作者回填同一实际正文。h3-prompt-writing负责实际H3词，工程技能继续其检查与执行。本套件提供项目文档、阶段事实和连续性规则；明确专项任务只读匹配子技能，本主路由用于跨阶段、状态与初始化。不重建既有项目、不循环转派。新项目启用导演中间层；旧项目只有补齐《导演.md》后才进入新契约。
 
 
 ## 确定性检查（跑并贴输出，不作放行依据）
@@ -76,9 +76,9 @@ warn 逐条说明处理理由；退出码不作为能否继续的依据。会硬
 隔很多轮才做，所以账必须在第一次生成之前做完。完整规范见
 [场记账](references/continuity-breakdown.md)。
 
-``text
+```text
 剧本 → 资产（先出场景/地点）→ 导演 → 场记 → 分镜 → 图片提示词 → 视频提示词 → 生产
-``
+```
 
 - **产出物**：`设定集/场记.md`，一部戏一份，路径固定在设定集根目录，不按集拆、不按场拆。
   文首写 `- 账本：CONT-V001`，改账换版本。
@@ -143,9 +143,9 @@ warn 逐条说明处理理由；退出码不作为能否继续的依据。会硬
 
 需要项目配置时运行：
 
-``bash
+```bash
 python3 {技能目录}/scripts/project_tool.py init ./my-drama --title "示例短剧"
-``
+```
 
 直接输入已经确认创作者说明语言、提示词语言、画幅、集数或单集目标时长时，首次 `init` 就带上对应的
 `--language`、`--prompt-language`、`--aspect-ratio`、`--episode-count`、`--target-seconds`；只省略
@@ -156,40 +156,40 @@ python3 {技能目录}/scripts/project_tool.py init ./my-drama --title "示例�
 正文语言的影响。档案只接受已发布并已接受的创作者决策，所以是三步，不是一步。先写一行决策记录
 （`accepted_value` 就是要落进 `choices` 的对象本身，不要再包一层 `choices`）：
 
-``jsonl
+```jsonl
 {"decision_id":"CD-H3","status":"accepted","target_locators":[{"src":"short-drama","field":"/creator_authority/production_profile/choices"}],"accepted_value":{"target_video_model":"minimax-h3","video_prompt_dialect":"minimax-h3","video_prompt_language":"en","native_duration_seconds":{"min":4,"max":15},"supported_generation_modes":["first_frame","reference"],"audio_generation":"same_pass"}}
-``
+```
 
 上例是**本机经 h3q 出片**的档案（只有首帧与参考图）；改用云端 H3 API 时，`supported_generation_modes` 换成 H3 方言里的云端推荐值。
 
 再发布、接受、写入：
 
-``bash
+```bash
 python3 {技能目录}/scripts/project_tool.py publish <project> --owner short-drama \
   --artifact-id AR-PROFILE --output "创作者决策/production-profile.jsonl=输入/profile.jsonl"
 python3 {技能目录}/scripts/project_tool.py accept <project> --artifact-id AR-PROFILE --decision accepted
 python3 {技能目录}/scripts/project_tool.py set-authority <project> \
   --field /creator_authority/production_profile/choices \
   --decision-ref "创作者决策/production-profile.jsonl#CD-H3"
-``
+```
 
 各字段取值由命中的模型方言给出：`../short-drama-video-prompts/SKILL.md` 的 MiniMax H3 / Seedance / Wan 3.0 方言文件都写了
 推荐档案。写完用 `status` 复核 `video_model_profile` 是否已经出现。
 
 项目定位与安全写入见 [运行预检](references/runtime-preflight.md)。用户明确要求 Dashboard 时运行：
 
-``bash
+```bash
 python3 {技能目录}/scripts/dashboard_server.py --workspace <workspace> --port 0 --detach --open
-``
+```
 
 `--detach` 让服务进程脱离当前 shell 独立运行，会话结束、终端关闭或智能体退出都不会带走它；
 链接因此在整个创作期间保持有效。运行中的地址、端口和 pid 记录在
 `<workspace>/.short-drama/dashboard.json`（仅本人可读），日志在同目录 `dashboard.log`：
 
-``bash
+```bash
 python3 {技能目录}/scripts/dashboard_server.py --workspace <workspace> --status   # 打印当前链接
 python3 {技能目录}/scripts/dashboard_server.py --workspace <workspace> --stop     # 停止
-``
+```
 
 同一 workspace 已有在跑的 Dashboard 时，再次启动只会打印同一个链接，不再开第二个端口；确实要换
 端口或换令牌时加 `--restart`。不加 `--detach` 时行为不变：前台运行，Ctrl-C 结束。
@@ -234,9 +234,9 @@ Look Development 是可选分支，不是进入图片提示词或分镜的固定
 
 用户问“做完了怎么导出/交付给我”时，用 `export` 打包当前状态：
 
-``bash
+```bash
 python3 {技能目录}/scripts/project_tool.py export <project> --out <项目外目录>
-``
+```
 
 它把每集现有的六份创作文档和 `剧集/<EP>/制作成果/` 复制到 `--out`，附 `manifest.json` 与
 `checksums.sha256`，并排除 `输入/`、`交付/` 和 `.short-drama/`。只要一部分时加

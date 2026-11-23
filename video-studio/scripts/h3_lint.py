@@ -2,7 +2,7 @@
 """h3_lint.py — H3 提示词工程一致性检查。
 
 真实项目的瓶颈不是出图质量，是 H3 提示词的工程一致性。
-《咕角色C嘎》EP01 返修 4 轮卡住的五类问题，qc_image.py 一个都查不出来：
+《示例项目》EP01 返修 4 轮卡住的五类问题，qc_image.py 一个都查不出来：
 
   P0-1  <Picture N> 的定义与使用不一致（Picture 4 已改指父母手部，S04 仍标成客厅背景）
   P0-2  出场主体的参考图未在本场加载（S08 说"笑"的主语没加载图片）
@@ -10,7 +10,8 @@
   P1-1  同一角色的术语漂移（flipper hand / flipper sleeve / right hand）
   P1-3  台词语速超载（字数 ÷ 4.1字/秒 + 2 秒余量 > 段落时长；4.1 与 h3_gate G18 同口径）
 
-本脚本查前 4 类 + 时长；P0-3 只做启发式提示，不做硬判。
+本脚本查前 4 类 + 时长；P0-3 只做启发式提示，归入 p1 警告，不阻断退出码
+（早期实现曾误并进 p0 导致「牵手+挥手」直接 BLOCK，与文档相反，已修）。
 
 用法：
     python3 h3_lint.py <提示词文件或目录>
@@ -94,18 +95,39 @@ def check_picture_definitions(text: str) -> list[str]:
 
 
 def check_reference_loaded(text: str) -> list[str]:
-    """P0-2：出场主体（<Subject N>）在本文件内必须至少有 1 次 <Picture N> 加载。
+    """P0-2：每个出场的 <Subject N> 必须至少有一张 <Picture M> 在其定义句里加载。
 
-    启发式：若文本出现 <Subject 2> 但全文一个 <Picture> 都没有 → 报缺失。
+    修法（S08 事故）：原实现只在「有 Subject 且全文零张 Picture」时报错，
+    查不出「<Subject 2> 缺图但 <Picture 1> 已存在」这类主语参考未加载。
+    现改为编号映射：从 `<Subject N> is ... in <Picture M>` / `<Picture M> ... <Subject N>`
+    等定义句收集 N→{M}，任何出场的 Subject 没有对应 Picture 即报。
     """
     issues = []
-    subs = sorted({int(m) for m in SUBJECT_REF.findall(text)})
-    pics = sorted({int(m) for m in PICTURE_REF.findall(text)})
-    if subs and not pics:
-        issues.append(
-            f"P0-2 出现了 <Subject {subs[0]}...> 但没有任何 <Picture N> 加载；"
-            f"出场主体缺参考图"
-        )
+    subjects = sorted({int(m) for m in SUBJECT_REF.findall(text)})
+    if not subjects:
+        return issues
+
+    loaded = {n: set() for n in subjects}
+    # (a) <Subject N> is ... in <Picture M>（官方主用写法）
+    for m in re.finditer(r"<Subject\s+(\d+)>[^\n]*?\bin\s+<Picture\s+(\d+)>", text):
+        n, pic = int(m.group(1)), int(m.group(2))
+        if n in loaded:
+            loaded[n].add(pic)
+    # (b) <Picture M> ... <Subject N>：同一行/定义句内反向绑定
+    for line in text.splitlines():
+        pics = {int(x) for x in PICTURE_REF.findall(line)}
+        subs = {int(x) for x in SUBJECT_REF.findall(line)}
+        if pics and subs:
+            for n in subs:
+                if n in loaded:
+                    loaded[n].update(pics)
+
+    for n in subjects:
+        if not loaded[n]:
+            issues.append(
+                f"P0-2 出场的 <Subject {n}> 没有在定义句里绑定任何 <Picture M>；"
+                f"主语参考未加载（S08 事故形态：<Picture 1> 存在但主语缺图）"
+            )
     return issues
 
 
@@ -291,10 +313,13 @@ def check_fl2va_single_shot(text: str) -> list[str]:
     if not is_fl:
         return issues
 
-    # 声明了要硬切才放行
+    # 声明了要硬切才放行。词表与 h3-video-gate 的 G28 保持一致（同一 FL2VA 判据，
+    # 写 hard cut / smash cut 等的 FL2VA 在两道闸门下必须同判，不能一处放行一处 P0）。
     declared = any(k in low for k in [
         "the camera cuts to", "the shot cuts to", "the shot transitions to",
         "the shot changes to", "the shot switches to", "cross-dissolve",
+        "hard cut", "smash cut", "jump cut", "match cut", "cuts directly to",
+        "cuts back to", "the scene cuts to", "the camera switches to",
     ])
     # 首尾帧是否被写进不同段（错法）。帧号同样两种写法都要认。
     per_shot = {}
@@ -331,8 +356,8 @@ def lint(path: Path) -> dict:
     p1 = []
     p0 += check_picture_definitions(text)
     p0 += check_reference_loaded(text)
-    p0 += check_physical_heuristic(text)
     p0 += check_fl2va_single_shot(text)
+    p1 += check_physical_heuristic(text)   # P0-3 只做启发式提示，归 p1 不阻断（与模块 docstring 一致）
     p1 += check_terms(text)
     p1 += check_shot_timing(text)
     dialogue_results = check_dialogue_overload(text)

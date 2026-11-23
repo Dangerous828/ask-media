@@ -16,7 +16,11 @@ VHS_LoadVideo（原帧序，force_rate=0）
 ```
 
 - `H3LatentUpscaleLBH` 的 `width/height` 是**像素**目标，内部按 `VAE_DOWN=16` 换算 latent 尺寸；对齐 32 即可。
-- 权重取自 `models/latent_upscale_models/`：`minimax_h3_latent_upscaler_3d_bf16.safetensors`（690 MB）。
+- 权重取自 `models/latent_upscale_models/`：本链路节点 `H3LatentUpscaleLBH` 记录名为
+  `minimax_h3_latent_upscaler_3d_bf16.safetensors`（690 MB）。注意本仓
+  `scripts/mkdraft.py` 的 `MinimaxH3LatentUpscaler3D` 节点写的是 `..._fp16.safetensors`；
+  两者是否为同一权重、渲染机实际文件名以实际部署为准（核对 `models/latent_upscale_models/`），
+  不符会报找不到权重。
 - 纯 video latent 输入也接受（`_streams()` 返回单流时直接放大）；AV latent 输入会原样带过音频流。
 
 **入口一：MCP（推荐）**
@@ -30,6 +34,8 @@ VHS_LoadVideo（原帧序，force_rate=0）
 - 默认 2×，也可显式给 `width`/`height`；`save_path` 缺省 `~/Downloads/h3q/`。
 - 工具自动 ffprobe 源、上传到 `ComfyUI/input/`、生成图、提交、轮询、取回并校验非空。
 - 实测：451f / 768×448 → 1536×896，**165.1 s**，GPU 峰值约 6.8 GB。
+  这是修正前的旧值：1536×896 强拉 16:9 会变形，交付须用 `aspect="16:9"` 得到
+  **1536×864**（见 [`delivery-specs.md`](delivery-specs.md) §2.15）；本实测耗时仅代表该次测量，不代表修正后档位。
 
 **入口二：手工工作流**
 

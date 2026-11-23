@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """视频拉片·白模工作台 后端：静态文件 + 项目扫描 + 跑脚本（无AI，本地）。
-用法: python server.py [--port 8770]   然后浏览器打开 http://localhost:8770
+用法: python server.py [端口]   默认 11872，浏览器打开 http://127.0.0.1:11872
+仅绑定 127.0.0.1 回环，无鉴权设计；请勿把端口转发到公网或局域网。
 """
 import os,json,subprocess,sys,re,urllib.parse,html,threading,shutil,socket,glob,time
 from http.server import HTTPServer,BaseHTTPRequestHandler
@@ -18,13 +19,10 @@ def _find_projects():
         d=nd
     return os.path.abspath(os.path.join(ROOT,"..","..","..",".."))
 VIDEO=_find_projects()
-# 脚本查找顺序：本 Skill 的 scripts（dashboard 在 <skill>/dashboard 时为 ../scripts）→ 工作区 previs_system → 旧 .codex 路径
+# 脚本查找顺序：本 Skill 的 scripts（dashboard 在 <skill>/dashboard 时为 ../scripts）→ 工作区 previs_system。
+# 不再回退旧私有布局（.codex/skills/video-previs/scripts）；公开仓只认本 Skill 的相对位置。
 SKILL=os.path.abspath(os.path.join(ROOT,"..","scripts"))
 SYS=os.path.join(VIDEO,"previs_system")
-# 兼容旧 workbench 布局（server 在 workbench/ 时 SKILL 不存在，回退到工作区 skill）
-if not os.path.isdir(SKILL):
-    alt=os.path.join(VIDEO,".codex","skills","video-previs","scripts")
-    if os.path.isdir(alt): SKILL=alt
 def tool(name):
     for d in [SKILL,os.path.join(SYS,"tools"),os.path.join(SYS,"engine")]:
         f=os.path.join(d,name)
@@ -36,9 +34,10 @@ def load_llm_cfg():
     """启动/保存配置时把 llm_config.json 应用进环境变量（子进程脚本继承）。"""
     try: c=json.load(open(LLMCFG,encoding="utf-8"))
     except Exception: return
-    if c.get("api_key"): os.environ["ZHIPUAI_API_KEY"]=c["api_key"]
-    else:
-        os.environ.pop("ZHIPUAI_API_KEY",None); os.environ.pop("GLM_API_KEY",None)
+    # 显式配了 key 才覆盖环境变量；文件里没有 key 时不碰环境变量，
+    # 否则会清掉用户按环境变量配置、只改过模型的场景（见 issue #15-7）。
+    if c.get("api_key"):
+        os.environ["ZHIPUAI_API_KEY"]=c["api_key"]
     for k,e in [("text_model","GLM_TEXT_MODEL"),("vision_model","GLM_VISION_MODEL"),("base","GLM_BASE")]:
         if c.get(k): os.environ[e]=c[k]
 def under(root,p):
@@ -81,7 +80,7 @@ def scan_projects():
                         for g in gs: arts.setdefault(sub,[]).append(f+"/"+g)
                 else:
                     arts.setdefault(sub,[]).append(f)
-        # 项目根目录散放的产物（如 07_监狱白模3D 的 .blend/.mp4/build_*.py）
+        # 项目根目录散放的产物（如 示例白模工程 的 .blend/.mp4/build_*.py）
         for f in sorted(os.listdir(d)):
             if os.path.isfile(os.path.join(d,f)) and f.lower().endswith(MEDIA_EXT):
                 arts["根目录"].append(f)
@@ -89,9 +88,18 @@ def scan_projects():
     return out
 
 def find_blender():
-    cands=[r"J:\Blender 5.2\blender.exe",r"J:\Blender 5.1\blender.exe",r"J:\Blender 5.0\blender.exe"]
+    # 环境变量优先，便于非 Windows / 自定义安装路径覆盖（见 issue #15-4）。
+    cands=[]
+    env=os.environ.get("BLENDER_EXE","").strip()
+    if env: cands.append(env)
+    # 安装盘符与版本按部署实际情况配置：<Blender安装路径>\blender.exe。
+    # 自定义安装目录写成 <Blender安装根目录> 下的子目录，用环境变量补充，不写死盘符/版本。
+    for root in os.environ.get("BLENDER_SEARCH_DIRS", "").split(os.pathsep):
+        root=root.strip()
+        if not root: continue
+        cands.append(os.path.join(root,"blender.exe"))
+        cands+=glob.glob(os.path.join(root,"Blender *","blender.exe"))
     cands+=glob.glob(r"C:\Program Files\Blender Foundation\Blender *\blender.exe")
-    cands+=glob.glob(r"J:\Blender*\blender.exe")
     for c in cands:
         if os.path.isfile(c): return c
     return None
@@ -128,11 +136,11 @@ class H(BaseHTTPRequestHandler):
             p=safe_dl(q.get("p",[""])[0])
             if p:
                 size=os.path.getsize(p); rng=self.headers.get("Range")
-                if rng:
-                    import re as _re
-                    m=_re.search(r"bytes=(\d+)-(\d*)",rng)
+                m=re.search(r"bytes=(\d+)-(\d*)",rng) if rng else None
+                if m:
                     st=int(m.group(1)); en=int(m.group(2)) if m.group(2) else size-1
                     en=min(en,size-1)
+                    if st>en: st=en  # 畸形 Range 不抛异常
                     self.send_response(206); self.send_header("Content-Type","video/mp4")
                     self.send_header("Content-Range",f"bytes {st}-{en}/{size}")
                     self.send_header("Accept-Ranges","bytes"); self.send_header("Content-Length",str(en-st+1)); self.end_headers()
@@ -169,29 +177,6 @@ class H(BaseHTTPRequestHandler):
             jid=int(q.get("id",["0"])[0])
             with self.JLOCK: j=self.JOBS.get(jid)
             return self._send(200,"application/json; charset=utf-8",json.dumps(j or {"err":"无此任务"},ensure_ascii=False).encode())
-        if u.path=="/api/import_src":
-            body=json.loads(self.rfile.read(ln).decode("utf-8","replace") or b"{}")
-            proj=(body.get("project") or "").replace("/","").replace("\\","")
-            fn=os.path.basename(body.get("name") or "")
-            src=safe_dl(fn)
-            if not proj or not src:
-                return self._send(400,"application/json",json.dumps({"ok":False,"err":"项目或源文件不合法"}).encode())
-            d=os.path.join(VIDEO,"projects",proj,"素材"); os.makedirs(d,exist_ok=True)
-            dst=os.path.join(d,fn)
-            if os.path.exists(dst): return self._send(409,"application/json",json.dumps({"ok":False,"err":"同名文件已存在"}).encode())
-            try: shutil.copyfile(src,dst)
-            except Exception as e: return self._send(500,"application/json",json.dumps({"ok":False,"err":str(e)}).encode())
-            return self._send(200,"application/json; charset=utf-8",json.dumps({"ok":True,"path":"projects/"+proj+"/素材/"+fn},ensure_ascii=False).encode())
-        if u.path=="/api/openblend":
-            body=json.loads(self.rfile.read(ln).decode("utf-8","replace") or b"{}")
-            p=os.path.normpath(os.path.join(VIDEO,body.get("p","")))
-            if not under(VIDEO,p) or not os.path.isfile(p) or not p.lower().endswith(".blend"):
-                return self._send(400,"application/json",json.dumps({"ok":False,"err":"blend 文件不合法"}).encode())
-            try:
-                os.startfile(p)
-                return self._send(200,"application/json; charset=utf-8",json.dumps({"ok":True,"opened":os.path.basename(p)},ensure_ascii=False).encode())
-            except Exception as e:
-                return self._send(500,"application/json",json.dumps({"ok":False,"err":str(e)}).encode())
         if u.path=="/api/file":
             # 读文本文件
             rel=q.get("p",[""])[0]; p=safe_video(rel)
@@ -204,8 +189,10 @@ class H(BaseHTTPRequestHandler):
             if pth:
                 size=os.path.getsize(pth); rng=self.headers.get("Range"); ct={".mp4":"video/mp4",".mp3":"audio/mpeg",".jpg":"image/jpeg",".png":"image/png",".mkv":"video/x-matroska",".mov":"video/quicktime",".wav":"audio/wav",".m4a":"audio/x-m4a",".mp3":"audio/mpeg",".aac":"audio/aac",".ogg":"audio/ogg",".blend":"application/octet-stream",".py":"text/plain; charset=utf-8",".xlsx":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}.get(os.path.splitext(pth)[1].lower(),"application/octet-stream")
                 fh=open(pth,"rb")
-                if rng and "bytes=" in rng:
-                    mm=re.search(r"bytes=(\d+)-(\d*)",rng); st=int(mm.group(1)); en=int(mm.group(2)) if mm.group(2) else size-1; en=min(en,size-1)
+                mm=re.search(r"bytes=(\d+)-(\d*)",rng) if rng else None
+                if mm:
+                    st=int(mm.group(1)); en=int(mm.group(2)) if mm.group(2) else size-1; en=min(en,size-1)
+                    if st>en: st=en
                     self.send_response(206); self.send_header("Content-Type",ct); self.send_header("Accept-Ranges","bytes")
                     self.send_header("Content-Range","bytes %d-%d/%d"%(st,en,size)); self.send_header("Content-Length",str(en-st+1)); self.end_headers()
                     fh.seek(st); left=en-st+1
@@ -228,6 +215,31 @@ class H(BaseHTTPRequestHandler):
         self._send(404,"text/plain",b"404")
     def do_POST(self):
         u=urllib.parse.urlparse(self.path); q=urllib.parse.parse_qs(u.query); ln=int(self.headers.get("Content-Length",0))
+        if u.path=="/api/import_src":
+            body=json.loads(self.rfile.read(ln).decode("utf-8","replace") or b"{}")
+            proj=(body.get("project") or "").replace("/","").replace("\\","")
+            fn=os.path.basename(body.get("name") or "")
+            src=safe_dl(fn)
+            if not proj or not src:
+                return self._send(400,"application/json",json.dumps({"ok":False,"err":"项目或源文件不合法"}).encode())
+            d=os.path.join(VIDEO,"projects",proj,"素材"); os.makedirs(d,exist_ok=True)
+            dst=os.path.join(d,fn)
+            if os.path.exists(dst): return self._send(409,"application/json",json.dumps({"ok":False,"err":"同名文件已存在"}).encode())
+            try: shutil.copyfile(src,dst)
+            except Exception as e: return self._send(500,"application/json",json.dumps({"ok":False,"err":str(e)}).encode())
+            return self._send(200,"application/json; charset=utf-8",json.dumps({"ok":True,"path":"projects/"+proj+"/素材/"+fn},ensure_ascii=False).encode())
+        if u.path=="/api/openblend":
+            body=json.loads(self.rfile.read(ln).decode("utf-8","replace") or b"{}")
+            p=os.path.normpath(os.path.join(VIDEO,body.get("p","")))
+            if not under(VIDEO,p) or not os.path.isfile(p) or not p.lower().endswith(".blend"):
+                return self._send(400,"application/json",json.dumps({"ok":False,"err":"blend 文件不合法"}).encode())
+            try:
+                if not hasattr(os,"startfile"):
+                    return self._send(501,"application/json",json.dumps({"ok":False,"err":"打开 .blend 仅支持 Windows"}).encode())
+                os.startfile(p)
+                return self._send(200,"application/json; charset=utf-8",json.dumps({"ok":True,"opened":os.path.basename(p)},ensure_ascii=False).encode())
+            except Exception as e:
+                return self._send(500,"application/json",json.dumps({"ok":False,"err":str(e)}).encode())
         if u.path=="/api/import":
             proj=q.get("project",[""])[0].replace("/","").replace("\\","")
             fn=os.path.basename(q.get("name",[""])[0])
@@ -257,6 +269,10 @@ class H(BaseHTTPRequestHandler):
                  "vision_model":(body.get("vision_model") or "").strip() or old.get("vision_model","glm-4.5v"),
                  "base":(body.get("base") or "").strip() or old.get("base","https://open.bigmodel.cn/api/paas/v4")}
             json.dump(new,open(LLMCFG,"w",encoding="utf-8"),ensure_ascii=False,indent=1)
+            # clear_key 是唯一显式清除语义：同时清掉文件与进程环境变量。
+            # 仅改模型/key 留空时不清除环境变量里已有的 key（见 issue #15-7）。
+            if body.get("clear_key"):
+                os.environ.pop("ZHIPUAI_API_KEY",None); os.environ.pop("GLM_API_KEY",None)
             load_llm_cfg()
             ok=bool(os.environ.get("ZHIPUAI_API_KEY") or os.environ.get("GLM_API_KEY"))
             return self._send(200,"application/json; charset=utf-8",json.dumps({"ok":True,"configured":ok},ensure_ascii=False).encode())
@@ -265,7 +281,7 @@ class H(BaseHTTPRequestHandler):
             step=body.get("step"); raw=body.get("args",[])
             mp={"shots":"extract_shots.py","subtitles":"extract_subtitles.py","speech":"extract_speech.py",
                 "plan":"plan_coverage.py","render":"dialogue_engine.py","xlsx":"export_storyboard_xlsx.py","dialogue":"export_dialogue.py","explain":"explain_storyboard.py",
-                "lapdoc":"lapian_docs.py","docs":"export_docs.py",
+                "lapdoc":"lapian_docs.py",
                 "fill":"fill_descriptions.py","draft":"draft_storyboard.py","explain_ai":"explain_storyboard.py"}
             if step=="blender_previs":
                 jsp=os.path.normpath(os.path.join(VIDEO,raw[0] if raw else ""))
@@ -384,7 +400,7 @@ class H(BaseHTTPRequestHandler):
         else: self._send(404,"text/plain",b"404")
 if __name__=="__main__":
     load_llm_cfg()
-    port=int(sys.argv[1]) if len(sys.argv)>1 and sys.argv[1].isdigit() else 8775
+    port=int(sys.argv[1]) if len(sys.argv)>1 and sys.argv[1].isdigit() else 11872
     print(f"工作台: http://localhost:{port}")
     HTTPServer(("127.0.0.1",port),H).serve_forever()
 

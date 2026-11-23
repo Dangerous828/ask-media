@@ -81,7 +81,7 @@ v4 的量化结果（`ep01_v4/AUDIT_R3_FINAL.md`）：
 
 A 组全面接近官方 Gemini 基准（0.0 / 4.9 / 84.8 / 10.3 / 7.67）。B、C 全面落后。
 
-→ `build_prompt.py` 五槽拼装**废弃**，只留「剥标签」（标签不进词流是对的，因为官方 264 字效果好不是因为散文，是因为零噪声 token）。
+→ `build_prompt.py` 五槽拼装**不作为规定写法**（仅供自用；修掉两个 bug 后第五轮 nx1_clean 四项全过，见 `MEASURED-第五轮.md` §3.1），本 skill 只保留「剥标签」（标签不进词流是对的，因为官方 264 字效果好不是因为散文，是因为零噪声 token）。整体口径见 `SKILL.md` §三 R3 权威裁决。
 
 ---
 
@@ -170,21 +170,31 @@ A 版重渲一次**完全复现**（切点帧号与 top5 完全一致）⇒ 确�
 | 3 | ffmpeg 默认 vsync 补帧 | 容器 `nb_frames=1065` 却解出 1066 帧，切点整体偏移 1，把真实 20.37 掩盖成 0.36 | 必须加 `-fps_mode passthrough`，并核对 `nb_frames` |
 | 4 | 接缝用绝对阈值 | S01 段内中位 0.57，S02 中位 9.18，同一个 3.5 在两段意义完全不同 | 用**局部动量比** = `seam_mad / max(前段尾12帧中位, 后段头12帧中位)` |
 
-工具在 `example-project/smooth3d/ep01_v4/tools/cut_detect.py`，可直接 `python3 cut_detect.py` 复现全部数字。
+原始切点检测工具 `example-project/smooth3d/ep01_v4/tools/cut_detect.py` 未随公开版发布，本仓无该文件；上述数字与复现命令记录在 `MEASURED-闸门复验.md`，以该文为准。
 
 ---
 
 ## 七、四件套阈值必须按场景分档，不能一套通用
 
+全部档位以 `scripts/qc_image.py` 的 `PROFILES` 为唯一权威（下表仅为速查）：
+
 | 场景 | 死黑 | 暗灰 | 中间调 | 高光 |
 |---|---|---|---|---|
 | `virtual-void`（赛博虚空） | ≤5% | ≤15% | ≥60% | 5–12% |
-| `cartoon3d` | ≤5% | ≤15% | ≥55% | 5–28% |
-| `interior-backlit` | ≤5% | ≤15% | ≥55% | 5–35% |
-| `aerial-landscape` | — | — | — | 按题材本性 |
+| `cartoon3d`（3D 卡通暖柔光） | ≤5% | ≤15% | ≥55% | 5–28% |
+| `interior`（室内中近景，数据不足暂宽档） | ≤10% | ≤30% | ≥40% | 2–30% |
+| `interior-backlit`（室内+过曝窗） | ≤5% | ≤15% | ≥50% | 5–38% |
+| `aerial-landscape`（航拍/远景地景） | ≤5% | ≤28% | ≥50% | 8–30% |
+| `screen-occluded`（主体大面积遮挡） | ≤5% | ≤15% | ≥55% | 1–28% |
+
+数据来源：前两档来自官方 Gemini 9 格 + 角色C EP01 21 张关键帧；
+后三档来自《示例项目》EP01 v4 的 9 段成片实测（S01 逆光窗 / S08 航拍 / S09 双手挡屏各成一档）；
+`interior` 是数据不足时的宽松临时档。各档阈值与题材绑定的理由见 `qc_image.py` 的 `PROFILES` 注释。
 
 **关键实证**：同一批 9 张关键帧，用 `virtual-void` 档判 **1/9 通过**，用 `cartoon3d` 档判 **3/9 通过**。
 角色C高光均值 21.1%（官方 10.3%）是它的画风本性，不是缺陷。
+`cartoon3d` 高光上限 28% 按项目基准复核（角色C P50 16%、P75 35.3%，28% 只覆盖约半数，
+不是"覆盖多数"）；示例项目实测修正建议的角色C档 15–25% 与此处 5–28% 尚未调和，按本片基准取阈值。
 
 另有 `border_dark` 字段（`dead_in_ring` / `dead_in_inner` / `inner_ok`），只记录不门控：
 
@@ -194,21 +204,32 @@ A 版重渲一次**完全复现**（切点帧号与 top5 完全一致）⇒ 确�
 
 ---
 
-## 八、当前真实状态（不要让上游的「完成」误导你）
+## 八、历史状态快照（2026-10-22 写成，仅作当时记录）
 
-### 已就绪 ✅
+> ⚠️ **本节是历史快照，不代表当前状态；以 `SKILL.md` 正文、`MEASURED-第五轮.md` 与 `MEASURED-闸门复验.md` 为准。**
+> 其中「未完成」表里的两条文件格式待办已随 1c0b406 的引用改写失效（见下方说明），不要去找它们。
+
+**引用关系更新（取代本节旧待办）**：本 skill 不再自建 `references/formats/*` 与
+`references/backends/qwen-2.1.md`。对应事实已改挂到仓内已有文档：
+剧本格式 → `../drama-skills/skills/short-drama-write/references/screenplay-format.md`；
+镜头语言 → `../drama-skills/skills/short-drama-storyboard/references/production-shot-grammar.md`；
+资产规范 → `../drama-skills/skills/short-drama-assets/SKILL.md`；
+Qwen 后端档位 → `../h3-queue/references/still-standard-tier-20261105.md`。
+本节下方两行「不存在」是当时实况，现已失效。
+
+### 已就绪 ✅（当时）
 
 - `video-studio` 已注册到 `~/.agents/skills/video-studio`（软链，2026-10-22 补）
 - `qc_image.py` / `h3_lint.py` 实跑通过（本文件写成时复验）
 - v4 九镜关键帧 + 九段视频 + 1099 帧成片全部落盘
 - 成片音轨已修复（`animatic_v4s_audio.mp4`，AAC 48kHz，mean −21.0 dB）
 
-### 未完成 ⬜
+### 未完成 ⬜（当时；状态以 `SKILL.md` 正文为准）
 
-| 项 | 状态 |
+| 项 | 当时状态 |
 |---|---|
-| `references/formats/{script,storyboard,assets,shots}.md` | **四个文件都不存在**（目录为空） |
-| `references/backends/qwen-2.1.md` | 不存在（目录为空） |
+| ~~`references/formats/{script,storyboard,assets,shots}.md`~~ | 已失效：不再自建，改指向仓内 drama-skills 文档（见本节开头引用关系更新） |
+| ~~`references/backends/qwen-2.1.md`~~ | 已失效：改指向 `../h3-queue/references/still-standard-tier-20261105.md` |
 | 第二个 profile | 只有 `3d_anime`，且只在赛博题材跑过 |
 | 出片验收 | 短剧成片已由 short-drama-review 的 look_check / video_check 承担 |
 | ~~`ask-studio` 已停用但根契约未改~~ | 已修：根 `AGENTS.md` 改为“路由已停用，资料保留在 `.archive/ask-studio`”（2026-10-26） |
@@ -222,7 +243,7 @@ A 版重渲一次**完全复现**（切点帧号与 top5 完全一致）⇒ 确�
 |---|---|---|
 | `v5_S02_out.png` | S02 尾帧 / S03 首帧 | 满幅草甸，两小人奔跑，无屏幕黑框 |
 | `v5_S05.png` | S05 尾帧 | 角色C冲向地面金色洞，洞心透出客厅与角色D |
-| `v5_S07.png` | S07 尾帧 | Doro 双手捧橙递出，角色D双手来接 |
+| `v5_S07.png` | S07 尾帧 | 角色A 双手捧橙递出，角色D双手来接 |
 
 创作者三条决定（**不要推翻**）：
 
@@ -242,17 +263,15 @@ A 版重渲一次**完全复现**（切点帧号与 top5 完全一致）⇒ 确�
 
 ## 十、相关文件索引
 
-> 下表相对路径以本 skill 目录（`video-studio/`）为基准；
-> `example-project/...` 开头的以 `~/projects/` 为基准。
+> 下表相对路径以本 skill 目录（`video-studio/`）为基准。
+> 早期记录引用的 `example-project/...`（本地项目目录下的示例项目仓）、`tools/cut_detect.py`、
+> `MEASURED-角色C项目实测.md`、`qc_compare.py` 等**未随公开版发布**，本仓无对应文件，
+> 不要按路径去找；下表只列本仓可读文件，其结论已内联到对应文档。
 
 | 文件 | 内容 |
 |---|---|
 | `结论-提示词体系适用性.md` | 三组实测对照 + 本 skill 哪些组件该留该弃 |
-| `MEASURED-角色C项目实测.md` | 21 张真实关键帧四件套分布、8 步替代 45 步的验证 |
+| `MEASURED-示例项目实测.md` | 真实项目关键帧四件套分布、8 步替代 45 步的验证（即早期 `MEASURED-角色C项目实测.md` 的公开版） |
 | `MEASURED-第一轮.md` / `MEASURED-第二轮.md` / `MEASURED-第三轮.md` / `MEASURED-第五轮.md` | 赛博样本五轮迭代原始数据 |
-| `example-project/smooth3d/ep01_v4/METHOD.md` | v4 五条推导规则（用户认可的「新 skill」） |
-| `example-project/smooth3d/ep01_v4/SHOT_DESIGN.md` | 九镜逐镜设计 + 锚点链自检表 |
-| `example-project/smooth3d/ep01_v4/AUDIT_R3_FINAL.md` | 三轮自审最终结论与四项事实 |
-| `example-project/smooth3d/ep01_v4/H3_TRANSITION_MEASURED.md` | 转场实测报告（本项目最完整的一手数据） |
-| `example-project/smooth3d/ep01_v4/tools/cut_detect.py` | 切点检测工具，可复现全部数字 |
-| `example-project/smooth3d/ep01_v5/CONTINUITY_PLAN.md` | v5 待执行方案 |
+| `MEASURED-闸门复验.md` | 闸门复验与转场/切点实测（内联了早期 `H3_TRANSITION_MEASURED.md` 的结论；原 `cut_detect.py` 未随公开版发布） |
+| `MEASURED-Opus六信号复验.md` | 六信号方案复验、preflight 与段内自溶判据 |

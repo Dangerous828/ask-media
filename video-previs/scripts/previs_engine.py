@@ -4,7 +4,7 @@
 v4: 人物改为带关节的人形骨模(球-棒骨架)，可摆 站立/四肢张开飞/头朝下俯冲 等真实姿态
 用法: python previs_engine.py <storyboard.json> [out.mp4]
 """
-import sys,json,math,os
+import sys,json,math,os,shutil,subprocess
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:
@@ -12,6 +12,23 @@ except Exception:
 import numpy as np
 from PIL import Image,ImageDraw,ImageFont,ImageFilter
 import cv2
+
+def load_font(size):
+    """字体逐级回退：Windows 雅黑 → DejaVuSans → 系统常见字体 → PIL 默认。"""
+    candidates = [
+        r"C:\Windows\Fonts\msyh.ttc",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/Library/Fonts/Arial Unicode.ttf",
+        "/System/Library/Fonts/Supplemental/Arial Unicode.ttf",
+        "/System/Library/Fonts/Helvetica.ttc",
+    ]
+    for path in candidates:
+        try:
+            return ImageFont.truetype(path, size)
+        except (OSError, ValueError):
+            continue
+    return ImageFont.load_default()
+
 
 def np3(*a): return np.array(a,dtype=float)
 def norm(d):
@@ -22,6 +39,24 @@ def Ry(a): c,s=math.cos(a),math.sin(a); return np.array([[c,0,s],[0,1,0],[-s,0,c
 def Rx(a): c,s=math.cos(a),math.sin(a); return np.array([[1,0,0],[0,c,-s],[0,s,c]])
 def Rz(a): c,s=math.cos(a),math.sin(a); return np.array([[c,-s,0],[s,c,0],[0,0,1]])
 SKIN=(222,186,146); LEG=(46,50,58)
+
+def make_h264_writer(out,W,H,fps):
+    """ffmpeg 管道直出 H.264/yuv420p/faststart；无 ffmpeg 报错，不用 mp4v 冒充。"""
+    ff=shutil.which("ffmpeg")
+    if not ff:
+        raise RuntimeError("找不到 ffmpeg：白模一律输出 H.264，请安装 ffmpeg 后重试")
+    cmd=[ff,"-y","-v","error","-f","rawvideo","-pix_fmt","bgr24","-s",f"{W}x{H}",
+         "-r",f"{fps:g}","-i","-","-an","-vf","scale=trunc(iw/2)*2:trunc(ih/2)*2",
+         "-c:v","libx264","-preset","fast","-crf","20","-pix_fmt","yuv420p",
+         "-movflags","+faststart",out]
+    p=subprocess.Popen(cmd,stdin=subprocess.PIPE,stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
+    def wr(fr): p.stdin.write(fr.tobytes())
+    def cl():
+        try: p.stdin.close()
+        except Exception: pass
+        err=p.stderr.read().decode("utf-8","replace") if p.stderr else ""
+        if p.wait()!=0: raise RuntimeError("ffmpeg 编码失败: "+err[-400:])
+    return wr,cl
 
 # 三档本地姿势（局部坐标：+Y上 +Z面朝 ，骨盆原点）
 def pose_stand():
@@ -62,8 +97,8 @@ class Engine:
         s.aerial = cfg.get("scene")=="city_aerial"
         s.fogNear=2.0; s.fogFar=120.0 if s.aerial else 52.0
         s.fogFloor=0.20 if s.aerial else 0.10
-        s.fontL=ImageFont.truetype(r"C:\Windows\Fonts\msyh.ttc",22)
-        s.fontSub=ImageFont.truetype(r"C:\Windows\Fonts\msyh.ttc",28)
+        s.fontL=load_font(22)
+        s.fontSub=load_font(28)
 
     class Cam:
         def __init__(s,pos,tgt,fov,eng):
@@ -342,12 +377,16 @@ class Engine:
         return np.array(img)[:,:,::-1]
 
     def render(s,out):
-        vw=cv2.VideoWriter(out,cv2.VideoWriter_fourcc(*"mp4v"),s.FPS,(s.W,s.H))
+        write,close=make_h264_writer(out,s.W,s.H,s.FPS)
         n=int(s.TOTAL*s.FPS)
-        for f in range(n): vw.write(s.render_frame(f/s.FPS))
-        vw.release(); return n
+        try:
+            for f in range(n): write(s.render_frame(f/s.FPS))
+        finally: close()
+        return n
 
 if __name__=="__main__":
+    if len(sys.argv)<2:
+        sys.exit("用法: python previs_engine.py <storyboard.json> [out.mp4]")
     cfg=json.load(open(sys.argv[1],encoding="utf-8"))
     out=sys.argv[2] if len(sys.argv)>2 else os.path.join(os.path.dirname(sys.argv[1]),"..","out",cfg["project"]+"_白模.mp4")
     out=os.path.abspath(out)

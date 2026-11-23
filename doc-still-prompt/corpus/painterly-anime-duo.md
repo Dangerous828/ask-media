@@ -2,8 +2,7 @@
 
 - 验证状态：**部分通过**（光线/构图/身份成立；品牌文字与画法颗粒未达）
 - 通道：本地 h3q · Qwen Image 2.1，1536×1216，seed 42，cfg 4.5（r1 为 3.5），40 步标准档，无参考图
-- 出图证据：`~/projects/research/t2i-contract-regression-20261106/output/compare-S01-r2.png`（r1 对照在同目录 `-r1`）
-- 原图：`~/projects/recreate-20261106/refs/ref01-deepseek-vs-glm.png`
+- 出图证据：仅本地验证，对比图未随公开版发布
 
 ## 原图观察
 

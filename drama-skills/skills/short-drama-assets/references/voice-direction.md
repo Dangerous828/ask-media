@@ -11,7 +11,6 @@
 - [写出区分度](#写出区分度)
 - [专名发音](#专名发音)
 - [变体：伪装、年龄与跨段变化](#变体伪装年龄与跨段变化)
-- [voice-casting.md 的渲染规则](#voice-castingmd-的渲染规则)
 
 `voice_direction` 是 Character 记录的一部分（`AST-07`），跨集稳定。本场怎么说属于表演，
 由 `$short-drama-write` 的配音本逐句决定。

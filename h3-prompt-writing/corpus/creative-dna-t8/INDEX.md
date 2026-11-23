@@ -1,6 +1,6 @@
 # Creative DNA 机制卡索引（T8 · 全量语料库）
 
-**这不是死仓。** 这里收录 T8 案例库全部文本：284 张机制卡（273 个正式模板 + 9 个官方 Skill + 2 个社区 Skill）、613 条案例原文，共 624 个官方索引条目。验证状态统一为**外部案例机制，本地 h3q 未测**。
+**这不是死仓。** 这里收录 T8 案例库的可检索原文：**624 条可检索条目 = 613 条案例原文 + 9 个官方 Skill + 2 个社区 Skill**；`catalog.json` / [MASTER-INDEX.md](MASTER-INDEX.md) / [search.py](search.py) 均以这 624 条为准。另有 **273 张正式模板卡**仅存在于上游 `catalog-index-source.json` 的 `recommendationEntities`，**未入本地检索索引、search.py 搜不到**（如需检索须先按上游来源补建条目）。本地 `cards/` 目录共 284 个文件（= 9 官方 Skill + 2 社区 Skill + 273 模板卡原文），其中 273 张模板卡原文落在 `cards/` 但不在可检索的 624 条内。验证状态统一为**外部案例机制，本地 h3q 未测**。
 
 ## 三条进来路径
 
@@ -8,9 +8,9 @@
 2. **从写词技能进来**：`h3-prompt-writing/SKILL.md` Workflow 第 5 步 → `corpus/README.md` → 本索引 → 症状表或检索。
 3. **从验收进来**：独立验收按写作阶段留下的锚点逐条核，FAIL 写成带时间码的 Finding 交还 owner；返工换路线可再查卡，但卡的主入口是写作前，不是事后。完整链路实证见 [PRODUCTION-INTEGRATION.md](PRODUCTION-INTEGRATION.md)。
 
-> **卡内 `references/summary.md`、`references/template.md` 是上游 T8mars 原文残留链接，本地未收录**：
-> 卡片是原文逐字收录、自足的，命中后直接读卡内「原文」段与机制锚点，不要去找这两个文件；
-> `cases/`、`cards-community/` 里的 `../creative-dna.json`、`./prompts/...` 同理。
+> **卡内 / 案例内嵌的 `references/summary.md`、`references/template.md` 是上游 T8mars 原文残留链接，本地未收录，属死链**：
+> 卡片与案例是原文逐字收录、自足的，命中后直接读文件内「原文」段与机制锚点，不要去找这两个文件（从 `cards/`、`cases/` 位置解析它们也不存在）；
+> `cases/` 里的 `../creative-dna.json`、`./prompts/...` 同理。这是批量收录的统一头部格式，个别卡片头部不作逐条提示。
 
 ## 全量检索（关键词）
 
@@ -33,8 +33,8 @@ python3 corpus/creative-dna-t8/search.py 关键词 [关键词...]
 
 ## 用卡三步
 
-1. 选卡 → 读该卡的**完整原文**（SKILL.md + summary.md + template.md 逐字收录），不要只看中文摘要。
-2. 导演核完整 template 的不变量、目的与缺失后果，记录采纳/改编理由及承载镜头；资产按需补状态，场记落实状态与接续条件，分镜再给证明时间窗，词继承为可见证据。统一按 [语料机制与剪辑准备](../../../drama-skills/skills/short-drama/references/mechanism-preparation.md)，未定条件不宣称就绪。
+1. 选卡 → 读该卡的**单个 `.md` 全文**（内嵌「原文」段与机制锚点）；本地卡片均以单文件收录，无独立的 `SKILL.md` / `summary.md` / `template.md`，不要去找这三个文件，也不要只看中文摘要。
+2. 导演核卡内原文的 Rule／Purpose／Failure if removed（如有）与机制锚点，记录采纳/改编理由及承载镜头；资产按需补状态，场记落实状态与接续条件，分镜再给证明时间窗，词继承为可见证据。统一按 [语料机制与剪辑准备](../../../drama-skills/skills/short-drama/references/mechanism-preparation.md)，未定条件不宣称就绪。
 3. 写完仍按本地链路走：场记取值 → 六段/三段 H3 方言 → `h3-video-gate` → 出片实看。**卡的英文骨架不是 H3 正文，禁止直接复制投产。**
 
 ## 硬边界

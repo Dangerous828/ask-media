@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """make_manifest.py — 为产物生成可追溯 manifest。
 
-复核指出：产物散落 /tmp 导致 27 张丢失、36 张重算表无法复核。
-每次出图后立刻调用本脚本，落进项目目录。
+产物散落 /tmp 时无法复核（出图后立刻调用本脚本、落进项目目录即可避免）。
+每条 manifest 冻结 profile / 脚本 / 提示词 / 图片的 SHA-256，供事后追溯。
 
 用法：
     python3 make_manifest.py --out <manifest.json> --profile 3d_anime \
@@ -51,6 +51,12 @@ def main() -> int:
         "prompts": [{"path": str(p), "sha256": sha256(Path(p))} for p in args.prompt],
         "images": [{"path": str(p), "sha256": sha256(Path(p))} for p in args.image],
     }
+    # --prompt / --image 的路径不存在时给出干净报错（exit 2），不要抛未捕获的 FileNotFoundError traceback。
+    for p in list(args.prompt) + list(args.image):
+        if not Path(p).is_file():
+            print(f"ERROR: 文件不存在: {p}", file=sys.stderr)
+            return 2
+
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     existing = []

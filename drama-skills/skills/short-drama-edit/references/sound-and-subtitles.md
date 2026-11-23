@@ -141,7 +141,7 @@ Remotion 安装与样式调整见 [Remotion 叠层](../assets/remotion/README.md
 | 混音 | `amix weights=1 1:normalize=0` + `alimiter 0.94`，画面 `-c:v copy` 不重编码 |
 | 复现 | 音符表与增益表都留在项目里，改旋律只动音符表、改平衡只动增益表，**画面不用重跑** |
 
-一个已验证的完整实例在 `~/projects/example-project-ep01/成片/`：`BGM设计.md`（动机与逐段结构）、`bgm/notes.tsv`（162 个音符）、`bgm/render.swift`、`bgm/mix_bgm.py`（按镜头增益表）。做法可整段搬用，旋律按各片自己的主题重写。
+一个本地验证过的完整实例（仅本地验证，产物未随公开版发布）由 `BGM设计.md`（动机与逐段结构）、`bgm/notes.tsv`（162 个音符）、`bgm/render.swift`、`bgm/mix_bgm.py`（按镜头增益表）组成。做法可整段搬用，旋律按各片自己的主题重写。
 
 注意：这条路给的是**可用的一版**，不是影视级作曲。要真正的管弦编制或带人声的歌曲，仍需外部音乐服务；此时按上表把渲染环节换掉，音符表与电平表照旧可用。
 

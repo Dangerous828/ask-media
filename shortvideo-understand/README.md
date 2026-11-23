@@ -54,7 +54,10 @@ shortvideo-understand/
 ├── scripts/
 │   ├── understand.py           # 主编排：平台判定 + 元信息 + 字幕优先 + ASR + 画面层
 │   └── look.py                 # 画面层：视频 URL/本地 → 抽帧 → 多模态描述
+├── tests/
+│   └── test_keep_video.py      # --keep-video 行为回归
 └── lib/chubby_common/          # 就地修正后的公共工具（vendored）
+    ├── __init__.py
     ├── cookies.py              # 零配置浏览器 cookie 探测（按域条数择优）
     ├── deps.py                 # 绝对路径解析（yt-dlp / ffmpeg 不在 PATH 也能找到）
     ├── ytdlp.py                # yt-dlp 封装（cookie / UA / Referer / 重试 / 友好错误）
@@ -79,9 +82,9 @@ shortvideo-understand/
 
 ## 出处
 
-B站/抖音转录链路基于 [chubbyguan/chubbyskills](https://github.com/chubbyguan/chubbyskills) v0.15.0（MIT，`LICENSE` 随包保留）的 `bilibili-transcribe` / `douyin-transcribe`。字幕双扩展名扫描、零配置 cookie 探测、可插拔 ASR 后端、抖音 Cookie 头拼装、可执行文件绝对路径解析，以及画面层 `look.py` 与编排层 `understand.py`，行为定义全部见上文「关键实现说明」。
+本 skill 版本为 1.0.2。B站/抖音转录链路基于 [chubbyguan/chubbyskills](https://github.com/chubbyguan/chubbyskills) v0.15.0（MIT，`LICENSE` 随包保留）的 `bilibili-transcribe` / `douyin-transcribe`。字幕双扩展名扫描、零配置 cookie 探测、可插拔 ASR 后端、抖音 Cookie 头拼装、可执行文件绝对路径解析，以及画面层 `look.py` 与编排层 `understand.py`，行为定义全部见上文「关键实现说明」。
 
-回流上游 PR 时，可在任意位置 `git clone` 上游 v0.15.0 作对照；本机另存有派生仓 `~/projects/vendor/chubbyskills/`（含 `.patch-backup/` 改动前原文件），非运行依赖。
+回流上游 PR 时，可在任意位置 `git clone` 上游 v0.15.0 作对照。
 
 ## 已知边界
 
