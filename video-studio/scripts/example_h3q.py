@@ -154,23 +154,25 @@ def render_via_h3q(prompt_text: str, ref_images: list[str], out_name: str,
                    dry_run: bool = False) -> dict:
     """通过 h3q **队列**出图。返回 {ok, out, raw}。
 
-    steps：0 = 队列默认（档位见 h3-queue/references/still-standard-tier-20261105.md，此处不复述数字）
-           8 = 与队列默认同档，等效于不传（不生成显式 --steps/--cfg，避免重复声明）
-           >0 且 !=8 = 显式 --steps N --cfg 3.5（CFG 与 h3-queue/SKILL.md 默认档一致）
+    steps：0 = 队列默认（档位现状以 h3qc/MCP 实读为准，实测快照见
+           h3-queue/references/still-standard-tier-20261105.md）
+           8 = 已退役 Turbo 档的遗留值：代码将其按默认档处理（不生成显式
+           --steps/--cfg，实际走默认档步数），等效于不传
+           >0 且 !=8 = 显式 --steps N --cfg 3.5（3.5 为回退 40 步档的 CFG，非默认档参数）
     """
     if steps < 0:
         sys.exit("--steps 不能为负数: %d" % steps)
     _require_env()
+    # 危险字符黑名单（PowerShell 拼接无转义体系，拒绝即阻止）：在**上传之前**检查，
+    # 被拒的提交不产生任何远端副作用；--size 与 --out/--label/--refs 一并覆盖。
+    import re as _re
+    for _v in [out_name, label, size] + list(ref_images):
+        if _re.search(r"[\\'\"`;&|<>]", str(_v)):
+            raise ValueError(f"参数含命令拼接字符，拒绝提交: {str(_v)[:60]}")
     with tempfile.TemporaryDirectory() as td:
         pf = Path(td) / f"{Path(out_name).stem}.txt"
         pf.write_text(prompt_text, encoding="utf-8")
         remote_prompt = _scp_up(pf)
-
-        # 参数白名单：值不进引号转义体系（PowerShell 拼接），禁止引号/分号/反引号
-        import re as _re
-        for _v in [out_name, label] + list(ref_images):
-            if _re.search(r"[\\'"'`;&|<>"]', str(_v)):
-                raise ValueError(f"参数含命令拼接字符，拒绝提交: {str(_v)[:60]}")
         refs = ",".join(ref_images) if ref_images else ""
         args = [
             "submit", "--kind image",

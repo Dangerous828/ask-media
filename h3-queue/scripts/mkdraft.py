@@ -65,8 +65,9 @@ def add_upscale(g):
     n300, n301, n302, n303, n304 = _alloc_ids(g, 5)
     g[n300] = {"class_type": "LTXVSeparateAVLatent",
                 "inputs": {"av_latent": [ids["SamplerCustomAdvanced"], 0]}}
-    # 权重名（fp16 / bf16）在本仓与 latent-upscale.md 记录不一致；渲染机实际文件名
-    # 以实际部署为准（核对 models/latent_upscale_models/），不符时改这里再出图。
+    # 权重名与 latent-upscale.md 的记录分属两条链路（本文件 3D upscaler 用 fp16、
+    # LBH 链用 bf16），非同一权重；部署机核对 models/latent_upscale_models/ 实际
+    # 文件名，不符时改这里再出图。
     g[n301] = {"class_type": "MinimaxH3LatentUpscaler3D",
                 "inputs": {"latent": [n300, 0],
                            "model_name": "minimax_h3_latent_upscaler_3d_fp16.safetensors",

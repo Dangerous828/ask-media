@@ -143,7 +143,7 @@ def hybrid_check(bands: dict, base_bands: dict) -> dict:
 
 
 # 仅作 measure()/基准加载的函数默认参数值；main() 要求显式给 --qc-profile 或 --baseline，
-# 不会静默套用。保留常量是为了兼容直接调用 measure() 的旧脚本，不代表存在「默认档」。
+# 不会静默套用。measure() 的 profile 默认参数仅为兼容旧脚本保留，CLI 已强制显式档（--qc-profile 或 --baseline），两者不代表存在「默认档」。
 DEFAULT_PROFILE = "virtual-void"
 
 # 灾难线（任何档都必须过）：死黑 ≤40%。熵不作门控，只作记录。

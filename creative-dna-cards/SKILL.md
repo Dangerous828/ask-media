@@ -27,7 +27,7 @@ python3 ../h3-prompt-writing/corpus/creative-dna-t8/search.py 关键词 [关键�
 
 脚本按官方中文标题、机制、摘要、标签、适用面匹配，输出原文路径。全量标题清单在 `../h3-prompt-writing/corpus/creative-dna-t8/MASTER-INDEX.md`；按症状精选的入口在 `../h3-prompt-writing/corpus/creative-dna-t8/INDEX.md`。
 
-命中后**只读一张卡**：本地卡片均为 `../h3-prompt-writing/corpus/creative-dna-t8/cards/` 下的**单个 `.md`**，读该文件的全文（内嵌的原文段、机制、摘要与模板正文）即可；不存在独立的 `SKILL.md` / `summary.md` / `template.md`，不要去找它们，也不要只看中文摘要。
+命中后**只读一张卡**：本地卡片为**单个 `.md`**——绝大多数在 `../h3-prompt-writing/corpus/creative-dna-t8/cards/`，另有 4 篇精修卡在 `../h3-prompt-writing/corpus/creative-dna-t8/` 顶层，读该文件的全文（内嵌的原文段、机制、摘要与模板正文）即可；不存在独立的 `SKILL.md` / `summary.md` / `template.md`，不要去找它们，也不要只看中文摘要。
 
 ## 给回什么
 

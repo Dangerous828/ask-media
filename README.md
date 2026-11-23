@@ -91,7 +91,7 @@ for skill in drama-skills/skills/*/; do ln -s "$PWD/$skill" "$HOME/.claude/skill
 
 - 本仓库自有技能：[MIT License](LICENSE)，Copyright (c) 2026 Dangerous828。
 - 随仓附带的三方技能保留各自许可：
-  - `drama-skills/`：MIT，Copyright (c) 2026 drama-skills contributors。本地改写分叉，上游 [zenstory-ai/drama-skills](https://github.com/zenstory-ai/drama-skills)（上游最新 v0.13.0 / commit 7fed9df，2026-11-22），vendored 时点未记录，同步上游前先比对上游 CHANGELOG。
+  - `drama-skills/`：MIT，Copyright (c) 2026 drama-skills contributors。本地改写分叉，上游 [zenstory-ai/drama-skills](https://github.com/zenstory-ai/drama-skills)（上游最新 v0.13.0 / commit 7fed9df，2026-11-22）；本仓 vendored 于 2026-11-02（收编时点，此后为本地改写分叉），同步上游前先比对上游 CHANGELOG。
   - `shortvideo-understand/`：自研 skill；`lib/chubby_common` 复用 Chubby 代码（MIT，Copyright (c) 2026 Chubby）。
   - `humanizer/`：CC BY-NC 4.0，Copyright (c) 2026 shiujan，仅限非商业使用；商用授权见 [lieflat.work](https://lieflat.work/skills/less-ai-tone/)。
   - `frontend-design/`：Apache-2.0，来源 [anthropics/skills](https://github.com/anthropics/skills)。

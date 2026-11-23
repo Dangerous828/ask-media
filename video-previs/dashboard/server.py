@@ -17,7 +17,7 @@ def _find_projects():
         nd=os.path.dirname(d)
         if nd==d: break
         d=nd
-    # 不再静默回落四级父目录：找不到含 projects/ 的目录就停在 dashboard 自身位置，
+    # 不再静默回落四级父目录：找不到含 projects/ 的目录就停在技能目录（dashboard 上一级），
     # 首页显示空项目引导（index.html 有新建引导），避免误扫无关目录。
     return os.path.abspath(os.path.join(ROOT, ".."))
 VIDEO=_find_projects()
