@@ -230,7 +230,7 @@ Toonflow 原文要的是「亮暗过渡柔和、暗部不死黑」，对应的�
 `sk_grid09` 死黑 80.6% / 熵 5.00 就是这个机制。熵保留作记录。
 
 ```bash
-# 档位必须显式给（QC 无默认档：套错题材档会静默误判，实测同一批图默认档 1/9 vs 正确档 3/9）
+# 档位必须显式给（QC 无默认档：套错题材档会静默误判，实测同一批图用出图默认档错判 1/9 vs 用正确题材档 3/9）
 python3 scripts/qc_image.py <图片或目录> --qc-profile cartoon3d
 
 # 介质信号（四带查不出的那一半：粒子密度/体积光/噪点），相对基准、默认只告警
@@ -379,6 +379,7 @@ A/B 两版同 PASS，真真切镜就这样漏过了闸门。现在 `check_fl2va_
 ```bash
 # 在 Windows 上跑（h3qc 与队列同机）
 # h3qc.py 为渲染机侧私有脚本，须另行部署（见 h3-queue §8）
+# 尺寸与种子为示例，非缺省
 python h3qc.py submit --kind image \
   --prompt-file p.txt --out <渲染机产物目录>\o.png \
   --size 1344x768 --seed 42 --label my-shot \
@@ -388,7 +389,7 @@ python h3qc.py submit --kind image \
 - 出图默认档按实读方法查 [still-api-params.md](../h3-queue/references/still-api-params.md) 与 [h3-queue 出图章节](../h3-queue/SKILL.md)，此处不复述数字；为什么如此见 [档位实测快照](../h3-queue/references/still-standard-tier-20261105.md)（2026-11-05）
 - **负向仅 `cfg>1` 档位生效**（档位现状以 `h3qc`/MCP 实读为准，查法见 [still-api-params.md](../h3-queue/references/still-api-params.md)）：cfg=1 档位 `--negative` 无效（分层见 [still-api-params.md](../h3-queue/references/still-api-params.md)「术语与分层」节，此处不重复），排除项写进正文正向、不依赖 negative；
   `--fast` 仍被接受但被忽略。档位配置与退役档记录详见 `h3-queue` §2.7 与上述档位实测文档
-- **身份板、资产板**参考图按项目侧预处理约定（非通道限制）压到长边 768 + JPEG q80；**首帧、起始状态与构图参考**按目标画布无损 PNG 上传，不要压（short-drama adapter 已自动区分）
+- **身份板、资产板**参考图按项目侧预处理约定（非通道限制，见 `scripts/ref_guard.py` 的参考图检查说明与 `MEASURED-Opus六信号复验.md` 第 3 项）压到长边 768 + JPEG q80；**首帧、起始状态与构图参考**按目标画布无损 PNG 上传，不要压（short-drama adapter 已自动区分）
 - **要挂参考图就走 `h3qg.py`**（= h3qc + 提交前闸门）：`python h3qg.py submit ...`
 - **`--idem-key` 必须含 seed / 输出名**：同 prompt 换 seed 是不同活，
   只按 label 去重会让后续提交被静默吞掉（实测：12 张提交只渲出 4 张）
