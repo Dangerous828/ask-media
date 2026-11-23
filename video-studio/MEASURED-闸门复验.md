@@ -95,8 +95,9 @@ A 版重渲一次**完全复现**（切点帧号与 top5 完全一致）⇒ 确�
 **复现条件（关键：文件必须结构完整，否则被别的规则先挡下，掩盖缺口）**
 
 ```bash
+# 以下命令**以仓库根为工作目录**（所以是 scripts/… 不是 ../scripts/…）
 # 双帧 + 三段式，首行写成 "Picture 1 is the first frame ..." 而不是官方那句 "aligns with the ... mark"
-python3 ../scripts/h3_lint.py /tmp/lintchk2/full1.txt          # 修复前 exit=0 ✗
+python3 scripts/h3_lint.py /tmp/lintchk2/full1.txt          # 修复前 exit=0 ✗
 python3 h3-video-gate/scripts/h3_gate.py /tmp/lintchk2/full1.txt --frames 107 --strict   # 修复前 exit=0 ✗
 ```
 
@@ -191,8 +192,8 @@ is_fl = (1 in pics and 2 in pics) or (has_align and len(pics) >= 2)
 cd <本地项目目录>/example-project/smooth3d/ep01_v4/tools && python3 cut_detect.py
 
 # 闸门退出码（P0-4 / G28 / G21）
-python3 ../scripts/h3_lint.py /tmp/lintchk2/full1.txt;         echo $?   # 1
-python3 ../scripts/h3_lint.py /tmp/lintchk2/official_single.txt; echo $? # 0
+python3 scripts/h3_lint.py /tmp/lintchk2/full1.txt;         echo $?   # 1
+python3 scripts/h3_lint.py /tmp/lintchk2/official_single.txt; echo $? # 0
 python3 h3-video-gate/scripts/h3_gate.py /tmp/lintchk2/full1.txt --frames 107 --strict
 # 在仓库根执行，先进入 h3-video-gate/
 cd h3-video-gate && python3 -m pytest tests/ -q                                   # 28 passed
@@ -201,7 +202,7 @@ cd h3-video-gate && python3 -m pytest tests/ -q                                 
 cd <本地项目目录>/example-project/smooth3d/ep01_v4/h3_prompts && stat -f '%Sm %N' -t '%H:%M:%S' *_*.txt
 
 # 回滚
-mv ../scripts/h3_lint.py.bak-20261022-1518 ../scripts/h3_lint.py
+mv scripts/h3_lint.py.bak-20261022-1518 scripts/h3_lint.py
 mv h3-video-gate/scripts/h3_gate.py.bak-20261022-1523 h3-video-gate/scripts/h3_gate.py
 ```
 

@@ -5,7 +5,7 @@
 > **卡片内的链接口径**：`cases/` 与 `cards/` 下的卡片是**上游原文逐字收录**，正文里的 `[Creative DNA](./creative-dna.json)`、
 > `[MiniMax H3](./prompts/minimax-h3.md)`、`[Seedance 2.0](./prompts/seedance-2.0.md)`、`references/summary.md`、
 > `references/template.md` 等**指向上游仓的结构**（上游有 `prompts/`、`references/`、`locales/`、`preview.gif`，本仓只收文本）。
-> 这些链接在本仓**解析不到文件**（见下一条的逐项口径）；为了保住"逐字收录"没有改原文。
+> 这些链接在本仓**解析不到文件**（逐项口径见本索引「卡内 / 案例内嵌……」那一段）；为了保住"逐字收录"没有改原文。
 > 原文块里的 `"skill_ref": "../../../skills/<名字>"` 同理：上游的技能目录本仓没有，但**同名机制卡在
 > `cards/<名字>.md`**，需要读那份就按这个名字去找；`locales/zh-CN.json`、`locales/en.json`、`preview.gif`
 > 是上游条目的清单字段（不是本仓文件），留着是为了保持与上游数据一致。

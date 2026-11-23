@@ -193,7 +193,7 @@ video-studio/          ← 只有算法，不含阈值
 - 无 `--qc-profile` 且无 `--baseline` → **退出码 2**，并提示可用档位
 - 代码里仍保留模块级 `DEFAULT_PROFILE = "virtual-void"`，它**只是 `measure()` 的函数默认参数值**，
   兼容旧脚本直接调用；`main()` 强制显式给档或基准，不读取该常量作默认档，故不算“默认档复活”
-- 项目侧新增 `qc/profile.json` 声明本片档位（项目实测文件，未随公开版发布）（example-project 已建，档位 `cartoon3d`）
+- 项目侧新增 `qc/profile.json` 声明本片档位（example-project 已建，档位 `cartoon3d`；项目实测文件，未随公开版发布）
 
 验收：不给档位被拒 ✓；显式 `--qc-profile cartoon3d` 正常输出 3/9 ✓。
 

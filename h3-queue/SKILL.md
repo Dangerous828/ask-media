@@ -125,8 +125,7 @@ $PY -s $CLI submit --kind image \
 `--engine` 选 H3-Image 权重；省略时走上面的 Qwen Image 2.1 通路。
 现役只保留 W4A8 一档（社区量化 Q4_K_M 已从脚本移除）。用
 `qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors` 文本编码器与
-`minimax_h3_image_vae_fp16.safetensors`，`MiniMaxH3ImageConditioning` + Euler/simple，
-实测时点（2026-11-05）为 6 步 / CFG 1.0。
+`minimax_h3_image_vae_fp16.safetensors`，`MiniMaxH3ImageConditioning` + Euler/simple；步数与 CFG 的实测时点见 [still-standard-tier-20261105.md](references/still-standard-tier-20261105.md)。
 
 | engine | 权重 | loader |
 |---|---|---|
