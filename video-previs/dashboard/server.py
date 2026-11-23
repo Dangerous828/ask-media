@@ -8,17 +8,19 @@ from http.server import HTTPServer,BaseHTTPRequestHandler
 try: sys.stdout.reconfigure(encoding="utf-8")
 except Exception: pass
 ROOT=os.path.dirname(os.path.abspath(__file__))
-# projects/ 与脚本目录：向上查找（dashboard 可在 Skill 内或独立 workbench 内）
+# projects/ 与脚本目录：从 dashboard 目录向上查找（Skill 内嵌、独立 workbench 两种布局都在 3 层内）。
+# MAX_UP 是上溯层数的保护上限，不是"允许回落多少层"；命中必须存在 projects/ 目录。
+MAX_UP=6
 def _find_projects():
     d=ROOT
-    for _ in range(6):
+    for _ in range(MAX_UP):
         cand=os.path.join(d,"projects")
         if os.path.isdir(cand): return d
         nd=os.path.dirname(d)
         if nd==d: break
         d=nd
-    # 不再静默回落四级父目录：找不到含 projects/ 的目录就停在技能目录（dashboard 上一级），
-    # 首页显示空项目引导（index.html 有新建引导），避免误扫无关目录。
+    # 上溯 MAX_UP 层仍未找到含 projects/ 的目录：停在技能目录（dashboard 上一级），
+    # 首页显示空项目引导（index.html 有新建引导），不静默上溯到无关目录。
     return os.path.abspath(os.path.join(ROOT, ".."))
 VIDEO=_find_projects()
 # 脚本查找顺序：本 Skill 的 scripts（dashboard 在 <skill>/dashboard 时为 ../scripts）→ 工作区 previs_system。

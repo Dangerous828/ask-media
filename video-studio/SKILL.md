@@ -386,7 +386,7 @@ python h3qc.py submit --kind image \
 
 - 队列默认档位见 [h3-queue 档位实测](../h3-queue/references/still-standard-tier-20261105.md)，此处不复述数字
 - **负向仅 `cfg>1` 档位生效**（档位现状以 `h3qc`/MCP 实读为准）：cfg=1 档位 `--negative` 被静默丢弃，排除项写进正文正向、不依赖 negative；
-  `--fast` 仍被接受但被忽略。档位与回退配置详见 `h3-queue` §2.7 与上述档位实测文档
+  `--fast` 仍被接受但被忽略。档位配置与退役档记录详见 `h3-queue` §2.7 与上述档位实测文档
 - **身份板、资产板**参考图压到长边 768 + JPEG q80（实测压后画面更干净）；**首帧、起始状态与构图参考**按目标画布无损 PNG 上传，不要压（short-drama adapter 已自动区分）
 - **要挂参考图就走 `h3qg.py`**（= h3qc + 提交前闸门）：`python h3qg.py submit ...`
 - **`--idem-key` 必须含 seed / 输出名**：同 prompt 换 seed 是不同活，

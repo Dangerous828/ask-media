@@ -22,8 +22,8 @@ import urllib.error
 import urllib.request
 
 BASE = "http://127.0.0.1:8199"
-# 必须设为渲染机上 ComfyUI 的实际 output 绝对路径；默认相对路径 "ComfyUI/output"
-# 只在 ComfyUI 根目录作为当前目录运行时成立，换目录运行会拷错地方。
+# 必须设为渲染机上 ComfyUI 的实际 output 绝对路径。本脚本不提供默认值：相对路径
+# "ComfyUI/output" 只在 ComfyUI 根目录作为当前目录运行时成立，换目录运行会拷错地方。
 if not os.environ.get("COMFYUI_OUTPUT"):
     sys.exit("必须设置 COMFYUI_OUTPUT 为渲染机 ComfyUI 的实际 output 绝对路径"
              "（默认相对路径只在一个特定工作目录成立，故不再提供默认值）")

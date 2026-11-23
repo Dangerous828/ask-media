@@ -116,8 +116,9 @@ $PY -s $CLI submit --kind image \
 ```
 
 - `--size` 是真实采样画布 `WxH`，宽高向下对齐到 32 的倍数，最小各 32；输出不再自动做 center crop。**要作视频首帧或参考的关键帧，按目标视频画布出**（`768x1344` / `1344x768` / `1024x576` 等）。
-  当前 MCP 部署默认 `2k-16x9=2752x1536`（env `H3Q_IMAGE_SIZE`），是横屏；竖屏 2K 显式给 `2k-9x16=1536x2752`。
-- 缺省值由渲染机/MCP 部署定义，**以实现实读为准**（`h3qc submit --help` / MCP schema / 覆盖键 `H3Q_IMAGE_*`，见 [still-api-params.md](references/still-api-params.md)）；实测时点为 CFG 3.5、无 LoRA、`steps=0` 按参考选 40/45 步。可显式设置 `cfg`、`steps`、`loras`、`resolution`，不自动叠加 Turbo LoRA。
+  尺寸缺省由部署覆盖键 `H3Q_IMAGE_SIZE` 决定（`2k-16x9` / `2k-9x16` 是具名横/竖档，具体像素值以实现实读为准）；
+  要竖屏出图显式给 `--size 2k-9x16` 或直接给 `WxH`。
+- 缺省值由渲染机/MCP 部署定义，**以实现实读为准**（`h3qc submit --help` / MCP schema / 覆盖键 `H3Q_IMAGE_*`，见 [still-api-params.md](references/still-api-params.md)）；实测时点（2026-11-05）为 CFG 3.5、无 LoRA、`steps=0` 按参考选 40/45 步，仅作该日快照。可显式设置 `cfg`、`steps`、`loras`、`resolution`，不自动叠加 Turbo LoRA。
 - 图片分支会丢弃 `out_width` / `out_height`（视频尺寸）；`refine_denoise` / `refine_steps` 可透传给图片二采，见下方「出图（MiniMax H3-Image）」。
 - 带参考图：`--refs a.png,b.png`（CLI 文件须已在 ComfyUI 的 `input/`；MCP 上传本地源文件，见 §2.8）。`resolution=0` 默认按原参考尺寸编码，模型仍对齐 32；它控制参考编码，不替代 `size` 指定的采样画布。
 - **负向仅在 `cfg>1` 生效**（`negative_prompt: negative if cfg > 1.0 else ""`）。显式 `cfg=1` 仍受尊重，此时 MCP 对非空 negative 返回无效提示。

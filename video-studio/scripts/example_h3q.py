@@ -20,7 +20,7 @@
         ref_images=["kf_s04_anime_sunlit.png", ...],   # ComfyUI input/ 里的文件名
         out_name="kf_s05_v2_surprised.png",
         seed=2040,
-        steps=0,          # 0 = 队列默认；传 45 则显式 --steps 45 --cfg 3.5（对齐 h3-queue SKILL 默认 CFG）
+        steps=0,          # 0 = 走队列默认档；传 N>0 则显式 --steps N --cfg 3.5（线性 CFG 取值，与步数无关）
     )
 
 命令行：
@@ -158,7 +158,8 @@ def render_via_h3q(prompt_text: str, ref_images: list[str], out_name: str,
            h3-queue/references/still-standard-tier-20261105.md）
            8 = 已退役 Turbo 档的遗留值：代码将其按默认档处理（不生成显式
            --steps/--cfg，实际走默认档步数），等效于不传
-           >0 且 !=8 = 显式 --steps N --cfg 3.5（3.5 为回退 40 步档的 CFG，非默认档参数）
+           >0 且 !=8 = 显式 --steps N --cfg 3.5（固定配线性 CFG 3.5，与步数无关；
+           档位现状按 h3qc/MCP 实读，见 h3-queue/references/still-standard-tier-20261105.md）
     """
     if steps < 0:
         sys.exit("--steps 不能为负数: %d" % steps)
