@@ -76,7 +76,7 @@ for skill in drama-skills/skills/*/; do ln -s "$PWD/$skill" "$HOME/.claude/skill
 
 ## 出图口径
 
-出图的默认档、回退档、权重文件名与默认尺寸的**唯一权威位置**是 [`h3-queue/references/still-standard-tier-20261105.md`](h3-queue/references/still-standard-tier-20261105.md) 与 [`h3-queue/references/delivery-specs.md`](h3-queue/references/delivery-specs.md)。其余各处（README、`video-studio/SKILL.md`、`example_h3q.py` docstring、`still-api-params.md`、`doc-still-prompt/CHANGELOG`）只引用该口径，不再各自写数字；仍有分歧的实测值标「待实测确认」。
+档位事实的权威是**渲染机实现**（h3q/h3qc/MCP server），文档只写实读方法（`h3qc submit --help` / MCP schema / 部署覆盖键 `H3Q_IMAGE_*`，见 [`still-api-params.md`](h3-queue/references/still-api-params.md)）。[`still-standard-tier-20261105.md`](h3-queue/references/still-standard-tier-20261105.md) 与 [`delivery-specs.md`](h3-queue/references/delivery-specs.md) 是带日期的实测快照（解释档位为什么如此、含退役档记录）；其余各处只引用读法，不另写数字。
 
 ## 说明
 

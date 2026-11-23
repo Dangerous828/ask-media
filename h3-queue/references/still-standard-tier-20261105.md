@@ -1,11 +1,11 @@
 # 生图标准档实测：40 步 / CFG 3.5（2026-11-05）
 
-> **权威口径**：现行缺省档 = 基础模型 `qwen_image_2.1_int8_convrot`、CFG 3.5、
-> `steps=0`（渲染器按是否带参考选 40/45 步）、无 LoRA（`loras=none`）；这是
-> [`../SKILL.md` §2「出图（Qwen Image 2.1）」](../SKILL.md) 与
-> [`still-api-params.md`](still-api-params.md) 的唯一口径，任何其它"档位"说法以它为准。
-> 本文是 2026-11-05 的历史 A/B 实测，只解释"为什么标准档是 40 步 / CFG 3.5"
-> 和 CFG 与负向通道的关系；Turbo 蒸馏档已退役（见 §三），不存在"现行缺省 Turbo 8 步"。
+> **本文性质**：2026-11-05 的档位实测快照，解释「为什么默认档如此」（40 步 / CFG 3.5 的 A/B 依据、
+> CFG 与负向通道的关系、Turbo 蒸馏档退役记录）。它**不是运行时口径**——档位现状以实现实读为准：
+> `h3qc submit --help`（渲染机）、MCP `h3_generate_image` schema、部署覆盖键
+> `H3Q_IMAGE_CFG/_STEPS/_LORAS/_RESOLUTION/_SIZE`（见 [still-api-params.md](still-api-params.md)）。
+> 实测时点的缺省 = 基础模型 `qwen_image_2.1_int8_convrot`、CFG 3.5、`steps=0`（按是否带参考选 40/45 步）、无 LoRA；
+> Turbo 蒸馏档已退役（见 §三），不存在"现行缺省 Turbo 8 步"。
 > `cfg=1` 无负向通道，排除项须写正文正向或用 `cfg>1` 的 `--negative`，否则会被静默丢弃。
 
 本机 <渲染主机SSH别名>（RTX 5070 Ti 16GB），Qwen Image 2.1 `qwen_image_2.1_int8_convrot`，

@@ -2,7 +2,7 @@
 
 > 适用范围：本公开仓库的目录结构与技能；文中提及的私有中枢（`git.example.com/skills.git`）、SSH 签名、入 Hub 钩子与 `sync-skills.sh` 属作者本机分发流程，未随公开版发布，读者按自己的客户端安装即可。
 > 本文件只保存根级路由与必要纪律。阶段写法、模型参数、执行命令与实测边界由对应 skill 及 references 持有，根文件不复制参数表。
-> **出图档位与交付规格的唯一权威位置**：`h3-queue/references/still-standard-tier-20261105.md` 与 `h3-queue/references/delivery-specs.md`；其余各处只引用该口径，不另写数字。
+> **档位事实的权威链**：渲染机实现（h3q/h3qc/MCP server）是唯一运行时源；文档不持有档位数字，只写**实读方法**——`h3qc submit --help`（渲染机）、MCP `h3_generate_image` schema、部署覆盖键 `H3Q_IMAGE_CFG/_STEPS/_LORAS/_RESOLUTION/_SIZE`（见 `h3-queue/references/still-api-params.md`）。`still-standard-tier-20261105.md` 是解释「档位为什么如此」的实测快照（带日期、退役档一并记录），不是运行时口径；其余各处只引用读法，不另写数字。
 
 ## 套件内外分工
 
