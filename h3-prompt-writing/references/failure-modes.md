@@ -126,8 +126,8 @@ subject_definitions:
    这是段内身份锚的正确做法，等价于 FL2VA 的尾帧锁，但没有运动谷副作用。
 3. **`<Picture N>` 有三种合法角色**（`ref-en.txt:62-72`）：首帧 / keyframe / **storyboard reference**
    （只定观点与站位，不做逐像素约束）。只要首帧不写尾帧 = I2VA 行为，运动不被钉死；
-   判据来自真真：`Use first/last-frame ... when continuity is more important than visual novelty`
-   （`creative-workflows.md:71`）——**连续性优先才挂帧，新信息优先就别挂**。
+   判据来自官方文档原文：`Use first/last-frame ... when continuity is more important than visual novelty`
+   （MiniMax H3 官方 `creative-workflows.md`，该文档未随本仓发布；`ref-en.txt:62-72` 的同源摘录在本目录）——**连续性优先才挂帧，新信息优先就别挂**。
 4. **切点措辞只用枚举**：`the camera cuts to` / `the shot cuts to` / `the shot transitions to` /
    `the shot changes to` / `the shot switches to`（`base-en.txt:89-92`）；每个切点必须带来
    subject/space/state/viewpoint/time 五类新信息之一，只改距离或小角度 ⇒ 改用运镜。
