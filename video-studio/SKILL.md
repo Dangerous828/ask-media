@@ -76,11 +76,11 @@ description: 短剧/动画出图的验收与工程检查工具箱。当明确用
 
 | 你手上 / 想做什么 | 阶段 | 读 |
 |---|---|---|
-| 一个点子、梗概、或要改编的小说 | 剧本 | `references/formats/script.md`（待补） |
+| 一个点子、梗概、或要改编的小说 | 剧本 | [剧本格式规范](../drama-skills/skills/short-drama-write/references/screenplay-format.md) |
 | 明确用 H3 起草剧本、现成剧本进入 H3 制作、选画风或询问 H3 适不适合 | 剧本适配 | **先读 [H3 剧本适配参考](references/craft/h3-script-fit.md)**；逐场定位实际风险，按证据等级提出保留剧情作用的拍法；作者原文与剧情分叉按参考中的规则处理 |
 | 剧本有了，要拆成镜头／反馈拆太散或拼接生硬 | 分镜与连续段 | **开工前必读** [连续段规划](references/craft/sequence-planning.md)；独立短片同时核 `short-film-scene-continuity` 场景账。再交 `short-drama-storyboard`（独立时间区间表用 `storyboard-30s`） |
-| 分镜有了，要拆角色/场景/道具 | 资产 | `references/formats/assets.md`（待补） |
-| 要写某张图 / 某个资产板的提示词 | 图片提示词 | `references/formats/assets.md`（待补） + `profiles/<画风>.md` |
+| 分镜有了，要拆角色/场景/道具 | 资产 | [资产三类规范](../drama-skills/skills/short-drama-assets/SKILL.md) |
+| 要写某张图 / 某个资产板的提示词 | 图片提示词 | [资产三类规范](../drama-skills/skills/short-drama-assets/SKILL.md) + `profiles/<画风>.md` |
 | 要写视频提示词 | 视频提示词 | **`references/official/ref-en.txt`**（Ref2VA）或 **`base-en.txt`**（T2VA/I2VA/FL2VA/L2VA） |
 | 要选/换画风 | 风格 | `references/craft/visualStyles.md` → 落到 `profiles/` |
 | 要把分镜行翻译成单帧提示词 | 单帧 | `references/craft/imagePromptCraft.md` |
@@ -472,10 +472,10 @@ projects/<剧名>/
 | `references/craft/visualStyles.md` | 选画风、建 profile、8 维度决策表 |
 | `references/craft/imagePromptCraft.md` | 分镜行 → 单帧提示词的字段映射 |
 | `references/craft/videoPromptCraft.md` | 通用首帧/首尾帧五段式 |
-| `references/formats/script.md` | 剧本规范（待补） |
-| `references/formats/storyboard.md` | 分镜拆解规范（待补） |
-| `references/formats/assets.md` | 角色/场景/道具三类规范（待补） |
-| `references/backends/qwen-2.1.md` | Qwen 后端标定（待补） |
+| [剧本格式规范](../drama-skills/skills/short-drama-write/references/screenplay-format.md) | 剧本规范（由 short-drama-write 持有） |
+| [镜头语言与拆解](../drama-skills/skills/short-drama-storyboard/references/production-shot-grammar.md) | 分镜拆解规范（由 short-drama-storyboard 持有） |
+| [资产三类规范](../drama-skills/skills/short-drama-assets/SKILL.md) | 角色/场景/道具三类规范（由 short-drama-assets 持有） |
+| [Qwen 出图档位实测](../h3-queue/references/still-standard-tier-20261105.md) | Qwen 后端标定（由 h3-queue 持有） |
 | `profiles/<画风>.md` | 六槽填好的画风档案 |
 | `MEASURED-第一轮.md` | 本轮实跑数据与结论 |
 | `MEASURED-EP001读法前置-20261102.md` | 写分镜/提示词前查“读法前置”10 条与两个失败案例（逆行、自言自语像对别人抱怨） |
@@ -501,9 +501,9 @@ projects/<剧名>/
 
 | 项 | 为什么重要 |
 |---|---|
-| `references/formats/shots.md`（待补） | 五槽填写规范散在散文里，脚本无法校验必填槽 |
-| `references/formats/` 资产三类 | character/scene/prop 规范还没抄进来 |
-| `references/backends/qwen-2.1.md`（待补） | 后端标定数据未落文档 |
+| [五段式规范](references/craft/videoPromptCraft.md) | 五段式已在该文档；必填槽的**脚本校验**仍缺（规范散在散文里，尚未结构化到可校验） |
+| 资产三类规范 | 已由 [short-drama-assets](../drama-skills/skills/short-drama-assets/SKILL.md) 承担，不再在本技能内另建副本 |
+| Qwen 后端标定 | 已由 [h3-queue 的档位实测](../h3-queue/references/still-standard-tier-20261105.md) 承担，不再在本技能内另建副本 |
 | profile 删「叙事世界」槽 | 现在写着「当代温暖都市」，是题材不是画风，做古装要新建 profile |
 | profile 加「构图与运动」 | 【景别机位】无画风依据（扁平风禁虚化、真人给 24/35/50/85mm 语义） |
 | 第二个 profile | 只有 3d_anime，且只在赛博题材上跑过 |
@@ -529,6 +529,6 @@ projects/<剧名>/
 1. 9 格 × 3 seed = 27 张，四件套通过 ≥7/9，且无灾难格（死黑 >40%）
 2. 产物带 manifest
 3. ≥2 个 profile，其中 1 个在非赛博题材上跑过
-4. `formats/shots.md`（待补）存在且脚本校验必填槽
+4. 五段式规范（[videoPromptCraft.md](references/craft/videoPromptCraft.md)）结构化到脚本可校验必填槽
 
 **当前 4 项均未满足**（第 2 项已实现脚本但未全面应用）。

@@ -78,8 +78,6 @@ for rel in sorted(all_files):
                     or PLACEHOLDER.match(ref) or PROJECT_ARTIFACT.match(ref)
                     or '/' not in ref):
                 continue
-            if '待补' in line:   # 文档自标的未创建占位文件
-                continue
             if os.path.exists(os.path.join(ROOT, dirn, ref)):
                 continue
             norm = os.path.normpath(ref)
