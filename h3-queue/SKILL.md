@@ -68,7 +68,7 @@ pdd 的 `draft → final` 是两次完整采样，**没有 pass-1 latent 接续*
 
 ## 输入能力与续接职责
 
-本地短剧 adapter 接受以下互斥组合；真实生产前核对当前服务端白名单与渲染路径，客户端有参数不等于该部署端到端已验证。**本节及§2.8 是文档层通道能力的权威声明**：其他技能的档位/模式说明一律引用本节及§2.8，不另维护一套能力表；文档层契约不等于运行时真值，能力与档位数字仍以渲染机实读为准（见本章开头「版本口径」与 `h3qc submit --help`）。
+本地短剧 adapter 接受以下互斥组合；真实生产前核对当前服务端白名单与渲染路径，客户端有参数不等于该部署端到端已验证。**本节与「short-drama-produce 接入口」（§2.8 → `produce-adapter.md`）是文档层通道能力的权威声明**：其他技能的档位/模式说明一律引用这两处，不另维护一套能力表；文档层契约不等于运行时真值，能力与档位数字仍以渲染机实读为准（见本章开头「版本口径」与 `h3qc submit --help`）。
 
 | 输入组合 | 可承担的职责 | 未由此保证的内容 |
 |---|---|---|
@@ -80,7 +80,7 @@ pdd 的 `draft → final` 是两次完整采样，**没有 pass-1 latent 接续*
 
 **首帧/首尾帧一律走非 pdd 分支，不走 pdd draft（视频）档**：`pdd_lu` 调的 `pdd_render_ref.py` 没有 `--first-frame`/`--last-frame`，走它会导致首帧对不上（MAD 实测对照见 [transcard.md](references/transcard.md) 与 [incidents.md](references/incidents.md) §2026-11-22）。现在按输入自动分流：`h3_generate_video` / 项目 adapter 只要带 `first_frame` 就落到 `h3_render_ref.py`（单首帧→i2va，首尾帧→fl2va），不再拼 `--workflow pdd_lu`；只挂 `refs` 的全参考组任务照旧走 pdd draft/final。两帧按渲染器语义传 ComfyUI `input/` 里的**裸文件名**；经 h3q 提交时 `sol_profile` 缺省落 `off`。**转场卡直接用 `scripts/transcard.py`，别手搓命令**——见 references/transcard.md。项目内的活（produce 那条路）还要先把两端帧过参考准入（`look_check` assess→review→approve --use reference），`ref_gate` 会把未批准的帧挡成 `reference_not_accepted`；`transcard.py` 是通道级工具，不替你走这道准入。
 
-`draft → final` 是两次完整采样（见上文与 [produce-adapter.md](references/produce-adapter.md) §2.8），`final` 产出新 take、无 latent 可续；交付前须对 final 本身重新验收。图像精修不保证对白、口型或声线正确。
+`draft → final` 是两次完整采样（见上文与 [produce-adapter.md](references/produce-adapter.md) 的「视频档位」节），`final` 产出新 take、无 latent 可续；交付前须对 final 本身重新验收。图像精修不保证对白、口型或声线正确。
 
 ## 2. 怎么提交
 
@@ -116,7 +116,7 @@ $PY -s $CLI submit --kind image \
   要竖屏出图显式给 `--size 2k-9x16` 或直接给 `WxH`。
 - 缺省值的读法见本节开头的通用口径；2026-11-05 的实测快照见 [still-standard-tier-20261105.md](references/still-standard-tier-20261105.md)。可显式设置 `cfg`、`steps`、`loras`、`resolution`，不自动叠加 Turbo LoRA。
 - 图片分支会丢弃 `out_width` / `out_height`（视频尺寸）；`refine_denoise` / `refine_steps` 可透传给图片二采，见下方「出图（MiniMax H3-Image）」。
-- 带参考图：`--refs a.png,b.png`（CLI 文件须已在 ComfyUI 的 `input/`；MCP 上传本地源文件，见 §2.8）。`resolution=0` 默认按原参考尺寸编码，模型仍对齐 32；它控制参考编码，不替代 `size` 指定的采样画布。
+- 带参考图：`--refs a.png,b.png`（CLI 文件须已在 ComfyUI 的 `input/`；MCP 侧由服务自己上传本地源文件，该服务不入本仓）。`resolution=0` 默认按原参考尺寸编码，模型仍对齐 32；它控制参考编码，不替代 `size` 指定的采样画布。
 - **负向仅在 `cfg>1` 生效**；阈值定义与负向丢弃的分层见 [still-api-params](references/still-api-params.md)「术语与分层」节，此处不重复。显式 `cfg=1` 仍受尊重。
 - `seed=0` 是有效种子，保留原值。同秒同 label/seed 的独立 MCP 调用各用唯一请求目录和输出名；仅显式复用 `idem_key` 才复用队列任务。
 

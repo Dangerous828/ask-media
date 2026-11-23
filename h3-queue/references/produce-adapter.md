@@ -11,7 +11,7 @@
   - **`first_frame` / `last_frame` 与 `may_control` 含"起始/首帧/构图/状态"的参考 → 原生尺寸 PNG，绝不重编码。** 这些就是交付像素本身；只在长边超过 `H3Q_REF_LONG_EDGE`（默认 2048，纯安全上限）时才缩。重编码经过见 [incidents.md](incidents.md) 对应节（sips/JPEG 缺陷已修）。
   - **身份／造型／道具／场景板 → 长边 768 + JPEG q80（保持实测口径，不动）。** `../../video-studio/SKILL.md` 与 `ref_guard.py` 记着：压完画面更干净，因为板卡噪点不再被放大。该实测出自 Qwen Image 2.1 Turbo 生图（8 步／CFG 1.0／1024×576，4–5 张参考），**H3 视频侧尚未两侧确认**，所以在 A/B 出结论前不因"看起来更保真"就抹掉它。
   - **做实验**：`H3Q_REF_LOSSLESS=all` 强制全 PNG，`=0` 强制全 JPEG。
-  - 张数不再构成压缩理由：显存峰值与参考图张数无关（见 §2.8），`ref_image_size: match` 本来就把每张归一到输出面积。
+  - 张数不再构成压缩理由：显存峰值与参考图张数无关（2/6 张同为 ~15.5 GiB 的实测见 [incidents.md](incidents.md) §2026-11-08），`ref_image_size: match` 本来就把每张归一到输出面积。
 - 严格按 `reference_bindings` 数组顺序上传。视频接受 **`reference_image` / `first_frame` / `last_frame`** 三种角色（旧文档写"只接受前两种"已过期），其余角色 fail closed；互斥关系由 adapter 强制并有测试覆盖：`last_frame` 必须配 `first_frame`（FL2VA 是两帧插值）；`last_frame` 与 `reference_image` 互斥；`first_frame` 与 `reference_image` 互斥。
 - **输入能力**统一见本技能「输入能力与续接职责」：单首帧、首尾配对、全参考互斥，没有参考视频/音频或无图文生，不接受任意 graph。档位由 `parameters.tier` 决定。单帧视觉接力不等于整段视频上下文续接，上游档案与所选组合保持一致。
 - 图片把 `<Picture N>`、用途、允许／禁止控制范围追加到实际提示词。视频逐字使用来源中的三段或六段正文，参考定义和保留范围由该正文承载，不在段落外追加元数据契约。

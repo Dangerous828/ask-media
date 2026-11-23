@@ -45,7 +45,7 @@
 
 **multishot 段的硬约束**：服务端 multishot 分支不接受 `tier=final`（没有 pdd 二采；v2 内建超分在本机 16G 发糊、固定 `output_scale=1`）。**透传清单以实际部署为准**：完整参数见 [`h3-multishot.md`](h3-multishot.md) §2.14 与 adapter `short_drama_h3q_adapter.py` 的 `multishot_argv()`——除 width / height / frames_per_shot / shot_count / seed / steps 外，还含 `--reference-image-size` / `--reference-subjects` / `--auto-chunk-ffn` 以及 `scene_video` / `scene_video_start` / `scene_video_seconds` / `--model` / `bank_clip_frames` / `audio_pin_frames` 的端到端透传；不要按这里的旧短清单判断参数是否被支持。**2026-11-15 起 multishot 走 v2 `H3MultishotMemorySampler`（§2.14）**，该采样器**有**内建 latent 超分参数（`upscale_model_name=(H3 latent x1.5/x2)` + `output_scale`），但本机 16G 实测内建超分**发糊不可用**（见记忆 h3-v2-latent-upscale-bad-on-16g），故渲染器固定 `output_scale=1 / (none)`；这类素材要画质，只能走「成品帧回编码 + 低 σ refiner」或「像素域时序超分」/ §2.11 后处理。
 
-**升 final 必须锁 1536×864**（`width*height > 1536*864` 面积判据硬拒 1536×896），16 GB 一手峰值只验过 362 f。pdd draft→final 为何不是精修接续（无 pass-1 latent、lu2 字段已下线）见 [`../SKILL.md`](../SKILL.md)「两条通道的档位语义」；实测数字在 [incidents.md](incidents.md) §2026-11-06/§2026-11-07。
+**升 final 必须锁 1536×864**（`width*height > 1536*864` 面积判据硬拒 1536×896），16 GB 一手峰值只验过 362 f。pdd draft→final 为何不是精修接续（无 pass-1 latent、lu2 字段已下线）见 [`../SKILL.md`](../SKILL.md)「两条通道的档位语义」；首帧取上一段末帧的实测见 [incidents.md](incidents.md) §2026-11-04。
 
 **R2 生成层实测（2026-11-15，独立 reviewer 完整播放验收 = REVISE）**：**定格句与时间线写满在画面层生效**（画面持续微动作、不是定格）；**尾段静默是生成层模型行为，修复走后期合成（需创作者授权 DSP），不是改提示词或 `self_anchor_voice`**。逐帧 MAD、音频收束曲线、切点解剖、REV-001/002、4/4 不达标等完整经过见 [incidents.md](incidents.md) §2026-11-15 R2。
 

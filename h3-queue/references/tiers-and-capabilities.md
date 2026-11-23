@@ -28,5 +28,5 @@
 `height=720 is not a multiple of 32`。用 1248×704、1312×736、1344×768、768×1344。
 
 **PDD 竖屏支持（2026-11-20 新增，example-project 9:16）**：`pdd_render_ref.py` 用 `--width/--height` 覆盖首采（横屏 argv 不变），`h3q.py` pdd_lu 分支已透传；MCP `_pdd_argv` 仅 width<height 时传首采，MCP 改动需重连才生效（重连前可直连 `h3qg.py submit --workflow pdd_lu --width ... --height ... --no-upscale`）。
-**推荐尺寸**：draft 首采 **576×992**、final 二采 **832×1440**（对 896×1536 基准的 aspect 差均 <2%）；896×1536 面积超 1536×864 上限会被拒。⚠️ **竖屏 draft 与 final 首采不是同一画布**（832×1440 → 544×960，宽高比差约 2%），**draft 只验表演/动作、不验构图**；要"草稿即成片构图"须让两条路径首采同尺寸（改 MCP `_pdd_argv`，需单独授权）或按 §2.8 把 draft/final 当两次完整采样分别验收。尺寸推导与核验经过见 [incidents.md](incidents.md) §2026-11-15 档位对齐，结论见 [`pdd-offline-recipe.md`](pdd-offline-recipe.md)。
+**推荐尺寸**：draft 首采 **576×992**、final 二采 **832×1440**（对 896×1536 基准的 aspect 差均 <2%）；896×1536 面积超 1536×864 上限会被拒。⚠️ **竖屏 draft 与 final 首采不是同一画布**（832×1440 → 544×960，宽高比差约 2%），**draft 只验表演/动作、不验构图**；要"草稿即成片构图"须让两条路径首采同尺寸（改 MCP `_pdd_argv`，需单独授权）或按 `../SKILL.md`「两条通道的档位语义」把 draft/final 当两次完整采样分别验收。尺寸推导与核验经过见 [incidents.md](incidents.md) §2026-11-15 档位对齐，结论见 [`pdd-offline-recipe.md`](pdd-offline-recipe.md)。
 
