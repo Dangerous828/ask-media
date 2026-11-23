@@ -137,7 +137,7 @@ S05(相邻镜 Subject 数 / 道具)规格里标为不做,脚本没有实现。�
 显存看门狗。下面只保留与提示词正确性有关的事实：
 
 - 帧数 17k+5 @24fps:5, 22, …, 124, 141, 158, …, 243, …,本地安全上限 362(15s,与 G25 一致);节点 length 网格上限 3592(≤3600f)。非网格值会被向上取整,导致提示词时间码与实际时长错位、尾镜/台词被截;闸门 G12 就是为此。
-- 几何:宽高须为 32 的倍数。**单次原生采样面积上限 1344×768(横屏)/ 768×1344(竖屏)**,超过无收益(官方:H3 训练在约 1MP)。这是**单次采样**的原生上限,不是所有通道的交付上限:pdd 二采上限 1536×864、竖屏 final 832×1440 等是不同通道的交付尺寸,由 `h3-queue/references/produce-adapter.md` 与 `tiers-and-capabilities.md` 各自核对,不受此行约束。
+- 几何:宽高须为 32 的倍数。**单次原生采样面积上限 1344×768(横屏)/ 768×1344(竖屏)**,超过无收益(官方:H3 训练在约 1MP)。这是**单次采样**的原生上限,不是所有通道的交付上限:pdd 二采上限 1536×864、竖屏 final 832×1440 等是不同通道的交付尺寸,由 `../h3-queue/references/produce-adapter.md` 与 `tiers-and-capabilities.md` 各自核对,不受此行约束。
 - 机械过闸只证明格式；出片后由 `short-drama-review` 的媒体验收先画风后剧情裁决，闸门 PASS 不是质量结论。
 
 ### 闸门留档（每次真实提交都要有一份可复核的证据）
@@ -160,11 +160,11 @@ SHA 的 `manifest.json`（含 `checker_source`、argv、context、`exit_code`）
 > 完整参数与实测见 [h3-queue](../h3-queue/SKILL.md)。本技能只列与提示词/闸门判断相关的部分。
 
 - **引擎只保留 `pdd`**（2026-11-15 起）：`lu2` / `legacy` 已下线，adapter 与 server 两条校验路径都会拒。
-- **一采画布**：`pdd` 缺省 1024×576（模板锁定）；16 GB 卡上限是**面积判据 1536×864（1,327,104 px）**，竖屏 832×1440（1,198,080 px）在内。以上为 2026-11-23 时点快照；现行缺省与上限以实现实读为准（渲染机 `h3qc submit --help` 与 `h3-queue/references/produce-adapter.md` §2.8）。
+- **一采画布**：`pdd` 缺省 1024×576（模板锁定）；16 GB 卡上限是**面积判据 1536×864（1,327,104 px）**，竖屏 832×1440（1,198,080 px）在内。以上为 2026-11-23 时点快照；现行缺省与上限以实现实读为准（渲染机 `h3qc submit --help` 与 `../h3-queue/references/produce-adapter.md` 的「视频档位」节）。
 - **`sol-profile` 默认 `off`**：Sol 加速档比 off 慢 3.5% 且构图会跑掉，一律不要开。2026-11-23 时点快照；现行以实现实读为准。
 - **`pdd_lu` 二采**：转发 `--out-width/--out-height`，362 帧到 1536×864 约 832 秒。2026-11-23 时点快照；现行以实现实读为准。
 - **`--tile-size` 必须为 0**：空间分块让每个 tile 各自重想内容，产生镜像/重复纹样（实测判废）。
-- **带首帧/首尾帧的任务不走 `pdd_lu`，因此没有二采**：`pdd_render_ref.py` 没有 `--first-frame`/`--last-frame`。`h3_generate_video` 与项目 adapter 现在按输入分流——带 `first_frame` 就落默认分支 `h3_render_ref.py`（单首帧 i2va、首尾帧 fl2va），只有挂 `refs` 的全参考组任务才走 pdd draft/final。默认分支没有二采档，要升分辨率走 `h3_upscale_video` 后处理放大（纯 latent 放大、无第二遍扩散、构图与音轨原样保留）。转场卡做法见 `../h3-queue/references/transcard.md`。**本地 h3q 支持 FL2VA（首尾帧插值）**——通道能力与实测见 `h3-queue/SKILL.md`「输入能力与续接职责」（2026-11-22 同首尾帧/同 107f/同 seed 的 pdd_lu 首帧 MAD 43.0 vs 非 pdd 分支 3.86）；本节只限 pdd_lu 分支不能带首/尾帧，不等于本地不支持尾帧。
+- **带首帧/首尾帧的任务不走 `pdd_lu`，因此没有二采**：`pdd_render_ref.py` 没有 `--first-frame`/`--last-frame`。`h3_generate_video` 与项目 adapter 现在按输入分流——带 `first_frame` 就落默认分支 `h3_render_ref.py`（单首帧 i2va、首尾帧 fl2va），只有挂 `refs` 的全参考组任务才走 pdd draft/final。默认分支没有二采档，要升分辨率走 `h3_upscale_video` 后处理放大（纯 latent 放大、无第二遍扩散、构图与音轨原样保留）。转场卡做法见 `../h3-queue/references/transcard.md`。**本地 h3q 支持 FL2VA（首尾帧插值）**——通道能力与实测见 `../h3-queue/SKILL.md`「输入能力与续接职责」（2026-11-22 同首尾帧/同 107f/同 seed 的 pdd_lu 首帧 MAD 43.0 vs 非 pdd 分支 3.86）；本节只限 pdd_lu 分支不能带首/尾帧，不等于本地不支持尾帧。
 - **多窗容器请求总帧数上限 451 帧**（总帧 = 每窗×窗数−（窗数−1），窗间共享 1 帧；早先「约 450 帧」为取整口径）：这是显存物理上限；adapter 对显式 `workflow=multishot` 只告警不拦截，超限 OOM 风险自负。
 - **切点时长**：本地安全档 4–15 秒（16G 容量/训练范围）；15 秒经 24fps/17k+5 向上吸附为 362 物理帧（15.083 秒）。节点 length 可到 5–3600 帧，超 362f 属容量/质量风险而非字段违规。
 

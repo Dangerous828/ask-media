@@ -151,12 +151,12 @@ for rel in sorted(all_files):
     with open(os.path.join(ROOT, rel), encoding='utf-8') as fh:
         text = fh.read()
     for lineno, line in enumerate(text.splitlines(), 1):
-        refs = []          # markdown 链接 + 反引号里的每个路径 token
+        refs = []          # (路径, 是否 markdown 链接)
         for m in LINK.finditer(line):
             ref = m.group(1)
             # 链接可能带页内锚点（file.md#section）：校验时只看文件部分。
             # 不剥离会让每个带锚点的链接都被判成断链（纯工具误报）。
-            refs.append(ref.split('#', 1)[0])
+            refs.append((ref.split('#', 1)[0], True))
         for m in BACKTICK.finditer(line):
             inner = m.group(1)
             if inner.startswith(('http://', 'https://', 'ftp://')):
@@ -164,13 +164,13 @@ for rel in sorted(all_files):
             # 反引号内容一律按路径 token 逐个解析——不要求「整段以扩展名结尾」。
             # 早期只匹配「整段就是一条路径」的写法，`python x.py a/b.txt --refs 3`
             # 这类以参数结尾的命令整段被漏掉，其中的错误路径因此全部逃检。
-            refs.extend(t.group(1) for t in PATH_TOKEN.finditer(inner))
+            refs.extend((t.group(1), False) for t in PATH_TOKEN.finditer(inner))
         # 正文裸路径：抹掉反引号内容、链接目标与 URL 后，剩下的路径写法也要解析
         plain = re.sub(r'`[^`]*`', ' ', line)
         plain = re.sub(r'\]\([^)]*\)', ' ', plain)
         plain = re.sub(r'https?://\S+', ' ', plain)
-        refs.extend(m.group(1) for m in BARE_PATH.finditer(plain))
-        for ref in refs:
+        refs.extend((m.group(1), False) for m in BARE_PATH.finditer(plain))
+        for ref, is_link in refs:
             checked += 1
             if ('*' in ref or '\\' in ref or '<' in ref or '>' in ref or '{' in ref
                     or PLACEHOLDER.match(ref)):
@@ -188,7 +188,10 @@ for rel in sorted(all_files):
             if os.path.exists(os.path.join(ROOT, dirn, ref)):
                 continue
             norm = os.path.normpath(ref)
-            if norm in all_files:
+            # markdown 链接按惯例是「相对本文件」，不做仓库根兜底——兜底会把
+            # `h3-queue/xxx.md` 这类漏写 ../ 的链接判成有效，读者点开却是 404。
+            # 反引号里的路径允许仓库根写法（正文常按仓库根称呼文件）。
+            if not is_link and norm in all_files:
                 continue
             # 套件根相对：drama-skills 文档里以技能名为首段的路径，实际在 drama-skills/skills/ 下
             suite_ref = os.path.join('drama-skills', 'skills', norm)
