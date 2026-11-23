@@ -4,8 +4,7 @@
 
 **split 引擎（现默认）**：`lu_render_ref.py` 的 pass2 换成 `MMH3 Ultimate Upscale` 单节点管线（bbaudio-2025/Comfyui-MMH3-UltimateUpscale，已装 `E:\...\custom_nodes\Comfyui-MMH3-UltimateUpscale`）：`MMH3TemporalSplitParams(chunk 136/overlap 17) → MMH3LatentUpscaleWithModelParams(3D upscaler 1344×768) → 主节点（每时间块整帧重采样，噪声掩膜保形，frame-0 钉源 + 颜色匹配）`。`--upscale-engine legacy3d` 可回退旧行为。
 
-- **⚠️ 空间分块必须关（`--tile-size 0`，2026-11-04 起客户端默认已是 0）**：2026-11-03 实测 512px tile（1344×768 → 3×2）时每 tile 主体按 conditioning 各自重绘，**左右 tile 画出同款舞者/对称人群（镜像伪影），成片判废**；破 ~300 帧上限靠时间分块就够，整帧采样显存无压力（legacy2 全段 1344×768×40 latent 帧原生采样本就通过），tile 版反而更慢（717s vs 整帧 385s）。
-  - **历史 bug（已修）**：`h3qc.py` 的 `--tile-size` 默认曾是 **512**，而 `h3q.py` lu2 分支只要参数存在就无条件透传，于是"默认档"实际把空间分块打开了，`lu_render_ref.py` 自己的 0 默认被覆盖。**任何在 2026-11-04 之前不带显式 `--tile-size 0` 跑的 final，都要复检有无镜像伪影。**
+- **⚠️ 空间分块必须关（`--tile-size 0`，2026-11-04 起客户端默认已是 0）**：破 ~300 帧上限靠时间分块就够，整帧采样显存无压力。镜像伪影实测与历史 bug 见 [incidents.md](incidents.md) §2026-11-04 tile；**2026-11-04 之前不带显式 `--tile-size 0` 跑的 final 都要复检有无镜像伪影**。
 - **denoise 语义**：split 引擎精修强度走 `BasicScheduler(denoise=refine_denoise)`；1.0 = 每块按 conditioning 全重绘（内容大漂）。**默认 0.30（2026-11-04 起）**。
   - **0.30 是实测保形点**：`MOTION-EP001-L01B`（311f）与 `MOTION-EP001-L02-ONESHOT`（362f）均到 1920×1088，与同一遍 latent 逐点同构图、同姿态，细节为真实重建（门钉、匾额彩画、舞者五官、裙褶层次、二层观众人形）而非插值锐化。
   - **≥0.45 会开始重绘**：turbo LoRA 是照「纯噪声 4 步」训的，部分 denoise 落在它的训练分布外，模型按 turbo 习惯整体重画。**看到"内容变了"先查 denoise，不要先怀疑 upscaler。**
@@ -15,8 +14,7 @@
 - `h3qc submit` 已透传 `--upscale-engine split|legacy3d`、`--chunk-frames`、`--tile-size`（h3q.py lu2 分支同步；改 h3q.py 后要重启 H3-Queue 计划任务服务才生效）。
 - **AV latent cache 节点曾丢失**：`SaveMiniMaxH3AVLatentCache`/`LoadMiniMaxH3AVLatentCache` 的来源包在本机已不存在（2026-11-03 发现），已用最小等价节点补上：`E:\...\custom_nodes\h3_av_latent_cache\__init__.py`（safetensors 存 `video`/`audio` 两个 key）。save-latent → from-latent 链路依赖它。
 
-**多段短片接续（2026-11-04 实测）**：第 N+1 段的 `--first-frame` 必须取第 N 段的**末帧**（`ffmpeg -sseof -0.06 -i <N段>.mp4 -frames:v 1`），不能用分镜关键帧顶替。分镜关键帧描绘的是该段的某个中间状态，直接当首帧会让接缝从"上一段终点"直跳到"该段中途"。
-实测 `L01B`（终点=红裙糊满全屏）→ `L02`：用 `SHOT-EP001-004.png`（已是红裙扫开、中堂可见）作首帧时，接缝处从"红裙糊满"直接跳到"红裙在左+小二清晰"，肉眼可见；改用 `L01B` 末帧后，接缝变成"红裙糊满 → 红裙糊满（同色调）→ +0.5s 扫开露出大厅"，转场自然。该案例采用单帧视觉接力；当前首尾配对与全参考能力另见本技能「输入能力与续接职责」，不从此历史案例限定所有接缝。
+**多段短片接续（2026-11-04 实测）**：第 N+1 段的 `--first-frame` 必须取第 N 段的**末帧**（`ffmpeg -sseof -0.06 -i <N段>.mp4 -frames:v 1`），不能用分镜关键帧顶替——分镜关键帧描绘的是该段某个中间状态，直接当首帧会让接缝从"上一段终点"直跳到"该段中途"。红裙接缝的实测经过见 [incidents.md](incidents.md) §2026-11-04 L01B→L02。该案例采用单帧视觉接力；当前首尾配对与全参考能力另见本技能「输入能力与续接职责」，不从此历史案例限定所有接缝。
 
 **SeedVR2 事后超分（B 路径，与二采互补）**：已装 `seedvr2_videoupscaler`（numz，`inference_cli.py` 可脱离 ComfyUI 直接跑）+ 权重 `models/SEEDVR2/`（3B fp8 3.2GB + ema_vae fp16 478MB）。ComfyUI 节点 `SeedVR2*` 系列同步可用。实测：draft4（896×512）前 72 帧 → 1260×720，184s（0.39 fps，fp8 无 Sage/FlashAttention）。CLI 必须带 `PYTHONUTF8=1`（GBK 崩 emoji）。适用：救已认可内容的 draft 素材、成片最后一道；产出仍要走 look_check（它是重绘细节的修复模型，不是无损放大）。
 

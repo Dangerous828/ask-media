@@ -121,13 +121,11 @@ license: MIT
 8. **画幅与分辨率不进正文**，走参数（图片通道是 `--size WxH`；`--width/--height` 是视频参数，给到图片分支会被丢弃）。
 
 **长度**：本机 Qwen-Image 2.1 目标 200–350 词。英文约 1.3 token/词，350 词≈455 token 仍有余量，400 词以上就贴着截断线走，后半段可能等于没写。宁可少写不可堆满。
-这里的截断线是**实测有效长度／短提示词场景下的经验值**，不是编码器的 token 上限；[engine-params-qwen](references/engine-params-qwen.md) 来源等级表里的「编码器 4.5K token 上限」是编码器侧硬上限（社区博客，未在本机验证），两者不是同一件事，不要把 4.5K 当成可以写到那个长度。
+这里的截断线是**实测有效长度／短提示词场景下的经验值**，不是编码器的 token 上限；编码器 4.5K token 上限是编码器侧硬上限（社区博客，未在本机验证），两者不是同一件事，不要把 4.5K 当成可以写到那个长度。
 
 **否定与排除项**：正文只陈述存在什么，不写指令句。要压制的伪影、不要的字幕水印、不要的多余道具，全部走 `--negative`。
 
-本机 Qwen 链路是标准 CFG 双条件结构（工作流里 positive / negative 两个 CLIPTextEncode + CFGGuider 带 cfg），**cfg 与负向槽都真实可用**：缺省 CFG 与 LoRA 以实现实读为准（`h3q_img.py` 顶部常量 / MCP schema / 覆盖键 `H3Q_IMAGE_*`），实测时点（2026-11-05 档位快照）为 CFG 3.5、无 LoRA（本目录 2026-11-09 的实测与该缺省同值），负向全程参与采样。只有两种情况负向被跳过——显式 `cfg ≤ 1`（渲染器打 NOTE 并把 negative 置空），或挂了蒸馏/加速 LoRA 把 cfg 压到 1。
-
-**不要把这条跟云端 API 的限制混淆**：阿里云 qwen-image-2.1 的 `negative_prompt` 请求参数确实不支持（那是产品层封装），但本机跑的是 ComfyUI 工作流，不受该限制。
+负向映射与跳过条件见 [engine-params-qwen §2](references/engine-params-qwen.md)（标准 CFG 双条件结构与两种跳过情况）；术语分层（两层丢弃）见 [still-api-params 术语与分层节](../h3-queue/references/still-api-params.md)。
 
 **手部这类"别拿东西"的意图用正向写法**：写手掌张开、掌心朝向、指尖松弛，让手看起来本来就空着；不写 `neither hand holding anything` 这类否定声明——声明不改变模型画什么，只会占注意力。
 

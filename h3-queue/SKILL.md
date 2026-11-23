@@ -25,19 +25,13 @@ description: 仅在要往渲染机（RTX 5070 Ti 16GB，SSH 别名按部署配�
 - **看任务跑到哪一步：读 `progress`，不读「~left」。** `h3qc queue`、`h3qc show <jid>`、`GET :8200/queue`、`GET :8200/job/<jid>` 和 MCP `h3_queue_status` 对正在运行的任务都带 `progress`：`phase`（`loading_models` 载模型 / `sampling` 采样 / `starting` 刚开始）、当前采样阶段的 `stage`、`step/total`、`pct`、`sec_per_it`、`stage_eta_s`，以及 `log_age_s`（ComfyUI 日志距今多久没写）。数据来自 ComfyUI 日志（`logs/serve.log`）里本任务开始之后的 tqdm 进度条。
   - **只给当前阶段的进度，不给整任务百分比。** 一个任务有多个采样阶段（总步数各不同，每段从 0 起，如 8 步一采、20 步二采），整任务总量事先未知，编造会不准。
   - **`~left` 是同类任务历史中位数减已用时**，345 帧、两小时的任务它会一直显示几秒。`overdue: true`（已用时超过中位数 1.5 倍）出现时，以 `progress` 为准。
-  - **判断是不是卡死看 `log_age_s`**：采样一步可能几分钟，进度条几分钟才动一次，但日志文件一直有写入，`log_age_s` 会反复回到几秒内；持续变大（比如超过 10 分钟）且 `step` 不变，才是真的停了。2026-11-21 EP003 的 345 帧视频动作任务全程 5m42s/步、共 7000 秒，期间进度条就是这样慢。
+  - **判断是不是卡死看 `log_age_s`**：采样一步可能几分钟，进度条几分钟才动一次，但日志文件一直有写入，`log_age_s` 会反复回到几秒内；持续变大（比如超过 10 分钟）且 `step` 不变，才是真的停了。慢任务的实测（长视频动作直投通道 5m42s/步）见 [video-motion-drive.md](references/video-motion-drive.md) §6 与 [incidents.md](references/incidents.md) §2026-11-21。
   - 任务刚开始、日志里还没有本任务的内容时 `phase=starting`，不是故障。
 - **查询超时记为状态未知。** 已有 `job_id` 就按原 ID 查询；提交响应不明时先核对既有记录，确需重试使用原 `idem_key`。健康查询超时可改查队列，不凭超时判断空闲或重启。
 
 ### 为什么必须走队列
 
-这张卡 16 GB，H3 常驻约 14 GB。多个会话各自直连 ComfyUI 提交时，后到的任务多要一点显存就 OOM，CUDA context 变 sticky（连 `cuMemGetInfo` 自己都开始报错），实例挂掉，**所有会话一起停摆**；而各客户端超时后又重提交，一次偶发 OOM 被放大成"互相阻断"。
-
-历史证据（2026-10-20 实测）：`serve.log` 里 505 行 `CUDA error: out of memory`、578 个 Traceback；空闲时显存仍被占 14.1/16.3 GB。
-
-**为什么空闲还占 14 GB（2026-11-21 定位并修复）**：ComfyUI 的 smart-memory 默认把模型留在显存里等下个任务，启动参数里没有 `--disable-smart-memory`，所以 H3 权重约 14 GB 常驻。队列原先只在 preflight 请求 `/free`（开跑前），任务结束路径没有任何释放动作，于是跑完就僵在那儿，直到下个任务 preflight 才可能被清。现在 `run_one()` 在 `set_state(done/failed)` 之后统一调 `release_vram()`，成功和失败都释放——崩溃的渲染同样留着 14 GB，不该让下一个任务继承。`/free` 实测 5 秒内从 13.9 GB 回落到 462 MB。
-
-队列解决的是**准入控制**，不是排队本身（ComfyUI 自带队列本来就是串行的）：
+**多会话直连 ComfyUI 会互相 OOM 阻断**（CUDA context 变 sticky、实例挂掉，客户端超时重投再把一次偶发 OOM 放大成互相阻断），所以常规任务必须经 h3q 做准入控制，不是排队本身（ComfyUI 自带队列本来就是串行的）。事故经过与显存实测见 [incidents.md](references/incidents.md) §2026-10-20 / §2026-11-21。
 
 | 失效模式 | 队列的做法 |
 |---|---|
@@ -53,9 +47,7 @@ description: 仅在要往渲染机（RTX 5070 Ti 16GB，SSH 别名按部署配�
 1. **常规任务经 h3q 提交；AI-Canvas-tauri 是例外**。用户在 AI Canvas 里运行该应用的 ComfyUI 工作流时可直接提交 8199；此例外不扩展到 `curl POST /prompt`、`render_qwen.py`、`h3_submit*.ps1` 或其他工具。先检查 ComfyUI 和 h3q 的运行情况，避免 GPU 任务并发。
 2. **禁止重启 / kill ComfyUI 来"解决问题"**。卡住先查队列状态和显存，再决定；重启会打断别人正在跑的活。
 3. **任何会重试的调用都必须带 `--idem-key`**。超时重投、脚本重跑、agent 自我纠错都算。同一个 key 提交多次只跑一次。
-   - **key 要能区分"不同的活"**：同一提示词换 `--seed` 或换输出名是另一张图，key 里就得带上 seed／输出名。
-     实测事故：4 档提示词 × 3 seed，key 只写了档名，**12 次提交只渲出 4 张**——其余 8 次被幂等去重，
-     `--wait` 对去重后的旧 job 照样返回 done，`rc=0`，客户端看着全成功（`h3qc.py ls` 里只有 4 条记录）。
+   - **key 要能区分"不同的活"**：同一提示词换 `--seed` 或换输出名是另一张图，key 里就得带上 seed／输出名；否则幂等去重会让提交成功与产物脱钩。事故经过见 [incidents.md](references/incidents.md) §2026-11-22。
    - **本地任务记录按jid原子合并**：并行查询/取回只能写回本次变化，不把网络调用前的整份旧快照覆盖其他任务。提交响应和真实job id先持久化；发现本地丢记录时先按已有id取回，不额外重投。
    - **提交成功 ≠ 产物存在**：幂等去重让二者脱钩。交付前**逐张校验文件存在且非空**，别用"数张数 / 看 rc"代替产物核对。（short-drama adapter 已在取回后自动核对视频非空、帧数与音轨。）
 
@@ -86,9 +78,9 @@ pdd 的 `draft → final` 是两次完整采样，**没有 pass-1 latent 接续*
 
 没有 `reference_video` / `reference_audio` 或无图文生入口。**要让角色学一段参考视频的动作（含参考音轨）走另一条通道，不经 h3q**：见 [references/video-motion-drive.md](references/video-motion-drive.md)。原生视频上下文续接要求实际视频输入，不能用一张尾帧冒充。若只需要继承可见状态，上游可明确选择单帧视觉接力；需要精确两端时可选首尾帧，不预设每一刀都走同一路线。
 
-**首帧/首尾帧一律走非 pdd 分支，不走 pdd draft（视频）档**：`pdd_lu` 调的 `pdd_render_ref.py` 没有 `--first-frame`/`--last-frame`；2026-11-22 实测同一对首尾帧、同 107f、同 seed，pdd_lu 产物首帧与指定首帧 MAD **43.0**，非 pdd 分支 **3.86**。现在按输入自动分流：`h3_generate_video` / 项目 adapter 只要带 `first_frame` 就落到 `h3_render_ref.py`（单首帧→i2va，首尾帧→fl2va），不再拼 `--workflow pdd_lu`；只挂 `refs` 的全参考组任务照旧走 pdd draft/final。两帧按渲染器语义传 ComfyUI `input/` 里的**裸文件名**；经 h3q 提交时 `sol_profile` 缺省落 `off`。**转场卡直接用 `scripts/transcard.py`，别手搓命令**——见 references/transcard.md。项目内的活（produce 那条路）还要先把两端帧过参考准入（`look_check` assess→review→approve --use reference），`ref_gate` 会把未批准的帧挡成 `reference_not_accepted`；`transcard.py` 是通道级工具，不替你走这道准入。
+**首帧/首尾帧一律走非 pdd 分支，不走 pdd draft（视频）档**：`pdd_lu` 调的 `pdd_render_ref.py` 没有 `--first-frame`/`--last-frame`，走它会导致首帧对不上（MAD 实测对照见 [transcard.md](references/transcard.md) 与 [incidents.md](references/incidents.md) §2026-11-22）。现在按输入自动分流：`h3_generate_video` / 项目 adapter 只要带 `first_frame` 就落到 `h3_render_ref.py`（单首帧→i2va，首尾帧→fl2va），不再拼 `--workflow pdd_lu`；只挂 `refs` 的全参考组任务照旧走 pdd draft/final。两帧按渲染器语义传 ComfyUI `input/` 里的**裸文件名**；经 h3q 提交时 `sol_profile` 缺省落 `off`。**转场卡直接用 `scripts/transcard.py`，别手搓命令**——见 references/transcard.md。项目内的活（produce 那条路）还要先把两端帧过参考准入（`look_check` assess→review→approve --use reference），`ref_gate` 会把未批准的帧挡成 `reference_not_accepted`；`transcard.py` 是通道级工具，不替你走这道准入。
 
-`draft → final` 查§2.8：pdd 两档各自完整采样，`final` 会产出新 take，不依赖同 seed、也没有 latent 可续；交付前须对 final 本身重新验收。图像精修不保证对白、口型或声线正确。
+`draft → final` 是两次完整采样（见上文与 [produce-adapter.md](references/produce-adapter.md) §2.8），`final` 产出新 take、无 latent 可续；交付前须对 final 本身重新验收。图像精修不保证对白、口型或声线正确。
 
 ## 2. 怎么提交
 
@@ -120,7 +112,7 @@ $PY -s $CLI submit --kind image \
 - `--size` 是真实采样画布 `WxH`，宽高向下对齐到 32 的倍数，最小各 32；输出不再自动做 center crop。**要作视频首帧或参考的关键帧，按目标视频画布出**（`768x1344` / `1344x768` / `1024x576` 等）。
   尺寸缺省由部署覆盖键 `H3Q_IMAGE_SIZE` 决定（`2k-16x9` / `2k-9x16` 是具名横/竖档，具体像素值以实现实读为准）；
   要竖屏出图显式给 `--size 2k-9x16` 或直接给 `WxH`。
-- 缺省值由渲染机/MCP 部署定义，**以实现实读为准**（`h3qc submit --help` / MCP schema / 覆盖键 `H3Q_IMAGE_*`，见 [still-api-params.md](references/still-api-params.md)）；实测时点（2026-11-05）为 CFG 3.5、无 LoRA、`steps=0` 按参考选 40/45 步，仅作该日快照。可显式设置 `cfg`、`steps`、`loras`、`resolution`，不自动叠加 Turbo LoRA。
+- 缺省值由渲染机/MCP 部署定义，**以实现实读为准**（`h3qc submit --help` / MCP schema / 覆盖键 `H3Q_IMAGE_*`，见 [still-api-params.md](references/still-api-params.md)）；2026-11-05 的实测快照见 [still-standard-tier-20261105.md](references/still-standard-tier-20261105.md)。可显式设置 `cfg`、`steps`、`loras`、`resolution`，不自动叠加 Turbo LoRA。
 - 图片分支会丢弃 `out_width` / `out_height`（视频尺寸）；`refine_denoise` / `refine_steps` 可透传给图片二采，见下方「出图（MiniMax H3-Image）」。
 - 带参考图：`--refs a.png,b.png`（CLI 文件须已在 ComfyUI 的 `input/`；MCP 上传本地源文件，见 §2.8）。`resolution=0` 默认按原参考尺寸编码，模型仍对齐 32；它控制参考编码，不替代 `size` 指定的采样画布。
 - **负向仅在 `cfg>1` 生效**；阈值定义与负向丢弃的分层见 [still-api-params](references/still-api-params.md)「术语与分层」节，此处不重复。显式 `cfg=1` 仍受尊重。
@@ -158,15 +150,14 @@ $PY -s $CLI submit --kind image --engine h3-image-w4a8 \
 
 - `--refine-denoise` 缺省 0 = 单次采样；大于 0 才追加二采节点，`--refine-steps 0` 用渲染器默认步数（具体值以实现实读为准）。二采保构图与文字，纹理区会重绘；实测同 seed 下几何/文字类 PSNR 27–32 dB，高纹理类 17–19 dB。
 - `--refs` 透传到 conditioning 节点的 `images.image_N`；命令行文件名须已在 ComfyUI `input/`。`--checkpoint`、`--loras`、`--alpha`、输出尺寸覆盖不适用于该引擎。
-- **参考图实测边界（2026-11-15，7 素材 × 忠实重绘/只改冷光）**：W4A8 的 `--refs` 全批通过。原社区量化 Q4_K_M 在 1152×768 带参考图时卡死（GPU 100%、显存占满、渲染器 903s 超时），已从脚本移除，不再作为可选档。
-- 同批对照结论：**参考图编辑维度 Qwen 2.1 比 H3 W4A8 更忠实**（7 例里 6 例结构保真更高），H3 W4A8 改光时常连主体、机位一起重绘并顺手抬曝光。纯文生复杂规格仍是 H3 更强；两者按任务类型分开选。实测记录存内部工程档案（未随公开版发布）。
+- **参考图边界**：现役只保留 W4A8，社区量化 Q4_K_M 已从脚本移除。参考图编辑维度 Qwen 2.1 比 H3 W4A8 更忠实，纯文生复杂规格仍是 H3 更强，两者按任务类型分开选。7 例对照与卡死经过见 [incidents.md](references/incidents.md) §2026-11-15。
 - MCP 的 `h3_generate_image` 目前只走 Qwen 通路，未暴露 `engine`；要用 W4A8 走上面的队列 CLI。
 
 ### 出图参数
 
 | 调用方式 | 步数 | LoRA | 说明 |
 |---|---|---|---|
-| 默认值以实现实读为准（覆盖键 `H3Q_IMAGE_*`） | 实测时点（2026-11-05）：纯文生 40 / 带参考 45 步 | 实测时点（2026-11-05）：无（`none`） | 负向仅 `cfg>1` 生效（阈值定义见 [still-api-params](references/still-api-params.md)「术语与分层」节）；耗时按实际尺寸、参考和排队情况判断 |
+| 默认值以实现实读为准（覆盖键 `H3Q_IMAGE_*`） | 见 2026-11-05 快照 | 见 2026-11-05 快照 | 负向仅 `cfg>1` 生效（阈值定义见 [still-api-params](references/still-api-params.md)「术语与分层」节）；耗时按实际尺寸、参考和排队情况判断 |
 | `--loras 'X:1.0'` | 显式设置或按默认选择 | 指定的 X | 按该 LoRA 的推荐参数设置 steps/CFG |
 | `--alpha 1` | 按默认选择 | 无 | 走 `SaveImageWithAlpha`（拆 alpha 再存） |
 
@@ -287,7 +278,7 @@ queued → running → done
 ```
 
 - `blocked_vram` 是**有意停靠**：宁可不动，也不在只剩 1 GB 的卡上硬提交。腾出显存后重新提交即可。
-- **两个阈值**（`H3Q_MIN_FREE_GB` / `H3Q_FLOOR_GB`，2026-11-21 从 2.0/1.5 提到 **4.0/3.0**）：可用显存低于 `MIN_FREE` 就先请求 `/free`；回收后仍低于 `HARD_FLOOR` 才停靠。原先 1.5 GB 的底线等于允许在只剩一两个 G 的卡上开跑，看着「明明没显存了还照样丢进去」，实际是在赌——H3 峰值要 15 GB 上下，赌输就是 OOM + sticky context。
+- **两个阈值**（`H3Q_MIN_FREE_GB` / `H3Q_FLOOR_GB`，2026-11-21 起 **4.0/3.0**）：可用显存低于 `MIN_FREE` 就先请求 `/free`；回收后仍低于 `HARD_FLOOR` 才停靠。阈值调整经过见 [incidents.md](references/incidents.md) §2026-10-20。
 - ComfyUI 挂掉时任务退回 `queued` 等待，不丢；恢复后自动续跑（`attempts` 会加一）。
 - `failed` 且 note 含 `TIMEOUT`：上游可能还在跑，**不要盲目重投**；先 `queue` 看现场。
 

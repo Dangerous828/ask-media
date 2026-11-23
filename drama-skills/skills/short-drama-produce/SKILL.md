@@ -14,13 +14,8 @@ license: MIT
 
 ## 确定性检查（跑并贴输出，不作放行依据）
 
-判断类问题只靠自看。以下三类必须跑脚本并把输出贴进交付说明，因为漏看一次不会报错：
+三类必跑脚本（台词逐字比对、来源场景 ID/场记卡引用、H3 提交前格式与算术）及 warn/硬拦截边界的统一口径见 [short-drama](../short-drama/SKILL.md) §确定性检查；本阶段照跑并把输出贴进交付说明。
 
-1. **台词逐字比对**：四字以上引文与《剧本.md》比对，改写台词会浪费一次付费生成。
-2. **来源场景 ID 与场记卡拉引用**：每镜「来源」的场景 ID 必须在剧本里存在，剧本每个场景都有镜头承载或登记「未拍场次」；每镜的 `- 场记：CARD-...` 必须在 `设定集/场记.md` 里存在，一卡对一镜——卡不存在、卡无人引用、一卡被两镜引用、一镜引用两卡都要报出来。漏一个 ID 在长文档里看不出来，但它会让账本失去权威。
-3. **H3 提交前的格式与算术**：帧数 `17k+5`、`--refs N` 与上传张数一致、六段/三段顺序、时间码、容器时长等于成员时长之和。
-
-warn 逐条说明处理理由；退出码不作为能否继续的依据。会硬拦截的是：参考图准入（`ref_gate`）、真正提交付费生成，以及生产选帧——`SHOT-...#KF-...` 必须解析到《分镜.md》`画面证明计划` 里唯一的 role，`用途：起始帧` ⇔ `first_frame`、`用途：结束帧` ⇔ `last_frame` 必须成对。
 ## 自看硬规则
 
 任何产物出来都要自己看过才往下走：**视频一秒一帧，闸门过了不算看过。** 完整细则与"什么叫不算看过"见 `ask-media` 技能的 `../../../ask-media/references/discipline.md`，本条不复述。
@@ -31,31 +26,22 @@ warn 逐条说明处理理由；退出码不作为能否继续的依据。会硬
 
 ## Quick Start
 
-只在用户明确要求实际生成后，从当前 `图片提示词.md`、`分镜.md` 或 `视频提示词.md` 中
-取出本次提示词，建立一个有边界的运行 job。creator-first job 的 `source` 必须指向拥有这条提示词的
-当前 Markdown，`source_entry` 必须点名该文档允许的条目：`图片提示词.md` 用 `IMG-*`，
-`视频提示词.md` 用 `MOTION-*`，`分镜.md` 的 image job 用复合选择器 `SHOT-*#KF-*`。
-`KF` 必须在该镜 `画面证明计划` 唯一登记，并按 role 选择正文：`composition` → `冻结关键帧提示词`，
-`start` → `起始帧提示词`，`pose_proof` → 对应 `#### KF-*`，`end` → `收尾关键帧提示词`。
-`composition / start / end` 各最多登记一个 KF；同一正文不能映射多个帧 ID。
-只写 `SHOT-*` 会在 prepare 失败；`start` 没有独立正文也会失败，不回退到 composition。
-创作者也可以提供已有起始帧——
-在自己的工具里出图再放进项目同样成立，图片始终不进项目时走分镜的 `PLAN-...`；
-产出落在 `剧集/<EP>/制作成果/images/` 后，分镜 owner 才能把它绑成 `用途：起始帧` 的 `REF-...`。存在真实参考图时，
-还必须逐张填写 `reference_bindings` 的槽位、顺序、路径、中文名、role 以及允许/禁止控制范围；
-源文档的 `用途` 与 job 的 provider role 分别核对，内置视频 adapter 只接受它公布的 role 取值
-（MiniMax 为 `first_frame`/`last_frame`/`reference_image`/`reference_video`/`reference_audio`，
-Seedance 为三个 `reference_*`）；带参考图却没有绑定的 job 会直接失败，不替它猜一个 role。走 Magpie MCP（`h3_generate_project_image` / `h3_generate_project_video`）同样适用：调用前先查本镜有没有参考图，有就必须按该工具的 schema 把参考图传过去；只传 `parameters` 不代表可以不传参考图。确实无参考时才走纯文生，并在调用记录里写明。
-`用途：起始帧` 只对应 `role:first_frame`，`用途：结束帧` 只对应 `role:last_frame`；
-反向冲突或端点 role 缺少对应用途同样会在 prepare 失败，adapter 不自行改判。
-本地图片由内置 adapter 按 base64 data URI 直接送出，不需要自建上传服务。
-`MOTION-*` 的「参考音频」行同样逐条进 `reference_bindings`，排在图片之后、role 固定为 `reference_audio`、`character` 照抄该行的 `角色`；
-adapter profile 没有声明接受 `reference_audio` 时 `run` 在提交前失败，见
-[adapter-contract.md](references/adapter-contract.md#adapter-config)。
-条目的「输入参考图」写成 `PLAN-...` 时，那些图片在创作者自己的工具里，项目内没有文件可送：
-`prepare` 直接失败并说明先把真实文件放进项目、改写成 `REF-...`，不拿计划当输入，也不静默丢掉参考。
-`references` 可以省略并由绑定顺序生成，也可以作为相同顺序的显式镜像。输出放在
-`剧集/<EP>/制作成果/`；这个 job 是生产工具的临时输入，不计入六份创作文档：
+只在用户明确要求实际生成后，从当前 `图片提示词.md`、`分镜.md` 或 `视频提示词.md`
+取出本次提示词，建立一个有边界的运行 job。`source` 指向拥有这条提示词的当前 Markdown；
+creator-first job 必须点名 `source_entry` 选择器，并逐张填写 `reference_bindings`，
+带真实参考图却缺绑定的 job 直接失败、不替它猜 role。选择器映射（`IMG-*` / `MOTION-*` /
+`SHOT-*#KF-*`）、KF role 与正文的对应、`用途`↔provider role（含 MiniMax / Seedance 取值）、
+参考音频绑定、`PLAN-...` 与 `references` 镜像的失败边界，全部见
+[adapter-contract.md](references/adapter-contract.md#job-file)，本节不复述。
+
+创作者自己在工具里出图、产出落在 `剧集/<EP>/制作成果/images/` 后，由分镜 owner 绑成
+`用途：起始帧` 的 `REF-...`；图片始终不进项目时走 `PLAN-...`。走 Magpie MCP
+（`h3_generate_project_image` / `h3_generate_project_video`）同样要先查参考图并按 schema 传入，
+只传 `parameters` 不代表可以不传；确实无参考才走纯文生并在调用记录里写明。adapter profile
+未声明接受 `reference_audio` 时 `run` 在提交前失败，见
+[adapter-contract.md](references/adapter-contract.md#adapter-config)。本地图片由内置 adapter
+按 base64 data URI 送出，不自建上传服务。输出放在 `剧集/<EP>/制作成果/`；这个 job 是生产工具的
+临时输入，不计入六份创作文档：
 
 ```bash
 python3 {技能目录}/scripts/production_tool.py prepare <project> --job <临时-job.json>
@@ -246,9 +232,9 @@ adapter 侧可用 `SHORT_DRAMA_REF_GATE` 显式覆盖共享副本路径，`produ
 独立运行使用的同字节分发副本，以 review 下脚本为源，仅在共享路径不可用时兜底；修改后必须同步并由
 `scripts/selftest.py` 核对。
 
-不要为了满足构图、道具数量或状态，用脚本拼贴、贴图、矢量重画或局部修改去制造参考图；这种图即使
-写明“只控制构图”，模型也会把它的平涂和光影一起学走。需要的状态改不出来时，按审查技能 REV-17
-回到提示词或分镜处理。连续生产时可在 job `parameters.executor` 写执行者名，审查脚本据此识别自审。
+参考图只用真实渲染、禁止拼贴／贴图／矢量重画／局部修图造“受控布局”(含 2026-10-25 EP001 事故)，见
+[AGENTS.md](../../../AGENTS.md) §3；状态造不出来时按审查技能 REV-17 回提示词或分镜。连续生产时可在
+job `parameters.executor` 写执行者名，审查脚本据此识别自审。
 
 这些 adapter 是已验证请求契约，不是账号可用性或生成质量保证；正式生产仍必须通过上面的本次
 确认闸门，并由审查 Skill 判断产物质量。
@@ -257,20 +243,7 @@ adapter 侧可用 `SHORT_DRAMA_REF_GATE` 显式覆盖共享副本路径，`produ
 
 ## 中断不等于要重跑
 
-视频任务在**提交那一刻**就已经计费，不是在拿到结果时。提交之后的一切——轮询几分钟、下载——
-都可能被进程被杀、断网、机器休眠打断。内置 adapter 因此在拿到供应商任务 ID 的第一时间就把它
-写进 `handle_path`（早于第一次轮询），这个路径不随本次尝试一起删除。
-
-于是中断之后有三条确定的动作，不必再花一次钱：
-
-1. `audit` 会把带着任务 ID 的未完成尝试报成 `orphaned_provider_job`，
-   `action` 是 `collect_before_retry`；
-2. `collect` 用那个 ID 取回结果并把这次尝试标成成功；
-3. 只有在 `collect` 也确认那边确实失败之后，才走重新确认与重投的老路。
-
-**不要在 `audit` 报出 `orphaned_provider_job` 时直接重投**——那是在为同一个镜头付第二次钱。
-`collect` 不走确认闸门是有意的：闸门防的是意外花钱，而 collect 不花钱；
-如果它也要求重新确认，那么中断之后最省事的路径就变成再付一次，正好是闸门要防的事。
+提交那一刻就计费；中断后按顺序做：`audit` 看 `orphaned_provider_job` → `collect` 取回 → 只有 collect 确认失败才重新确认重投。**不要在 `orphaned_provider_job` 时直接重投**（等于为同一镜头付第二次钱）。机制与边界见 [adapter-contract.md](references/adapter-contract.md#recovering-a-submitted-task)。
 
 ## 结果与复核
 
@@ -285,15 +258,7 @@ adapter 侧可用 `SHORT_DRAMA_REF_GATE` 显式覆盖共享副本路径，`produ
 作者在预览里看到改的是哪一项再确认；原样重投的那次确认不产生修复，只产生一笔费用。重复内容
 缺陷回到对应 prompt/spec owner。
 
-**同来源同因的质量返工不能靠改名清零。** 同一 `source`+`source_entry`+modality 的最新成功产物若带有
-绑定当前字节的人工 `rejected` 审查，下一个 job 必须在 `parameters.revision` 写明这次改了什么
-（观察、逐项变化、保持不变项、预期结果、`failure_key`、准确上一 job/run）；改多处要联动理由，
-同一原因再次失败要升级为 `strategy: redesign` 并引用导演/分镜/视觉设定/图片提示词里真实存在的
-上游决定。`prepare` 与 `run` 都会核对，拒绝报告与重设计文档进入输入指纹和私有快照；确认前证据字节
-变化就不启动 adapter。技术失败与 `collect` 取回不算质量返工，不要求 revision。每次 run 另把执行
-job 快照写入 `.short-drama/production/executions/<job-key>/<run-id>.json`，重名重新 prepare 也不抹掉
-历史依据。完整字段与例子见 [adapter-contract.md](references/adapter-contract.md)。工具只核结构，
-缺陷观察、归因与 `failure_key` 的稳定性由实际看片的人负责。
+**同来源同因的质量返工不能靠改名清零。** 同一 `source`+`source_entry`+modality 的最新成功产物带人工 `rejected` 审查时，下一个 job 必须在 `parameters.revision` 写明改了什么；同一原因再失败升级为 `strategy: redesign` 并引用真实上游决定。技术失败与 `collect` 取回不算返工。字段、例子与边界见 [adapter-contract.md](references/adapter-contract.md#quality-revision-imagevideo-retries)；缺陷观察与归因由实际看片的人负责。
 生产结束后不自动进入剪辑。素材要装配成成片时由用户点名 `$short-drama-edit`；它只取舍已有帧，
 不回头改本阶段的 job，也不生成新素材。
 每次回报结果都要写明：**这条媒体尚未验收**，在 `$short-drama-review` 的媒体验收（先画风后剧情）

@@ -27,22 +27,6 @@
 **画布硬约束**：宽高必须都是 **32 的倍数**。720/1080 都不合法，报
 `height=720 is not a multiple of 32`。用 1248×704、1312×736、1344×768、768×1344。
 
-**PDD 竖屏支持（2026-11-20 新增，example-project 9:16）**：此前 pdd 首采锁死
-1024×576 横屏，width/height 只作用于二采，draft 档会被静默吞掉（产物仍是横屏）。
-现 `pdd_render_ref.py` 新增 `--width/--height` 覆盖首采（默认 1024×576 不变，
-横屏任务 argv 逐字节不变），`h3q.py` pdd_lu 分支已透传（改后需重启 H3-Queue
-计划任务）。MCP `_pdd_argv` 仅在 width<height 时传首采：draft 竖屏首采=width/height；
-final 竖屏首采按 out/1.5 就近取 32 倍数推导、二采=width/height。MCP 改动需 Alma
-重连 magpie-h3 才生效，重连前可直连 `h3qg.py submit --workflow pdd_lu --width ...
---height ... --no-upscale`。竖屏推荐尺寸（对 896×1536 基准的 aspect 差均 <2%）：
-draft 首采 **576×992**（0.46%，面积小于横屏默认），final 二采 **832×1440**
-（0.95%，面积在 1536×864 上限内）。896×1536 本身面积超 1536×864 上限会被拒，
-不是竖屏专属问题。
-
-⚠️ **竖屏 draft 与 final 的首采不是同一画布**：MCP 侧 draft 首采直接用 `width/height`，
-final 首采按 out/1.5 就近取 32 倍数推导（832×1440 → 544×960），与 draft 的 576×992
-宽高比差约 2%。因此**竖屏 draft 只用来验表演/动作，不用来验最终构图**；草稿批准的
-那一帧不等于成片的构图帧。这是 MCP 侧实现的历史行为，具体数值以实际部署为准；
-要"草稿即成片构图"须让两条路径首采同尺寸（改 MCP `_pdd_argv`，需操作者单独授权），
-或按 §2.8 把 draft/final 当作两次完整采样分别验收。
+**PDD 竖屏支持（2026-11-20 新增，example-project 9:16）**：`pdd_render_ref.py` 用 `--width/--height` 覆盖首采（横屏 argv 不变），`h3q.py` pdd_lu 分支已透传；MCP `_pdd_argv` 仅 width<height 时传首采，MCP 改动需重连才生效（重连前可直连 `h3qg.py submit --workflow pdd_lu --width ... --height ... --no-upscale`）。
+**推荐尺寸**：draft 首采 **576×992**、final 二采 **832×1440**（对 896×1536 基准的 aspect 差均 <2%）；896×1536 面积超 1536×864 上限会被拒。⚠️ **竖屏 draft 与 final 首采不是同一画布**（832×1440 → 544×960，宽高比差约 2%），**draft 只验表演/动作、不验构图**；要"草稿即成片构图"须让两条路径首采同尺寸（改 MCP `_pdd_argv`，需单独授权）或按 §2.8 把 draft/final 当两次完整采样分别验收。尺寸推导与核验经过见 [incidents.md](incidents.md) §2026-11-15 档位对齐，结论见 [`pdd-offline-recipe.md`](pdd-offline-recipe.md)。
 

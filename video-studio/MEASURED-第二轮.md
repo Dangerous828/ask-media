@@ -192,11 +192,8 @@ exit=1
 
 ## 这些骨架不只用于生图
 
-官方 `base-en.txt` 对 `integrated_multimodal_description` 的要求是
-「Describes visuals, actions, shots, speakers, dialogue, singing, and diegetic audio
-along the timeline」——**画面/场景描写本来就是 H3 提示词的一部分**。
-
-差别只在语言：生图用中文，H3 必须英文，且要遵守 `[Shot N] At MM:SS.mmm` 等格式。
+骨架在出图与 H3 两条链路的用法差异（含 `base-en.txt` 对 `integrated_multimodal_description` 的原文要求与英文格式约束），
+统一见 `SKILL.md` §三 R3e，本节不重复。
 
 ---
 

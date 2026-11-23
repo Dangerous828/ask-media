@@ -79,7 +79,7 @@ When a render comes back with a known failure mode (extra character/animal, shar
 | 这镜有没有**换素材或改出点** | 换素材只看音频指标 | 必须**同时验画面与声音**；剪辑单写死的来源是真相源，文件名后缀不是质量排序 |
 | 多人同镜、多人并排 | 出场治理三件套 | 逐一点名站位与朝向；对整组人的行为，文字锁没有力量，改词两次仍在就改参考图几何或机位 |
 
-**优先级口诀**：手上多出东西 → 查首帧状态句；同框人不够像 → 查身份板；写了否定句 → 全部改成正向写法。
+**优先级口诀**：手上多出东西 → 查首帧状态句；同框人不够像 → 查身份板；写了否定句 → 全部改成正向写法。完整对照表见 [failure-modes.md](references/failure-modes.md)（含"他没有拔剑"被画进画面等案例）。
 
 ## Output Rules
 
@@ -111,16 +111,11 @@ H3 把写下的时间线读得很字面，所以代价最大的失败是提示�
 
 **3. 台词有起点。** 每句 `<d>` 前后有一个明确的开口时刻或区间，口型动作和说话人在同一句里；依赖这句话的反应排在它之后。时长按 `h3-video-gate` 的口径估（约 4.1 字/秒）。
 
-**3b. 多人对话按实际发言顺序交替写，不要按人归类（2026-11-13 EP003 实测）。** 同一个人的两句连写、再写另一个人的两句，模型会照着念成一人在连说，成品听起来像各说各的；剧本里 ABAB 的对话，正文与声景也必须 ABAB。`(Sx)` 按首次发声先后编号，不按角色固定。
+**3b. 多人对话按实际发言顺序交替写，不要按人归类。** 剧本里 ABAB 的对话，正文与声景也必须 ABAB；`(Sx)` 按首次发声先后编号，不按角色固定。事故经过见 [case-notes.md](references/case-notes.md) §I。
 
 **声景不写说话事件。** 说话属于画面事件，写进正文（`<Subject 1> (S1) says, <d>[Chinese] …</d>`）；`overall_soundscape` 只描述整段持续的环境声音，不写 says/speaks/murmurs/sings，也不写引号台词——官方 base-en.txt:154 要求它只用 1–4 句英文描述整段声床，重复台词会让模型念两遍。闸门 G19/G40 会提示。
 
-**3c. 台词时间码按字数铺，不按句序均分（2026-11-13 EP003 实测）。** 生成脚本自动加时间码时，如果把
-`n` 句台词平均撒在段长的前 60%（`t = dur * (0.12 + 0.50 * i / n)`），短段里的大台词量会挤爆窗口：
-41 个汉字塞进 6 秒后，模型只能把同一角色的句子连读，另一角色的台词整体后移，听感是"台词和画面完全对不上"。
-按 `每句汉字数 ÷ 4.1 字/秒（即 × 0.244s）+ 句间 0.55s` 估算（与 `h3-video-gate` 默认 `--rate 4.1` 同口径），先填满可用窗口（起 0.55s、尾留 0.35s），超出时按比例压缩；
-每段的总台词量超过"段长 − 0.5s − 动作预留"时，先砍句数或加长段长，不要让模型自由发挥。
-验收不能只看能量：`whisper-cli` 转写每段后对照剧本顺序，顺序错会立刻暴露。
+**3c. 台词时间码按字数铺，不按句序均分。** 按每句汉字数÷语速估时、先填满可用窗口，超出时砍句数或加长段；估时口径见 `h3-video-gate`（约 4.1 字/秒）。41 汉字塞 6 秒的事故经过与公式见 [case-notes.md](references/case-notes.md) §I。
 
 **4. 一件事只在它发生的地方说一次。** 服装、道具、光在它入画或变化的那句里写；不在开场句、主体句、结尾句各写一遍。
 开场风格句取项目画风基准的一两句话（介质、镜头质感、光），不展开成皮肤、织物、颗粒、景深的清单；整段正文末尾不追加"细节总结"。
@@ -142,107 +137,19 @@ H3 把写下的时间线读得很字面，所以代价最大的失败是提示�
      ```
    - **不要这样写**（把动作音放在最前）：`overall_soundscape: A door slams. Then room tone.`
    - **成因**：每段独立生成，声音起点不继承上一段；开场没有"已经在响"的基准，模型就用最响的那件事开场。给它一个持续底层，它就有东西垫着，不会甩冲击。
-   - EP002 实测 16 段里 3 段命中开场爆音，最狠的两段第 0 秒就是 −5.6/−6.4 dBFS（接近满刻度），随后掉 53.3/42.6 dB——那 0.3 秒完全是废的，戏在 1 秒后才开始。
+   - EP002 实测 16 段里 3 段命中开场爆音，最狠的两段第 0 秒就是 −5.6/−6.4 dBFS（接近满刻度），随后掉 53.3/42.6 dB——那 0.3 秒完全是废的，戏在 1 秒后才开始。成因见 [failure-modes.md](references/failure-modes.md)「开场爆音」案例。
 
 **8. 画面文字只写存在的，且必须用英文双引号逐字写死。** 场景里有招牌、菜单、屏幕、灯箱、霓虹，就用**英文双引号**把上面的字原样写出、不翻译：`a glowing light box reading "母婴店"`（官方 `base-en.txt:146` §4.5）。场景没有文字就什么也不写，但**不要指望"不写"能压制文字**——见下面第 9 条。
    - 只写"一个发光的灯箱"而不给引号内容，模型会自己编字。2026-11-07 EP002 实测：灯箱只写 `a glowing pink-white light box on the right of frame`，成片里凭空长出英文 `mother…` 招牌。这不是模型不行，是没给它文字身份。
    - **反向也成立**：真要有字就必须给引号内容，否则它编的和你想要的不一样；宁可用"字迹不可读"把可读性降下来。
 正文里"某些表面保持无文字"的整句是一个可渲染的名词串（见 failure-modes 的"画面无文字无水印"行），而且常与场景里真有的菜单板自相矛盾。
 
-**9. 不要靠写 `no subtitle / no text / no watermark` 压字幕——本项目实测无效，且可能反向。** 本地 `cfg=1` 没有独立负向分支，那句否定只是给模型一个可渲染的名词串（同实测三版都写这句，照样出文字；更早还出现"他没有拔剑"被画进画面的同类事故）。
-   - **压文字靠正向写法**：无标识墙面、纯色布景、明确遮挡、景别紧到不包含牌面。
-   - **生成后**跑伪字幕 OCR 扫描再挑片，别指望提示词一次到位。
-   - 与"降低分辨率"的取舍：低于约 **0.6 MP** 时伪字幕与碎字概率明显上升（社区测，非官方）。本地取值参考：`896x512`=0.46MP、`672x384`=0.26MP 都在风险区，`1024x576`=0.59MP 贴边，`1536x864`=1.33MP 安全。**但分辨率不是主要矛盾**——先查引号与负向句这两条，再考虑提分辨率。
+**9. 不要靠写 `no subtitle / no text / no watermark` 压字幕——本项目实测无效，且可能反向。** H3 `cfg=1` 没有独立负向通道，那句否定只是给模型一个可渲染的名词串。压文字靠正向可见状态（无标识墙面、纯色布景、明确遮挡、景别紧到不含牌面）+ 生成后 OCR 扫描挑片；分镜正文否定与 hdr 见 [failure-modes.md](references/failure-modes.md)「无文字水印」行与「角色/动作描述里写数值」行，H3 是否适合某项见 `../video-studio/references/craft/h3-script-fit.md` §5。
 
 
 ## Style Anchors from the Official 3D-Animation Skill
 
-From the official H3 repository (MiniMax-AI/MiniMax-H3), skill 3d-animation-short-generator,
-file SKILL.cn.md (bundled upstream, not in this repo). Use when the brief asks for Pixar-style / Q-version / stylized 3D animation.
-
-**H3 prompt suffix** (official STEP 7) — use only when the brief asks to *change* the look to a
-Pixar-like stylized 3D, and the project has no accepted look baseline yet. For a project whose 3D look is already
-established by references, the reference images carry the style; default to the neutral opener
-`premium cinema-grade 3D cartoon CGI rendering` and do not append brand-style names (no measurable gain on
-established Q-version looks, and character/brand-name style terms need an IP check before commercial use). H3 follows per-second instructions almost literally, so shot directives
-can go in nearly as written:
-
-    Pixar-inspired 3D cartoon rendering, C4D + Octane look, stylized Q-version proportions,
-    warm SSS skin, designed-with-detail hair, strong character design language, clean motion,
-    on-brand color palette
-
-**Reference-anchor sub-fields** (official STEP 5) — every shot table row must carry four
-sub-fields. They are **storyboard-table fields only**: when rewriting into an H3 prompt,
-fold them into the scene sentences (see the DNA prose rule below); do **not** emit them as
-an explicit `reference_anchors:` block — measured: the literal block disturbed set dressing
-(a floor lamp and side cabinet appeared) without improving motion:
-
-- `fixed_landmark` — a named landmark from the scene card plus its position in frame
-  (e.g. `door-frame: right third`)
-- `subject_position` — each character's position relative to frame, facing, opening pose
-- `exiting_subject_state` — characters present last shot but absent now: where they went and why
-- `lighting_baseline` — key/fill/rim directions inherited from the scene card, plus this shot's adjustment
-
-**Style lock — how to state it (H3 has no negative channel at cfg 1)**
-
-Two distinct things, judged by what the model can actually see:
-
-1. **The sampler's negative slot does nothing.** `BasicGuider` runs at cfg 1 with no
-   negative branch (`comfy-docs/minimax-h3-prompt-guide.md:39`); ComfyUI proves it in
-   source — `samplers.py:610` discards `uncond` when cfg ≈ 1.0, and `_calc_cond_batch:240`
-   skips it, so that conditioning never reaches the model. Putting a constraint in a
-   `negative_prompt` node or field is a dead config: it is not obeyed, it is not even run.
-2. **A prompt-body ban list is what §8 actually warns against** ("Ban lists add unwanted
-   concepts"). At cfg 1 there is no separate negative channel, so any 不要/no/not list can
-   only exist **in the body** — which means it enters the positive conditioning and may pull
-   the very concepts in. The official guide's recommendation is therefore `State what should
-   appear`, plus R2V `fully_preserved` / `partially_preserved`.
-
-⚠️ **Unresolved conflict between two official sources.** The official 3D-animation skill
-ships a six-item body ban list as its default style lock —
-负向风格约束：不要写实真人摄影、不要扁平二次元、不要塑料玩具皮肤、不要僵硬人体姿势、
-不要真实解剖僵硬感、不要无生命表情
-(`infinite-canvas-stack/upstream/service/skills/h3-3d-animation-short-generator.md:31`) —
-which is exactly the form prompt-guide §8 warns about. Neither source qualifies the other;
-the same skill also ships the positive line, so official practice does not settle which form
-carries the look. **Do not treat that style lock as proof that body ban lists are safe on
-H3.** Until measured, prefer the positive line:
-
-`Pixar-inspired 3D cartoon rendering, C4D + Octane look, stylized Q-version proportions,
-warm SSS skin, designed-with-detail hair, strong character design language, clean motion,
-on-brand color palette`
-
-Forms to prefer, in order:
-- **state what should appear** (the positive line above)
-- **R2V retention fields** for boundary keeping: `fully_preserved` / `partially_preserved`
-- **absence by omission** — do not describe what must not be on screen (see failure-modes
-  出场治理三件套: an off-stage character must not even get an identity definition)
-
-⚠️ **Unmeasured — do not state as fact**: whether a chained body ban list performs
-measurably worse than a single `no X` clause, or than the positive line alone, has no A/B
-data on this machine. The official ref-en/base-en example prompts contain 34 / 12
-`no|not|never|without` tokens, so body negation is not absent from official usage — but
-token counts in examples are not evidence of effect. Plan: same seed/prompt,
-A = positive line only, B = + single `no X` clause, C = + 6-item ban list, 2 seeds each,
-via h3q, then compare target-object appearance rate.
-
-**Strip storyboard tags before rendering** — `[char:…]`, `[scene:…]`, `[shot:…]`,
-`[dur:…]`, `[hook:…]` are storyboard-only cross-reference markers and must never reach
-the video prompt. (Pencil storyboards also carry shot numbers, camera icons, arrows and
-notes — remove those too.)
-
-### 正文否定：按语义核对，案例不代替能力保证
-
-优先把需要的画面写成正向可见状态；必要的行为、空间或发声边界可以使用简短否定。采样器没有独立负向条件分支，不等于文本编码器不能理解正文否定；不因出现 `no/not/never` 就判断失效。
-
-| 案例对象 | 观察与用法边界 |
-|---|---|
-| 点名不该出现的实体 | 在既有失败案例条件下观察到多余实体被带入；无剧情职责时省略该实体定义，有明确边界时比较正向表达与简短排除，不推定每次必然入画。 |
-| 不看镜头、不跟随人物 | 既有案例执行过这些行为限制；以实际视线/机位验证，不称所有镜头均可靠。 |
-| 门/门洞等几何边界 | 既有案例配合起始帧保持过该边界；先核真实输入与空间，否定句不能替代图中已存在的布局。 |
-
-G36 只提醒回读语义。不要为消除 warn 改掉已确认的声音/行为边界，也不复制长实体禁用表。参考几何冲突、挂图职责或停车镜头见 [EP002 案例](corpus/ep002-parking-contracts.md)；候选改写未实测时如实注明。
-
+H3 `cfg=1` 没有独立负向通道；把需要的东西写成正向可见状态（官方 Pixar 正向句与 R2V `fully_preserved`/`partially_preserved` 为默认，短句否定按语义核对、不因 `no/not` 判失效）。源码论证、六项画风禁令原文、未决冲突与 A/B 计划、参考锚四子字段、正文否定案例表、渲染前剥离分镜标记，全部见 [case-notes.md](references/case-notes.md) §J；正文否定的落地立场另见 `../video-studio/references/craft/h3-script-fit.md` §5，失败症状对照见 [failure-modes.md](references/failure-modes.md)。
 
 ## Camera Motion Mapping
 
@@ -289,10 +196,7 @@ G36 只提醒回读语义。不要为消除 warn 改掉已确认的声音/行为
 4. **起点亮度关系照实际首帧或上游状态写。** 用本镜实际物件说明最亮处与暗部；后续变化按账本中的因果与时刻展开。已有光照设定上，整体压暗或改色的氛围词也须有上游依据。
 5. **同一时刻、同一表面的描述相容。** 颜色或受光确实变化时交代原因与时刻，分别写清前后状态。
 
-**实测（example-project EP001，本地 h3q 草稿档 512×896、4 步、首帧续接）**：用 `seam_check.py` 把送进去的首帧和视频真实第 0 帧走同一条 ffmpeg 解码路径比较，三段的第 0 帧都比首帧暗约 5–6%（Rec.601 亮度 40.1→37.6、41.9→39.7、35.2→33.1）；三段连着走又逐段变暗（段均值折成全幅亮度约 38→35→33，每个接力环节约 −5%，由 ffmpeg signalstats 的 YAVG 折算）；A 段内部也有起伏（前 240 帧最低 32.1、最高 39.7，下探出现在第 6–7 秒附近）。正文里没有任何曝光陈述，反而每段都写了整体压暗的氛围词。
-读数依赖解码路径：同一对文件用 OpenCV 直接解码（不按视频的 BT.709 标签转换）会读成约 −11%。所以前后两边必须走同一条路径，用 `seam_check.py`，不要一边 ffmpeg 一边 OpenCV。
-没有做 A/B，不能断言压暗词是原因；能确定的是文字没有给曝光任何锚点，而且每个续接环节都在往暗走。验证办法：同一首帧、同一 seed，一版去掉压暗词并写相对亮度关系，对比第 0 帧亮度和段内起伏。
-出片后量第 0 秒：`python3 drama-skills/skills/short-drama-video-prompts/scripts/seam_check.py --before <送进去的首帧.png> --after <本段.mp4> --out 审查/seam --label frame0`，看 `luma_mean.change_pct`；段内起伏看 `within_shot_envelope.luma_min/luma_max`（只在段内比较，不与 `luma_mean` 相减）。没有通用阈值：−5–6% 只描述这次测量；须结合本片已接受的亮度关系、可比区域与画面内容核对，读数本身不说明压缩、提示词或其他因素各占多少。
+EP001 三段亮度读数、OpenCV −11% caveat 与 A/B 验证方案见 [case-notes.md](references/case-notes.md) §B；出片后量第 0 秒用 `seam_check.py` 看 `luma_mean.change_pct` 与 `within_shot_envelope`，没有通用阈值。
 
 ## Occlusion Transitions（遮挡转场，摘要）
 
@@ -392,35 +296,9 @@ G36 只提醒回读语义。不要为消除 warn 改掉已确认的声音/行为
   但没有配音」这类会诱发补词的描述；④台词必须逐字正确时用 `guide_audio` 预录整条时间线锁死，
   或后期把静默窗音频换成真实底噪（002 这类台词都在前一窗的镜头最适合这条）。
 
-## Seam Design: Airlock / Land Settled（社区实测，原 relay 案例；不适用于 V2 多窗容器）
+## Seam Design: Airlock / Land Settled
 
-> **适用范围仅限原 relay 案例**：手写链式续接、`flf_chain` 或逐镜独立生成再拼接的那类工况。
-> 当前本地 `workflow=multishot` 走 V2 `H3MultishotMemorySampler` + `context_pin`，前一窗末段已在
-> latent 层钉进下一窗，**不需要也不应**套用这套气闸规则：AIRLOCK 的「静默约 2s 开头」会占掉窗口时长，
-> 「逐字重复角色外貌 + 房间/灯光」可能与 context_pin 的连续性打架。V2 多窗按上面的通道约束写即可。
-
-链式接力的边界不是「对齐像素」，而是「设计一段气闸」。六条规则（relay 案例）：
-
-1. **AIRLOCK（气闸）**：后续镜头开场保持上一镜**精确结尾排列**——同人物、同位置、同构图——静默约 2s 再说话。头部是上一镜尾部的再生，解码时丢弃；写在这里的内容等于白写。
-2. **给 hold 动作**：呼吸、重心转移、视线变化。纯静止会被渲染成冻结帧。
-3. **LAND SETTLED（落稳）**：每镜结束回稳定排列，对白完成，留约 2s。你交出去的排列就是下一镜必须保持的排列。
-4. **台词绝不跨两镜**：预算 = 台词 + 4s 静默。24fps 下 362 帧≈27 词，243 帧≈15 词，124 帧不行——模型会为塞台词放弃气闸。
-5. **逐字重复**角色外貌 + 房间/灯光描述，不转述。
-6. **每镜改一个物理状态**：否则第 3 镜变成第 2 镜的近似副本。测试：交换两镜动作行还能读通 = 模型也分不清。
-
-### 矛盾渲染成并集
-
-第 3 镜开场描述与第 2 镜结尾排列不同 → 模型两个都给你（多出人/重复道具）。**场景变化必须在镜内气闸之后，绝不在边界。**
-
-### 身份保持的双机制
-
-帧接力（像素）+ 逐字文本（类别）。社区实测：40s 双人场景、零参考图，靠这两条保持住两张脸。
-
-### 长链漂移的已知量
-
-- 每次接缝细纹理约 +13%；>4 个窗口（30–40s）开始可见，7 窗口明显过锐。
-- `seed_per_shot` 保持开启；单一 seed 跨镜会让脸和声音都漂。
-- `color_level` 以第 1 镜稳定尾部为固定参考；邻居对邻居匹配会累积漂移。
+旧 relay 链路已不用；气闸六条规则、矛盾并集、双机制与长链漂移量见 [case-notes.md](references/case-notes.md) §K。当前以 `../drama-skills/skills/short-drama-video-prompts/references/seam-transition.md` 与 multishot V2 为准。
 
 ## Generation-Layer Relay vs Edit-Layer Splice
 

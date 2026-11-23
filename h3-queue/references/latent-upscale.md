@@ -33,9 +33,7 @@ VHS_LoadVideo（原帧序，force_rate=0）
 
 - 默认 2×，也可显式给 `width`/`height`；`save_path` 缺省为 MCP 默认输出目录。
 - 工具自动 ffprobe 源、上传到 `ComfyUI/input/`、生成图、提交、轮询、取回并校验非空。
-- 实测：451f / 768×448 → 1536×896，**165.1 s**，GPU 峰值约 6.8 GB。
-  这是修正前的旧值：1536×896 强拉 16:9 会变形，交付须用 `aspect="16:9"` 得到
-  **1536×864**（见 [`delivery-specs.md`](delivery-specs.md) §2.15）；本实测耗时仅代表该次测量，不代表修正后档位。
+- 实测数值与变形修正经过见 [incidents.md](incidents.md) §2026-11-12；交付画幅规则见 [`delivery-specs.md`](delivery-specs.md) §2.15 P0。
 
 **入口二：手工工作流**
 

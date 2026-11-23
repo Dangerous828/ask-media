@@ -8,7 +8,7 @@
 - **上传先按 modality 分流**：
   - **`modality=image`：直接上传参考源文件字节，保留扩展名；上传名含唯一请求标识，按绑定顺序编号。** 不经过 `sips`、缩放或重编码。`resolution=0` 由模型按原参考尺寸编码并对齐 32，不代表源像素未经任何模型预处理；采样画布由 `size` 单独指定。
   - **`modality=video`：继续以下按角色分两档的上传策略**（2026-11-08 修订）；以下压缩开关和参考面积归一规则仅用于视频。
-  - **`first_frame` / `last_frame` 与 `may_control` 含"起始/首帧/构图/状态"的参考 → 原生尺寸 PNG，绝不重编码。** 这些就是交付像素本身。旧代码用 `sips -Z 1344`，而 **`-Z` 会放大也会缩小**：1536×864 的真实末帧被缩到 1344（模型得自己补回 192px 宽度）、896×512 场景板被拉成 1344×768——**末帧接力交出去的已不是创作者验收过的像素**，这是 flf 契约的根本。只在长边超过 `H3Q_REF_LONG_EDGE`（默认 2048，纯安全上限）时才缩。MCP 旧版还把首帧压成 JPEG q80，属同类缺陷，已修。
+  - **`first_frame` / `last_frame` 与 `may_control` 含"起始/首帧/构图/状态"的参考 → 原生尺寸 PNG，绝不重编码。** 这些就是交付像素本身；只在长边超过 `H3Q_REF_LONG_EDGE`（默认 2048，纯安全上限）时才缩。重编码经过见 [incidents.md](incidents.md) 对应节（sips/JPEG 缺陷已修）。
   - **身份／造型／道具／场景板 → 长边 768 + JPEG q80（保持实测口径，不动）。** `../../video-studio/SKILL.md` 与 `ref_guard.py` 记着：压完画面更干净，因为板卡噪点不再被放大。该实测出自 Qwen Image 2.1 Turbo 生图（8 步／CFG 1.0／1024×576，4–5 张参考），**H3 视频侧尚未两侧确认**，所以在 A/B 出结论前不因"看起来更保真"就抹掉它。
   - **做实验**：`H3Q_REF_LOSSLESS=all` 强制全 PNG，`=0` 强制全 JPEG。
   - 张数不再构成压缩理由：显存峰值与参考图张数无关（见 §2.8），`ref_image_size: match` 本来就把每张归一到输出面积。
@@ -24,7 +24,7 @@
   | engine | 用途 | 默认 |
   |---|---|---|
   | `pdd`（**缺省**） | 官方 Alibaba PAI PDD 8 步蒸馏，首采 1024×576（模板锁定）。**唯一能让空间/透视关系成立的组合**，比 lu2 快约 10 倍 | ✅ 新项目一律用它 |
-  | `lu2` | 旧两段式 turbo 4 步。544p 蒸馏跑 768p，**画面空间结构会崩**（实测把「两车之间的窄缝」画成「标准车位」） | **2026-11-15 已下线，不再可选**（仅留作历史对照） |
+  | `lu2` | 旧两段式 turbo 4 步。544p 蒸馏跑 768p，**画面空间结构会崩**（实测对照见下表） | **2026-11-15 已下线，不再可选**（仅留作历史对照） |
 
   **2026-11-07 实测（EP002 第 006 镜，同素材同 seed 777001 同 362 帧）：**
 
@@ -35,8 +35,7 @@
   | pdd + 二采 1536×864 | **832.3s** | ✅ 成立 |
   | lu2 legacy 20步（1344×768） | ~1440s | ❌ 机位更乱 |
 
-- **⚠️ Sol 加速档一律不要开**（2026-11-07 实测）：`sol_scheduled` 比 off 慢 3.5% 且**构图跑掉**；`sol_int8qkpv` 快 22.8% 但**同样跑掉**。稀疏注意力跳过部分 token，丢掉的是空间线索。`H3FrontLoadedSigmas`（−24% 步数）也不能配 PDD——beta57 步点只有 2/40 落在 PDD 训练网格上，会被 `on_off_grid=error` 拦下。
-  → **`pdd_render_ref.py` 与 `lu_render_ref.py` 的 `--sol-profile` 默认已改为 `off`**（2026-11-07）。
+- **⚠️ Sol 加速档一律不要开**：`sol-profile` 默认 `off`；实测数字、构图跑掉与 `H3FrontLoadedSigmas` 冲突见 [incidents.md](incidents.md) §2026-11-07。
 
 - **参考图槽位：不是 2 张，实测到 9 张（2026-11-08）**
 
@@ -52,46 +51,10 @@
 
   **节点真实上限是 9**（`MiniMaxH3ReferenceToVideo.ref_images` autogrow `min:0, max:9`），不是 h3q 也不是模型的 2 张限制。`h3_gate.py` 不限制数量，只核对 `<Picture N>` 编号 ≤ 实际上传数。
 
-  **实测：显存峰值与参考图张数无关（2026-11-08）**：
-
-  | refs | draft 1024×576 | final 1536×864 |
-  |---|---|---|
-  | 2 | 15.14 GiB / 285.8s | ✅ 15.55 GiB / 831.2s |
-  | 3 | 15.14 / 290.6s | 未测 |
-  | 5 | 15.15 / 310.6s | 未测 |
-  | 6 | 未测 | ✅ **15.53 GiB / 882.4s**（2026-11-08） |
-  | 9 | 15.14 / 340.6s | ❌ 失败于 node 304 `SamplerCustomAdvanced`，605.9s（**已排除参考图数量**） |
-
-  **draft 档参考图几乎不吃显存**（2→9 张峰值都在 15.14–15.15），只涨时间约每张 7.8 秒。
-
-  **✅ 结论：final 档的显存不随参考图张数增长。** 6 张二采 15.53 GiB，比 2 张的 15.55 GiB 还略低——
-  峰值由二采主序列（138,672 token）决定，参考图那点 token 挤不进影响因素。时间才是要付的代价：
-  2→6 张 = 831.2s→882.4s，**每张约 +13 秒**（draft 档每张约 +8 秒）。
-
-  所以 **9 张那次失败与张数无关**。报错正文：
-
-  ```
-  torch.OutOfMemoryError: Allocation on device 0 would exceed allowed memory.
-  Currently allocated : 901.46 MiB
-  Requested           : 50.93 MiB
-  Device limit        : 15.92 GiB
-  Free (according to CUDA): 0 bytes
-  ```
-
-  **PyTorch 自己只占 901 MiB、只申请 50.93 MiB，CUDA 却报可用 0 字节**，摘要还写 `CUDA OOMs: 0`。
-  这不是"任务用光 16GB"的形态，而是**设备被别的东西占满**的形态；同时段 `h3q health` 报
-  `external work running=1`。
-
-  → **final 档挂多张是安全的**：6 张已实测成功，峰值与 2 张同级。按每张 +13s 排时间预算即可。
-  但开跑前仍要确认显存窗口干净（`nvidia-smi` 看 PID 归属，别用 `external work running` 判断，见下条），
-  否则一次瞬时分配失败会被误读成容量问题——本次就是这么绕了一圈。
-
-  → **验构图（draft）可以身份板＋场景板＋道具板全挂上，最多 9 张**（走 pdd_render_ref 渲染器路径；本仓 mkdraft.py 仅 2 槽，不适用），多人镜头不必再用正文文字补身份；
-  → **出片（final）实测通过 2 张与 6 张**，显存无增长；要多张直接上，按每张 +13s 排时间预算即可。
-  9 张那次失败属另一类问题（sticky context / 瞬时分配），不是容量；**重跑即可，不要因此退回 2 张**。
-  → 一次 OOM 会让 ComfyUI 进入 Sticky 状态需重启，`h3q` 看门狗会自动拉起。
-
-  顺带修掉的缺陷：改前 refs 数**少于**模板槽数时，多出来的槽仍接着模板自带图，模型会当额外的 `<Picture N>` 吃进去（现按 refs 裁剪）。回归核对：2 张路径改前改后**逐字节一致**。
+  **结论（2026-11-08 实测）：**
+  - 9 张参考图只走渲染机侧 `pdd_render_ref.py`（动态槽位逻辑在该私有脚本内，未随公开版发布）；本仓 `scripts/mkdraft.py` 离线副本最多 2 槽（`--ref0/--ref1`），不要拿它验证 9 图。节点真实上限 9 是 `MiniMaxH3ReferenceToVideo.ref_images` 的 autogrow `min:0,max:9`，`h3_gate.py` 不限制数量、只核对 `<Picture N>` 编号。
+  - 出片（final）实测通过 **2 张与 6 张**；**显存峰值与张数无关**，时间才是代价——**每张约 +13 秒**。实测数字见 [incidents.md](incidents.md) §2026-11-08。
+  - 验构图（draft）最多 9 张；9 张那次 OOM 属 sticky context / 瞬时分配，不是容量问题，重跑即可、不要退回 2 张。逐帧数据、报错正文与推翻过程见 [incidents.md](incidents.md) §2026-11-08。
 
 - **⚠️ `h3qc health` 两个字段容易读错（2026-11-08 连错两次，务必看清）**
 
@@ -103,33 +66,10 @@
   判"有没有别人占卡"不能靠这两个字段。可靠做法：`nvidia-smi --query-compute-apps=pid,used_memory` 看 PID 归属，
   再对 `h3qc queue`（h3q 自己的任务）做差。
 
-  这条纠正同时推翻了上面的一个推断：**`external work running=1` 不构成"9 张那次失败是别人干扰"的证据**。
-  那次失败目前仍未归因：报错正文的 `Free (according to CUDA): 0 bytes` 配合 `Currently allocated 901 MiB`
-  是 h3q 自述的 **CUDA context sticky** 形态（`cuMemGetInfo` 本身开始失效），
-  而不是干净的"显存被外部占满"。两种解释都还没被排除，**6 张二采是判据**。
+  这两个字段纠正过一次误判（`external work running=1` 被当成别人干扰的证据）；推翻经过与未归因结论见 [incidents.md](incidents.md) §2026-11-08。实测记录存项目内部档案（未随公开版发布）。
 
-  实测记录存项目内部档案（未随公开版发布）。
-
-- **第三条路线：HyperFlow H3 Flash（第三方压缩模型，2026-11-06 开源）——本机 16GB 跑不了，别装。**
-
-  Video Rebirth 出的 H3 压缩版，**独立权重**（13.7B，不到原版 31B 的一半），不是 PDD 之外的一个开关，也不是能叠在原版权重上的 LoRA。4/6/8 步、无 CFG、音画同出（32kHz 立体声）、支持 t2va / fl2va / ref2va（最多 9 图）。
-
-  实测数据（MiniMax 官方上游仓库的 integrations/README.md，1344×768、6 步、2 张参考图）：
-
-  | GPU | ref2v 5.2s / 15s | 峰值 VRAM |
-  |---|---|---|
-  | RTX 4090 (24G) | 180s / 866s | 22 GiB |
-  | RTX 5090 (32G) | 139s / 663s | 30 GiB |
-  | **RTX 5070 Ti (16G)** | — | **官方明写 "16 GB GPUs are not measured yet"** |
-
-  **本机不成立的三条硬理由**：
-  1. **显存**：峰值要 22 GiB，本机上限 15.92 GiB。现役 PDD 跑 1536×864 已到 15.55 GiB，只剩 0.37 GiB。换 `Q3_K_M` 只省 1.9 GB，而峰值里权重仅约 9 GB、余下 13 GB 是激活值与 VAE，填不上 6 GiB 的缺口。
-  2. **没有速度收益**：24G 卡出 15 秒要 866s，比现役 PDD 的 831s 还慢；16G 只会更慢或直接 OOM。
-  3. **改动面大**：要 ComfyUI ≥ 0.43.0（版本与运行实例提交号现场核对，以实际部署为准；不同来源的 `git describe` / commit 号可能不一致，判断版本只看 `comfyui_version.py` / `pyproject.toml`，见 [`../SKILL.md` "入口与环境"](../SKILL.md)）、装 `ComfyUI-GGUF` + `ComfyUI-HyperFlow-Flash`、用专属 `HyperFlow GGUF Loader`（普通 loader 不认两时间嵌入器）、整套工作流重写；且要下载约 35 GB（两个 GGUF + 15.7 GB 文本编码器 + VAE），E 盘按部署时实际余量。`<渲染机根目录>` 不是 git 仓库，升级 ComfyUI 后 PDD / LatentUpscaler3D / Sol 那套改动都要重验。
-
-  **什么情况下再来看它**：官方补 16GB 实测数据，或出现 16GB 可跑的精简版。届时重估的唯一看点是**音画同出**这个能力，不是速度。
-
-  来源：[GitHub](https://github.com/Video-Rebirth/hyperflow-h3-flash) · [HF 权重](https://huggingface.co/VideoRebirthAI/hyperflow-h3-flash) · [ComfyUI 节点](https://github.com/Video-Rebirth/ComfyUI-HyperFlow-Flash)
+- **第三条路线：HyperFlow H3 Flash —— 本机 16GB 跑不了，别装。**
+  再看条件：官方补 16 GB 实测数据，或出现 16 GB 可跑的精简版；届时唯一看点是**音画同出**，不是速度。三条硬理由、官方显存表与来源见 [incidents.md](incidents.md) §2026-11-06。
 
 - **视频档位 `parameters.tier`（adapter 代码强制，不靠提示）：**
 
