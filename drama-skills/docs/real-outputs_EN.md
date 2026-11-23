@@ -85,7 +85,7 @@ The four originals (sample project, local-only, not included in the public relea
 
 ## What the checker catches: break the sample in two places on purpose
 
-Origin: the same public sample as the previous subsection. `creator_markdown_check.py` validates the executable
+Origin: the same local-only sample project as the previous subsection (not shipped in this public repo). `creator_markdown_check.py` validates the executable
 contract between the five documents of one episode. It passes on the sample as shipped. Remove Character B from SHOT-002's visual basis and change MOTION-003's
 duration from 2s to 3s, and it reports the cause, not "validation failed":
 

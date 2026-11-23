@@ -16,7 +16,7 @@ description: 仅在要往渲染机（RTX 5070 Ti 16GB，SSH 别名按部署配�
 ## 入口与环境
 
 - **最低 ComfyUI 版本（以实际部署为准）**：H3-Image 需 v0.45.0+、Qwen 2.1 Turbo 需 v0.40.0+、H3 视频需 v0.30.0+（Multishot 建议 v0.34+）。此处 Turbo 指权重/节点支持版本，与已退役的 Turbo LoRA 出图档不是一回事。
-- **版本口径**：同一部署可能出现多个"版本号"（`comfyui_version.py` / `pyproject.toml`、`git describe`、运行实例 `git commit` 不一致）。判断当前版本只看 `comfyui_version.py` / `pyproject.toml` 的实际值；`git describe` 与提交号受仓库 tag / 工作树状态影响，不作为版本依据。特性是否可用以 `/object_info` 中节点是否注册为准。具体以实际部署为准。
+- **版本口径**：同一部署可能出现多个"版本号"（渲染机 ComfyUI 目录下的 `comfyui_version.py` / `pyproject.toml`、`git describe`、运行实例 `git commit` 不一致）。判断当前版本只看 `comfyui_version.py` / `pyproject.toml` 的实际值；`git describe` 与提交号受仓库 tag / 工作树状态影响，不作为版本依据。特性是否可用以 `/object_info` 中节点是否注册为准。具体以实际部署为准。
 
 ## 0. 队列速查：先入队，轮到再检查显存
 

@@ -75,7 +75,7 @@
 
 ## 检查器抓什么：把样例故意改坏两处
 
-出处：同上一节的公开样例。`creator_markdown_check.py` 核对一集六份文档之间可执行的契约。原样跑过；删掉 SHOT-002 视觉依据里的角色B、
+出处：同上一节的示例项目（local-only，未随公开版发布）。`creator_markdown_check.py` 核对一集六份文档之间可执行的契约。原样跑过；删掉 SHOT-002 视觉依据里的角色B、
 再把 MOTION-003 的时长从 2s 改成 3s，它报的是原因，不是「校验失败」：
 
 下面命令里的 `skills/…` 与 `examples/…` 都是**相对 `drama-skills/` 目录**；示例项目本仓未收录（local-only），

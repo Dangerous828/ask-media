@@ -13,7 +13,7 @@
 
 ## 本地 h3q 的能力边界
 
-原教程把选中的基础打斗当作 `@video_1` 送回模型生成新机位。**本地 h3q 没有 `reference_video`，也没有纯文生**；`last_frame` 已支持（FL2VA，见 `minimax-h3.md`），但 FL2VA 与 `reference_image` 互斥，所以这条"用视频参考生成新机位"的链仍然不成立。不要拿尾帧塞进 `reference_image` 冒充续接。
+原教程把选中的基础打斗当作 `@video_1` 送回模型生成新机位。**本地 h3q 没有 `reference_video`，也没有纯文生**；`last_frame` 已支持（FL2VA，见 [`minimax-h3.md`](../../../drama-skills/skills/short-drama-video-prompts/references/minimax-h3.md)），但 FL2VA 与 `reference_image` 互斥，所以这条"用视频参考生成新机位"的链仍然不成立。不要拿尾帧塞进 `reference_image` 冒充续接。
 
 本地等价做法，按优先级：
 

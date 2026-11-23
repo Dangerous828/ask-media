@@ -202,7 +202,7 @@
 
 - CFG 负向机制权威：`still-api-params.md:7-9`「术语与分层」（全仓只定义一次）。
 - PDD 竖屏支持：见 `tiers-and-capabilities.md` 竖屏段；draft 首采 **576×992**、final 二采 **832×1440**，896×1536 面积超 1536×864 上限被拒。竖屏 draft 与 final 首采不是同一画布（832×1440 → 544×960，宽高比差约 2%），draft 只验表演不验构图。
-- 版本口径：同一部署可能出现多个版本号；判断只看 `comfyui_version.py` / `pyproject.toml` 实际值，`git describe` 与提交号不作依据，特性以 `/object_info` 节点是否注册为准。
+- 版本口径：同一部署可能出现多个版本号；判断只看渲染机上 ComfyUI 目录的 `comfyui_version.py` / `pyproject.toml` 实际值，`git describe` 与提交号不作依据，特性以 `/object_info` 节点是否注册为准。
 
 ## 2026-11-06｜HyperFlow H3 Flash 三条硬理由（不装）
 
