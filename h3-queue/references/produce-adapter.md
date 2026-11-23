@@ -26,6 +26,8 @@
   | `pdd`（**缺省**） | 官方 Alibaba PAI PDD 8 步蒸馏，首采 1024×576（模板锁定）。**唯一能让空间/透视关系成立的组合**，比 lu2 快约 10 倍 | ✅ 新项目一律用它 |
   | `lu2` | 旧两段式 turbo 4 步。544p 蒸馏跑 768p，**画面空间结构会崩**（实测对照见下表） | **2026-11-15 已下线，不再可选**（仅留作历史对照） |
 
+  **口径（2026-11-23 时点）**：上表步数、尺寸与耗时为实测快照，现行 engine 可选集与缺省以运行时实读为准（渲染机 `h3qc submit --help` / adapter `parameters.engine` 校验）。
+
   **2026-11-07 实测（EP002 第 006 镜，同素材同 seed 777001 同 362 帧）：**
 
   | 组合 | 墙钟 | 窄缝成立 |
@@ -33,7 +35,9 @@
   | 旧 lu2 draft（896×512 4步） | ~120s | ❌ 标准车位 |
   | **pdd 8步 Sol off（1024×576）** | **285.8s** | ✅ 成立 |
   | pdd + 二采 1536×864 | **832.3s** | ✅ 成立 |
-  | lu2 legacy 20步（1344×768） | ~1440s | ❌ 机位更乱 |
+  | lu2 legacy 20步（1344×768，**已退役 lu2 legacy，2026-11-15 下线，仅历史对照**） | ~1440s | ❌ 机位更乱 |
+
+  该「20 步正式档」只属已退役的 lu2 legacy（2026-11-15 下线，出处：本节引擎表与 [incidents.md](incidents.md) §2026-11-06/§2026-11-07）；现役 pdd final 二采 8 步，362 帧全程约 832.3s（≈14 分钟）。
 
 - **⚠️ Sol 加速档一律不要开**：`sol-profile` 默认 `off`；实测数字、构图跑掉与 `H3FrontLoadedSigmas` 冲突见 [incidents.md](incidents.md) §2026-11-07。
 
@@ -69,16 +73,18 @@
   这两个字段纠正过一次误判（`external work running=1` 被当成别人干扰的证据）；推翻经过与未归因结论见 [incidents.md](incidents.md) §2026-11-08。实测记录存项目内部档案（未随公开版发布）。
 
 - **第三条路线：HyperFlow H3 Flash —— 本机 16GB 跑不了，别装。**
-  再看条件：官方补 16 GB 实测数据，或出现 16 GB 可跑的精简版；届时唯一看点是**音画同出**，不是速度。三条硬理由、官方显存表与来源见 [incidents.md](incidents.md) §2026-11-06。
+  先看归属：它是**第三方压缩模型**（Video-Rebirth 的 HyperFlow H3 Flash，13.7B），**不是 MiniMax 官方上游**。显存数字出自其仓库 Video-Rebirth/hyperflow-h3-flash 的 integrations/README.md（引用时点 2026-11-06，1344×768、6 步、2 张参考图口径，GGUF Q4_K_M / 该表未细分 INT8 档），本仓记录值为 RTX 4090 (24G) 22 GiB、RTX 5090 (32G) 30 GiB；上游现行表可能已更新，以引用时点为准。再看条件：官方补 16 GB 实测数据，或出现 16 GB 可跑的精简版；届时唯一看点是**音画同出**，不是速度。三条硬理由、显存表原文与来源链接见 [incidents.md](incidents.md) §2026-11-06。
 
 - **视频档位 `parameters.tier`（adapter 代码强制，不靠提示）：**
 
   | engine | tier | 实际参数 | 用途 | 约束 |
   |---|---|---|---|---|
   | `pdd` | `draft`（**缺省**） | `--workflow pdd_lu --no-upscale --sol-profile off`，首采 1024×576 | 验构图/运动/身份。362 帧约 285s | 步数由档位模板固定（8 步）；adapter 会把 `parameters.steps` / `parameters.cfg` 透传到 h3qc 命令行，服务端是否接受以实际部署为准，不要指望靠透传步数改变该档 |
-  | `pdd` | `final` | `--out-width/--out-height` 二采，`--sol-profile off` | 出成片。362 帧到 1536×864 约 832s | **16GB 上限 1536×864**（实测峰值 15.55/15.92 GiB）；超过直接拒绝 |
+  | `pdd` | `final` | `--out-width/--out-height` 二采，`--sol-profile off` | 出成片。362 帧到 1536×864 约 832s | **16GB 面积上限 1536×864（1,327,104 px）；竖屏 832×1440 在内**（实测峰值 15.55/15.92 GiB）；超过直接拒绝 |
 
   > **2026-11-15 起引擎只保留 `pdd`，`lu2`/`legacy` 全部下线**（操作者指令）。`VIDEO_ENGINES=("pdd",)`、`VIDEO_TIERS=("draft","final")`；adapter/server 两条校验路径都会拒 `engine=lu2` / `tier=legacy`，底层 `--workflow lu2|legacy` 变不可达死代码。多窗另走 `multishot`（v2，见 §2.14，不占 engine/tier）。lu2 的历史实测数据仅留作对照，不再是可选档位。
+  >
+  > **口径（2026-11-23 时点）**：上表档位参数、耗时与上限为实测快照；现行档位集、缺省与分辨率上限以运行时实读为准（渲染机 `h3qc submit --help` / adapter `parameters.tier` 校验 / MCP schema）。
 
   **长度只认帧数**：`pdd_lu` 忽略 `--seconds`，长度只认 17k+5 的 `--frames`；adapter 自动换算。
 

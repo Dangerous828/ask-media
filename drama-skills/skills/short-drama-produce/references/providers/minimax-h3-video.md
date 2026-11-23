@@ -46,6 +46,9 @@ consumes it when appending reference semantics and does not send it as a MiniMax
 conditioning at 9 `reference_image`, 3 `reference_video` and 3 `reference_audio` items, with video and
 audio clips between 2 and 15 seconds each and at most 15 seconds in total per modality; the compiler
 does not count them, so a configuration that can exceed those numbers has to bound them itself.
+**Those per-modality caps are not additive to 15 files: mixed inputs are capped at 12 files in total**
+(9 images + 3 videos + 3 audios would be 15, which exceeds the official 12-file mixed total). Bound
+the total to 12 when compiling a mixed request.
 frame conditioning (`first_frame` / `last_frame`) and full-reference conditioning
 (`reference_image` / `reference_video` / `reference_audio`) are mutually exclusive in one request.
 For continuation, bind the previous actual video as `reference_video` and its actual tail as

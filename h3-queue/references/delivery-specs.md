@@ -35,7 +35,7 @@
 
 | 顺序 | 方案 | 适用与要点 |
 |---|---|---|
-| 1 | **H3 低 σ refiner**（§2.10 `MMH3 Ultimate Upscale` `refine_denoise 0.30` / `H3HiresFix`，<https://github.com/bbaudio-2025/Comfyui-MMH3-UltimateUpscale>、<https://github.com/tazmannner/ComfyUI-H3-ResCascade>） | **运动镜头、长镜头、连续段首选**。成品帧 VAE 回编码后精修，同源质感、保 take、音频原样，跨帧一致。451 f 超 ~300 f 整段上限须时间分块（`chunk 136 / overlap 17`、`--tile-size 0`）；16 GB 只在 362 f / 1536×864 验证过（15.55 GiB、832 s）；空间 tile 会出镜像伪影；低 denoise 仍可能小人物位移，产物重走媒体验收 |
+| 1 | **H3 低 σ refiner**（成品帧 VAE 回编码后精修路线：§2.11 latent 放大 + `H3HiresFix`；§2.10 `MMH3 Ultimate Upscale` `refine_denoise 0.30` 为其载体之一，但该 MMH3 二采管线随 lu2 于 2026-11-15 下线、参数仅留离线参考，**不作为现役首选入口**，见 §2.10 退役横幅；<https://github.com/bbaudio-2025/Comfyui-MMH3-UltimateUpscale>、<https://github.com/tazmannner/ComfyUI-H3-ResCascade>） | **运动镜头、长镜头、连续段首选**（指「低 σ 精修 + 保 take」这条路线，不是已退役的 MMH3/lu2 入口）。成品帧 VAE 回编码后精修，同源质感、保 take、音频原样，跨帧一致。451 f 超 ~300 f 整段上限须时间分块（`chunk 136 / overlap 17`、`--tile-size 0`）；16 GB 只在 362 f / 1536×864 验证过（15.55 GiB、832 s）；空间 tile 会出镜像伪影；低 denoise 仍可能小人物位移，产物重走媒体验收 |
 | 2 | **FlashVSR**（<https://github.com/OpenImagingLab/FlashVSR>、<https://github.com/1038lab/ComfyUI-FlashVSR>） | **仅锁定机位／近静态特写**。吃成品 MP4、与生成通道解耦，官方 10 s→1080p 约 41 s；节点在 win `custom_nodes/ComfyUI-FlashVSR`，权重需下载。16 GB 用 Tiny / Tiny Long + `enable_tiling`；451 f 整段必裁 5–10 s（社区报 15 s 长片在 16 GB 崩）；RTX 50 系 Block-Sparse 兼容官方标 unknown，triton 编译报错是高频坑。上镜头前先确认这一镜没有推拉摇移 |
 | 3 | **SeedVR2 3B fp8**（已装，§2.10 B 路径） | 特写／交付镜头备选。环境零改动，`inference_cli.py` 可脱离 ComfyUI 跑；官方点名「720p AIGC 轻退化源会过锐化」，正对短剧 draft 素材，大运动不鲁棒。16 GB 用 batch 9–13 + temporal_overlap + VAE tiling + BlockSwap，慢，音轨用 ffmpeg 后合，产出走 `look_check`。**SeedVR2 仍 FAIL，不为存量铺开**；逐项症状与数字见 [incidents.md](incidents.md) §2026-11-15 SeedVR2 |
 

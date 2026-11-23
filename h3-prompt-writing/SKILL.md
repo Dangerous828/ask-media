@@ -73,7 +73,7 @@ When a render comes back with a known failure mode (extra character/animal, shar
 | 触发词（你的镜头里有这些吗） | 先翻哪条 | 最短结论 |
 |---|---|---|
 | **手上/身上有没有多出来的东西**（袋子、包、手机、钥匙、道具） | 否定句写在尾部无效 | 否定的力量取决于语法位置。把「手上是什么」写进**首帧状态句**，并点名**唯一允许持有的物体**；末尾写 "no bag" 无效 |
-| **同框有几个人**，参考图挂全了吗 | 配角没挂身份板 | 该镜**所有出场人物**都要挂身份板，不能只挂主角；配角的脸不会因为同框而自动对齐 |
+| **同框有几个人**，参考图挂全了吗 | 配角没挂身份板 | 在身份图上限内，该镜**所有出场人物**都要挂身份板，不能只挂主角；超上限的走冻结文字身份段或拆镜（上限与写法见 `references/ref-subject-picture.md`）；配角的脸不会因为同框而自动对齐 |
 | 有没有写 **"no XXX" / "without XXX" / "不得出现"** | 正文尾部否定无效 | 正文没有独立的负向条件分支，否定句只是一个可渲染的名词串。改成正向场景写法：把「手上是什么」写进首帧状态句 |
 | 画面里有没有**悬空/重影/重复**风险物（屏幕、牌子、手持物） | 换素材只看指标／绝对保持词 | 锁物体画面时同段写明**人物在画内位置**；道具小动作写不住就让道具不出现 |
 | 这镜有没有**换素材或改出点** | 换素材只看音频指标 | 必须**同时验画面与声音**；剪辑单写死的来源是真相源，文件名后缀不是质量排序 |
@@ -188,7 +188,7 @@ H3 `cfg=1` 没有独立负向通道；把需要的东西写成正向可见状态
 
 ## Light and Exposure
 
-证据与完整自检在 `references/case-notes.md` §B。通则：
+证据与完整自检在 `references/case-notes.md` §B（暖灯笼光色观测）与 §B 子节「EP001 首帧续接的亮度观测」。通则：
 
 1. **色温取自账本中的实际光源与状态。** 同源同态的数值冲突先核对上游；不同光源、空间或时刻有已确认差异时按原设定写，不为统一数值改光源。同族两个色温是否导致亮度波动，只是案例 §B 的待验证假设，不能据此删改合法光源。
 2. **只写有上游依据的光变。** 账本与分镜明确的开关灯、闪烁或经过不同照明区，保留触发、时刻与结果；稳定光源按稳定状态写。`brightness pulsing`、`flashing`、`brightens then dims`、`exposure shifting` 等变化词仅在这些依据成立时取用，不为氛围额外添加。
@@ -196,7 +196,7 @@ H3 `cfg=1` 没有独立负向通道；把需要的东西写成正向可见状态
 4. **起点亮度关系照实际首帧或上游状态写。** 用本镜实际物件说明最亮处与暗部；后续变化按账本中的因果与时刻展开。已有光照设定上，整体压暗或改色的氛围词也须有上游依据。
 5. **同一时刻、同一表面的描述相容。** 颜色或受光确实变化时交代原因与时刻，分别写清前后状态。
 
-EP001 三段亮度读数、OpenCV −11% caveat 与 A/B 验证方案见 [case-notes.md](references/case-notes.md) §B；出片后量第 0 秒用 `seam_check.py` 看 `luma_mean.change_pct` 与 `within_shot_envelope`，没有通用阈值。
+EP001 三段亮度读数（40.1→37.6、41.9→39.7、35.2→33.1，约 −5–6%）、OpenCV −11% caveat 与 A/B 验证方案见 [case-notes.md](references/case-notes.md) §B 子节「EP001 首帧续接的亮度观测」；出片后量第 0 秒用 `seam_check.py` 看 `luma_mean.change_pct` 与 `within_shot_envelope`，没有通用阈值。
 
 ## Occlusion Transitions（遮挡转场，摘要）
 
@@ -349,7 +349,7 @@ that inherits it gets worse.
 
 ## Production Presets (measured 2026-10-18 on RTX 5070 Ti 16GB; engine 更新 2026-11-15)
 
-This table records the historical lu2/Sol presets (full basis in the internal production-freeze record, not published in this repo). **Current channel (2026-11-15): only `pdd`** — `draft` runs the PDD 8-step first pass at 1024×576 (`--no-upscale`); `final` adds a second pass up to 1536×864. `lu2` / `legacy` / `tier: legacy` are retired and rejected by both adapter and MCP, so the three-tier rows below are **pre-2026-11-15 lu2 measurements kept for comparison only**. pdd `draft → final` has no latent continuation (`draft_job_id` / `draft_accepted` are no longer read). Multi-window containers use `workflow=multishot` (V2 sampler), which is not an engine/tier. Current contract: `../h3-queue/SKILL.md` §2.8（PDD 档位）与 §2.14（multishot）。
+This table records the historical lu2/Sol presets (full basis in the internal production-freeze record, not published in this repo). **Current channel (2026-11-15): only `pdd`** — `draft` runs the PDD 8-step first pass at 1024×576 (`--no-upscale`); `final` adds a second pass up to 1536×864. `lu2` / `legacy` / `tier: legacy` are retired and rejected by both adapter and MCP, so the three-tier rows below are **pre-2026-11-15 lu2 measurements kept for comparison only**. pdd `draft → final` has no latent continuation (`draft_job_id` / `draft_accepted` are no longer read). Multi-window containers use `workflow=multishot` (V2 sampler), which is not an engine/tier. Current contract: `../h3-queue/references/produce-adapter.md`（PDD 引擎见 :22、档位见 :134）与 `../h3-queue/SKILL.md` §2.14（multishot）。
 
 - **历史 lu2 draft（896×512，4 步 Turbo LoRA）**：46s–3m05s/段（311–362 帧）。画质软（放大 1.5× 有糊感）。
 - **历史 lu2 final（latent 放大二采）**：2026-11-04 起 >300 帧不再受限。二采引擎默认 `split`（MMH3 Ultimate Upscale 时间分块，chunk 136 / overlap 17），实测 311 帧与 362 帧 → 1920×1088 全部通过，单段 16–19 分钟。`--refine-denoise` 默认 0.30（保形点）；`--tile-size` 必须为 0（空间分块会产生镜像伪影）。

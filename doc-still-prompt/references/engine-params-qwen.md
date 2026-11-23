@@ -263,6 +263,8 @@ Z-Image 尚未接进 h3q 队列，要作为常规路线需先打通提交入口�
 | 变体 | 步数 | CFG | 负向词 | 质量 | 多样性 | 微调性 |
 |---|---|---|---|---|---|---|
 | **Z-Image-Turbo** | **8** | ❌ | ❌ | Very High | **Low** | N/A |
+
+> **本机 9 步 vs 官方 8 步的口径**：本机 ComfyUI 链路用 `num_inference_steps=9`，即 **8 次 DiT 前向 + 1 次初始噪声解算**，与官方表的 **8 步**是同一档，不是 "比官方多一步" 的另一档配置；下文本机实测写的「9 步」与此处官方「8 步」指同一 Turbo 档。
 | **Z-Image**（base） | 50 | ✅ | ✅ | High | Medium | Easy |
 | Z-Image-Omni-Base | 50 | ✅ | ✅ | Medium | High | Easy |
 | Z-Image-Edit | 50 | ✅ | ✅ | High | Medium | Easy |

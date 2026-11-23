@@ -129,7 +129,7 @@ warn 逐条说明处理理由；退出码不作为能否继续的依据。会硬
    `production_profile` 还是 `unset` 时，先把这个选择连同它带来的原生时长、参考方式和正文语言写进档案，
    再继续下游阶段。会话里的一句点名不落到档案上，下一轮就会退回通用路径，方言和时长要重猜。
    档案描述的是**实际出片通道**的能力：本机经 h3q 出 H3 时用 H3 方言里的「本地 h3q 通道档案」
-   （只有 `first_frame` 与 `reference`），不要写云端档案再在投产时临时降级。
+   （`first_frame` / `first_last_frame` / `reference` 三模式，见下方 CD-H3 示例），不要写云端档案再在投产时临时降级。
 9. 任何媒体生产开始前，确认《视觉设定.md》已登记「## 画风基准」（见 `../short-drama-assets/SKILL.md`）。没有时先
    停下补登记；没有基准就无法判断生成物是否退化，后续验收全部只能是 PROVISIONAL。
 10. 生产是“生成一条 → 验收一条 → 才决定下一条用什么输入”的循环，不是一次跑完再统一审。
@@ -157,10 +157,10 @@ python3 {技能目录}/scripts/project_tool.py init ./my-drama --title "示例�
 （`accepted_value` 就是要落进 `choices` 的对象本身，不要再包一层 `choices`）：
 
 ```jsonl
-{"decision_id":"CD-H3","status":"accepted","target_locators":[{"src":"short-drama","field":"/creator_authority/production_profile/choices"}],"accepted_value":{"target_video_model":"minimax-h3","video_prompt_dialect":"minimax-h3","video_prompt_language":"en","native_duration_seconds":{"min":4,"max":15},"supported_generation_modes":["first_frame","reference"],"audio_generation":"same_pass"}}
+{"decision_id":"CD-H3","status":"accepted","target_locators":[{"src":"short-drama","field":"/creator_authority/production_profile/choices"}],"accepted_value":{"target_video_model":"minimax-h3","video_prompt_dialect":"minimax-h3","video_prompt_language":"en","native_duration_seconds":{"min":4,"max":15},"supported_generation_modes":["first_frame","first_last_frame","reference"],"audio_generation":"same_pass"}}
 ```
 
-上例是**本机经 h3q 出片**的档案（只有首帧与参考图）；改用云端 H3 API 时，`supported_generation_modes` 换成 H3 方言里的云端推荐值。
+上例是**本机经 h3q 出片**的档案（单首帧 / 首尾帧 / 全参考三模式；首尾帧的透传与实测见 `../../../h3-queue/SKILL.md`「输入能力与续接职责」）；改用云端 H3 API 时，`supported_generation_modes` 换成 H3 方言里的云端推荐值。
 
 再发布、接受、写入：
 

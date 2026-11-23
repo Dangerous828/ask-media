@@ -47,7 +47,7 @@
   Markdown file cannot impersonate a creator source. `prepare` requires `prompt`
   to exactly equal the selected copyable body after Markdown quote markers and
   the separate `Frame` / `镜头语言` metadata lines are removed.
-- `reference_bindings`: zero to sixteen ordered semantic bindings. Every entry has
+- `reference_bindings`: zero to sixteen ordered semantic bindings (adapter envelope; the H3 provider caps mixed inputs at 12 files in total — see `providers/minimax-h3-video.md`). Every entry has
   exactly `slot_id`, contiguous `order`, project-relative `path`, Chinese `label`,
   non-empty `role`, and non-empty `may_control` / `must_not_control` lists. When
   `source_entry` is present, these fields must exactly match that entry's
@@ -71,7 +71,7 @@
   slots may use that role. Leaving a declared voice or its character out, or swapping
   characters, fails `prepare`. Adapters must preserve this character binding; bundled
   compilers derive the voice label from `character`, not the free-form asset `label`.
-- `references`: zero to sixteen current project files actually sent to production.
+- `references`: zero to sixteen current project files actually sent to production (adapter envelope; the effective H3 limit is the provider's 12-file mixed total — see `providers/minimax-h3-video.md`).
   It may be omitted when `reference_bindings` is present, in which case the paths
   are derived in binding order. If both are present, they must match exactly.
 - `outputs`: one to sixteen unique paths rooted at top-level `production/` or

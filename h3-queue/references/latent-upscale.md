@@ -4,6 +4,8 @@
 
 **为什么走这条路**：Multishot 内置的 `(H3 latent x2)` 依赖 Tr1dae 的 `MiniMaxH3LatentUpscaleCombined`，本机没有；装 Motion-Context 也会被 Multishot 按版本点名拒绝（0.3.1 抢 `PackedLayout`，0.4.0+ 直接抛错）。而 CORE 采样器只输出 IMAGE、不暴露 latent，所以不能直接接放大节点。可行解是把成品帧用 H3 video VAE 回编码成 latent，再交给盘上的 LBH 3D 网络。
 
+**V2 时代补充（2026-11-15 起）**：上面的「本机没有」是 CORE 时期的论证。Multishot 现走 V2 `H3MultishotMemorySampler`，**缺的是独立的 `MiniMaxH3LatentUpscaleCombined` 节点**；V2 采样器**内建** latent 超分参数（`upscale_model_name=(H3 latent x1.5/x2)` + `output_scale`）确实存在，但本机 16G 实测内建超分**发糊不可用**（记忆 h3-v2-latent-upscale-bad-on-16g），故渲染器固定 `output_scale=1 / (none)`。因此仍走「成品帧回编码 + 后处理放大」这条路，与 [delivery-specs.md](delivery-specs.md) §2.15 multishot 段对齐；「没有独立 Combined 节点」与「V2 有内建参数但本机不可用」不矛盾，是不同层面的两件事。
+
 **链路**（`ComfyUI-H3-ResCascade` + 自带节点）：
 
 ```

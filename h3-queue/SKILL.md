@@ -23,7 +23,7 @@ description: 仅在要往渲染机（RTX 5070 Ti 16GB，SSH 别名按部署配�
 - **任务已获本次生产授权，输入与闸门已通过，就先入 h3q。** 项目 MCP 用 `wait=false`，CLI 省略 `--wait`。保存 `job_id`，再查状态或排位。当前 GPU 忙、显存低或显示 `occluded`，都无需在调用端等卡空；轮到任务执行时，由 h3q worker 查 ComfyUI 和显存，必要时回收或等待。
 - **查谁在跑，先看 `h3_queue_status` 的队列视图（不带 `health`）或 `h3qc queue`。** `occluded` 表示 ComfyUI 有运行中或待处理的任务。`external_running` / `external_pending` 是 ComfyUI 的计数，包含 h3q 自己派发的任务。只有核对同一时段的 h3q 活动任务和 ComfyUI 队列后，才能判断是否有绕过 h3q 的任务。`up for Ns` 表示距上次健康探测成功的时间；判断是否重启要查进程或日志。
 - **看任务跑到哪一步：读 `progress`，不读「~left」。** `h3qc queue`、`h3qc show <jid>`、`GET :8200/queue`、`GET :8200/job/<jid>` 和 MCP `h3_queue_status` 对正在运行的任务都带 `progress`：`phase`（`loading_models` 载模型 / `sampling` 采样 / `starting` 刚开始）、当前采样阶段的 `stage`、`step/total`、`pct`、`sec_per_it`、`stage_eta_s`，以及 `log_age_s`（ComfyUI 日志距今多久没写）。数据来自 ComfyUI 日志（`logs/serve.log`）里本任务开始之后的 tqdm 进度条。
-  - **只给当前阶段的进度，不给整任务百分比。** 一个任务有多个采样阶段（总步数各不同，每段从 0 起，如 8 步一采、20 步二采），整任务总量事先未知，编造会不准。
+  - **只给当前阶段的进度，不给整任务百分比。** 一个任务有多个采样阶段（总步数各不同，每段从 0 起，如 8 步一采、8 步二采（pdd final）），整任务总量事先未知，编造会不准。20 步只存在于单遍 Ref2VA 与已退役的 lu2 legacy（2026-11-15 下线），不是 pdd 二采档。
   - **`~left` 是同类任务历史中位数减已用时**，345 帧、两小时的任务它会一直显示几秒。`overdue: true`（已用时超过中位数 1.5 倍）出现时，以 `progress` 为准。
   - **判断是不是卡死看 `log_age_s`**：采样一步可能几分钟，进度条几分钟才动一次，但日志文件一直有写入，`log_age_s` 会反复回到几秒内；持续变大（比如超过 10 分钟）且 `step` 不变，才是真的停了。慢任务的实测（长视频动作直投通道 5m42s/步）见 [video-motion-drive.md](references/video-motion-drive.md) §6 与 [incidents.md](references/incidents.md) §2026-11-21。
   - 任务刚开始、日志里还没有本任务的内容时 `phase=starting`，不是故障。
@@ -68,7 +68,7 @@ pdd 的 `draft → final` 是两次完整采样，**没有 pass-1 latent 接续*
 
 ## 输入能力与续接职责
 
-本地短剧 adapter 接受以下互斥组合；真实生产前核对当前服务端白名单与渲染路径，客户端有参数不等于该部署端到端已验证。其他技能的档位/模式说明引用本节及§2.8，不另维护一套能力表。
+本地短剧 adapter 接受以下互斥组合；真实生产前核对当前服务端白名单与渲染路径，客户端有参数不等于该部署端到端已验证。**本节及§2.8 是文档层通道能力的权威声明**：其他技能的档位/模式说明一律引用本节及§2.8，不另维护一套能力表；文档层契约不等于运行时真值，能力与档位数字仍以渲染机实读为准（见本章开头「版本口径」与 `h3qc submit --help`）。
 
 | 输入组合 | 可承担的职责 | 未由此保证的内容 |
 |---|---|---|
@@ -215,6 +215,8 @@ CLI 默认在入队后返回 `job_id`，MCP 使用 `wait=false` 获得同样行�
 
 ## 2.10 二采 split 引擎（tiled）+ SeedVR2 事后超分
 
+> **退役提示（2026-11-15）**：本节 split 引擎载体是 lu2 分支，该分支已于 2026-11-15 下线；文中的「现默认」只指 lu2 分支内部，不再是可选生产档。现役二采走 pdd（见 §2.8）。
+>
 > 无 §2.9，编号为历史遗留，内容无缺失。
 
 详见 [二采 split 引擎（tiled）+ SeedVR2 事后超分](references/upscale-split-engine.md)。

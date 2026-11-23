@@ -105,8 +105,8 @@ license: MIT
    多槽参考与首/尾帧在同一请求内互斥的模型，起始帧也随整组走多槽参考，不拆成两套输入。
    **身份槽位默认存在（2026-10-30 补）**：本镜有在屏角色时，要么挂该角色身份图（一个角色一张卡；多视图合并进同一个 `REF-...`，
    不拆成多条），要么明确写「以冻结文字身份段代替」。不许把「只有一张起始帧」当成默认交付形态——那等于把身份交给文字去猜。
-   同框 ≥3 个角色时只给主角色挂身份图，其余用冻结文字身份段；写法与上限见
-   `../short-drama/references/reference-roles.md` 与 `../../../h3-prompt-writing/references/ref-subject-picture.md`。
+   同框身份图 ≤2 张（实践上限），第 3 个起的角色用冻结文字身份段；确需全部锁死就拆镜。写法与上限见
+   `../../../h3-prompt-writing/references/ref-subject-picture.md` §3／§5；参考职责见 `../short-drama/references/reference-roles.md`。
 5. 核对本镜**叙事时长**（分镜 `duration_seconds`）落在目标模型档案的原生区间内；不在区间内就回到分镜修订（生成时长按合法档位向上取整的规则见 [target-model-profile.md](references/target-model-profile.md#叙事镜长与生成时长)），不能写完提示词后留给
    adapter 报错，也不能在正文里暗自改变时长。
    有对白、VO 或 OS 时，同时核对分镜「声音」中的估时依据与实际可用发声窗口；缺少依据就按

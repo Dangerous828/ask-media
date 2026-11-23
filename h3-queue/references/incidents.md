@@ -200,7 +200,7 @@
 ## 2026-11-06｜HyperFlow H3 Flash 三条硬理由（不装）
 
 - 条件：Video Rebirth 的第三方压缩版 H3 Flash，13.7B（原版 31B 不到一半），4/6/8 步、无 CFG、音画同出（32 kHz 立体声）、最多 9 图；独立权重，不是 PDD 开关也不是 LoRA。
-- 官方显存表（integrations/README.md，1344×768、6 步、2 张参考图）：RTX 4090 (24G) 22 GiB / 180 s（5.2 s）、866 s（15 s）；RTX 5090 (32G) 30 GiB / 139 s、663 s；**RTX 5070 Ti (16G) 官方明写 "16 GB GPUs are not measured yet"**。
+- 显存表来源 = 第三方压缩模型仓库 Video-Rebirth/hyperflow-h3-flash 的 integrations/README.md（**非 MiniMax 官方上游**；引用时点 2026-11-06，1344×768、6 步、2 张参考图口径，GGUF Q4_K_M，该表未细分 INT8 档）：RTX 4090 (24G) 22 GiB / 180 s（5.2 s）、866 s（15 s）；RTX 5090 (32G) 30 GiB / 139 s、663 s；**RTX 5070 Ti (16G) 该表明写 "16 GB GPUs are not measured yet"**。以上为本仓引用时点记录值，上游现行表可能已更新，以引用时点为准。
 - 本机不成立的三条硬理由：
   1. **显存**：峰值要 22 GiB，本机上限 15.92 GiB；现役 PDD 跑 1536×864 已到 15.55 GiB，只剩 0.37 GiB。换 `Q3_K_M` 只省 1.9 GB，而峰值里权重约 9 GB、余下 13 GB 是激活值与 VAE，填不上 6 GiB 缺口。
   2. **没有速度收益**：24G 卡出 15 s 要 866 s，比现役 PDD 的 831 s 还慢；16G 只会更慢或 OOM。

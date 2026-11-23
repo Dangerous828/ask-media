@@ -77,10 +77,10 @@ creator-first job 必须从 `图片提示词.md`、`分镜.md` 或 `视频提示
 
 ## 视频先出草稿档（硬规则，2026-11-01）
 
-本地 h3q 视频 job 的 `parameters.tier` 缺省就是 `draft`（当前引擎 `pdd`：8 步蒸馏、1024×576 首采，362 帧约 285 秒；不是 15–26 分钟的 20 步正式档）。
-档位、引擎与实际参数的唯一权威是 `../../../h3-queue/SKILL.md` §2.8 的「视频引擎 / 视频档位」PDD 契约；本技能只规定创作侧的确认顺序，不在这里重定义档位。
+本地 h3q 视频 job 的 `parameters.tier` 缺省就是 `draft`（当前引擎 `pdd`：8 步蒸馏、1024×576 首采，362 帧渲染约 285 秒（片长约 15 秒）；耗时对照用 pdd final 二采 362 帧约 832.3s（≈14 分钟），不是已退役的 lu2 legacy 20 步档（实测约 12.5–24 分钟））。
+档位、引擎与实际参数的唯一权威是 `../../../h3-queue/references/produce-adapter.md` 的「视频引擎 / 视频档位」PDD 契约（引擎见该文件 :22、档位见 :134）；本技能只规定创作侧的确认顺序，不在这里重定义档位。
 
-1. 新写或改过的段**先出 draft**，给创作者看构图、运动方向、身份和因果（`prepare` 的 preview 里 `tier_note` 字段会显示 ⚠️ DRAFT）。**草稿只用于验收，不进剪辑，不作为交付素材**。跨会话继续时必须重新确认 tier——缺省就是 draft，不会自动升档；不要一上来 `final`。
+1. 新写或改过的段**先出 draft**，给创作者看构图、运动方向、身份和因果（**竖屏 draft 只验表演/动作，不验最终构图**：竖屏 draft 与 final 首采画布差约 2%，见 `../../../h3-queue/references/tiers-and-capabilities.md`）（`prepare` 的 preview 里 `tier_note` 字段会显示 ⚠️ DRAFT）。**草稿只用于验收，不进剪辑，不作为交付素材**。跨会话继续时必须重新确认 tier——缺省就是 draft，不会自动升档；不要一上来 `final`。
 2. 创作者认可某段草稿后，才为它建 `tier: final` 的 job；prepare 预览必须能看出这是 final、且对应哪段已验收草稿。`draft_job_id` / `draft_accepted` 是 lu2 时代的 latent 接续凭据，pdd 分支不读取；可以写进记录便于追溯，但不要把它当成 latent 接续承诺。
 3. 引擎当前只有 `pdd`：`engine` 缺省即 `pdd`，`lu2` / `legacy` / `tier: legacy` 已于 2026-11-15 下线，adapter 在提交前拒绝，不在 job 里自创档位。要改档位语义，先改 h3-queue 的 PDD 契约与 adapter，再回到这里。
 4. 不要绕过 adapter 自写脚本直连 `h3qc`/`h3qg`：那会跳过参考验收、`h3-video-gate` 留档和本次确认。需要新参数就改 adapter。

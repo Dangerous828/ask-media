@@ -53,6 +53,7 @@ SKILL 的可执行规则见 `SKILL.md` §三 R4a。
 ## 六、四件套阈值必须按场景分档，不能一套通用
 
 档位权威是 `scripts/qc_image.py` 的 `PROFILES`（含 `virtual-void` / `cartoon3d` / `interior` / `interior-backlit` / `aerial-landscape` / `screen-occluded` 六档及阈值）。
+其中 `cartoon3d`（3D 卡通暖柔光）高光**行权值为 5–28%**：角色C高光 P50=16.0% / P75=35.3%，28% 只覆盖约半数样本，不是“覆盖多数”。示例项目实测建议的 15–25% 为**待采纳建议**（见 `MEASURED-示例项目实测.md` §五待办第 2 项），**未生效**。
 同一批图在默认档、正确档、混合判据下的通过率差异及数据源见 `MEASURED-Opus六信号复验.md` §4.1 / §11 与 `qc_image.py` 的 `PROFILES` 注释；画风本性的辨析见 `MEASURED-示例项目实测.md` §三–§四。
 `border_dark` 字段只记录不门控，实例见 `MEASURED-Opus六信号复验.md` §2.1。
 
