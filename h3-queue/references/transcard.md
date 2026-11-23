@@ -6,11 +6,13 @@
 
 ## 一条命令跑完
 
+下面的 `剧集/…`、`脚本/…`、`制作成果/…` 都是**项目侧路径**（按项目根填），不是本仓文件。
+
 ```bash
 python3 ../scripts/transcard.py \
   --before 剧集/EP0xx/制作成果/video/A.mp4 \
   --after  剧集/EP0xx/制作成果/video/B.mp4 \
-  --prompt-file <项目>/脚本/transcard_107f.txt （项目侧文件，未随公开版发布） \
+  --prompt-file <项目>/脚本/transcard_107f.txt \
   --frames 107 --width 576 --height 992 --seed 42 \
   --label ep0xx-tc1 --out-dir 制作成果/_草稿/转场卡 \
   --assemble

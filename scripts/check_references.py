@@ -232,7 +232,12 @@ for rel in sorted(all_files):
                 # 只会逼作者给仓外文件编路径。裸名漏目录仍靠人工审读发现。）
                 skipped["nonslash"] += 1
                 continue
-            if rel.startswith('drama-skills') and UPSTREAM_FITTURE.match(ref):
+            # 上游夹具豁免只覆盖「解析后仍在 drama-skills 子树内」的路径。
+            # `../evaluations/...` 是上游目录，合理；但 `../../../../tests/x.py`
+            # 会逃出 drama-skills 落到仓库根，那不是上游夹具，而是写错了层数
+            # （本仓 .../references/still-cuts.md 就这么逃检过一次）。
+            if rel.startswith('drama-skills') and UPSTREAM_FITTURE.match(ref) \
+                    and os.path.normpath(os.path.join(dirn, ref)).startswith('drama-skills/'):
                 skipped["upstream"] += 1
                 continue
             if os.path.exists(os.path.join(ROOT, dirn, ref)):
