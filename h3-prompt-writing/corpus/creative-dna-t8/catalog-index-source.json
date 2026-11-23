@@ -1,4 +1,5 @@
 {
+  "_fingerprintNote": "indexSha256 与当前 catalog.json 的实测 SHA-256（3a288cbf…）不一致，仓内无材料可证其指代对象；该字段暂不可用于校验。详见 INDEX.md「指纹口径」。2026-11-23 核实。",
   "catalogGeneratedAt": "2026-10-06T00:00:00+08:00",
   "catalogItems": [
     {

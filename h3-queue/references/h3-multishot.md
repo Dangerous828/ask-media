@@ -7,15 +7,15 @@
 
 | 判断 | 选哪条 | 依据 |
 |---|---|---|
-| 这镜能不能拆成两个单镜（各自有首帧/参考） | **能拆就拆，走单镜 pdd** | 单镜走 8 步蒸馏、快于多窗记忆采样约一个量级（多窗无 pdd 版本）；带日期耗时实测格见 seam-transition.md §0.2 multishot 行 |
+| 这镜能不能拆成两个单镜（各自有首帧/参考） | **能拆就拆，走单镜 pdd** | 单镜走 8 步蒸馏、快于多窗记忆采样约一个量级（多窗无 pdd 版本）；带日期耗时实测格见 [`seam-transition.md`](../../drama-skills/skills/short-drama-video-prompts/references/seam-transition.md) §0.2 multishot 行 |
 | 是否同机位同场景、且接缝必须无缝（动作接力、连续对话、光影不能跳） | 才考虑 multishot | context_pin 把上一窗末 22 帧 raw latent 钉进下一窗 |
 | 只是"同一个房间，先后两个动作" | **不算**，拆单镜 | 用上一镜末帧当下一镜首帧即可，EP005 002 就是这么过的 |
 | 有静默窗（这一窗没人说话） | 慎用多窗 | ref2va 会给静默段编台词，调参压不住，只能后期换底噪或 guide_audio 锁音轨 |
-| 创作者反馈"还是有硬切"，逐帧看机位/光影/人物大小都连续 | **先判型再动手——多窗救不了词层的缝**：查是镜内相位断（入场被压缩）还是情绪缝（切点跳档）。判型顺序见 seam-transition.md §0.1 第 0 步、修法见 `../../h3-prompt-writing/references/failure-modes.md`，本表不复制。修完词才重出，别反复重做容器 | 经过见 [incidents.md](incidents.md) §2026-11-19/20 |
+| 创作者反馈"还是有硬切"，逐帧看机位/光影/人物大小都连续 | **先判型再动手——多窗救不了词层的缝**：查是镜内相位断（入场被压缩）还是情绪缝（切点跳档）。判型顺序见 [`seam-transition.md`](../../drama-skills/skills/short-drama-video-prompts/references/seam-transition.md) §0.1 第 0 步、修法见 `../../h3-prompt-writing/references/failure-modes.md`，本表不复制。修完词才重出，别反复重做容器 | 经过见 [incidents.md](incidents.md) §2026-11-19/20 |
 
 **代价要写进决策**：双窗 20 分钟以上（EP005 S-002 判废经过见 [incidents.md](incidents.md) §2026-11-19/20）；需要 `scene_video` 做场景锚，否则房间会被重画；静默窗有编台词风险。
 
-**选路硬依据（2026-11-21 实测）**：单镜 `first_frame`（锁首帧）与 `refs`（身份板）在 adapter 层**互斥**，同 job 不可兼得（直接报错）。所以**双人同场、既要锁起帧又要双身份板的连续段，只有 multishot 一条路**（两窗各挂各的身份板）——别再试「单镜带两人」绕路。context_pin 验证状态见 §2.16 末段 2026-11-21 更新（0.45.3 已实测通过）。
+**选路硬依据（2026-11-21 实测）**：单镜 `first_frame`（锁首帧）与 `refs`（身份板）在 adapter 层**互斥**，同 job 不可兼得（直接报错）。所以**双人同场、既要锁起帧又要双身份板的连续段，只有 multishot 一条路**（两窗各挂各的身份板）——别再试「单镜带两人」绕路。context_pin 验证状态见本文「通道与参数」节的模板说明 2026-11-21 更新（0.45.3 已实测通过）。
 
 **"同机位"本身不是用多窗的理由**——能拆就拆成单镜；多窗也管不了词层的相位断与情绪跳档，先在词层判型修词（判型顺序见 `../../drama-skills/skills/short-drama-video-prompts/references/seam-transition.md` §0.1 第 0 步，判据见 `../../h3-prompt-writing/references/failure-modes.md`）。两则反面教材（EP005 002 双窗 26 分钟判废、EP004 006+007 两轮词层缝）经过见 [incidents.md](incidents.md) §2026-11-19/20。
 
@@ -68,8 +68,8 @@
 
 **音色跨窗必须钉住（2026-11-13 EP003 005+006 实测）**：`H3MultishotSampler` 有两个开关决定音色：
 
-- `seed_per_shot` 必须保持 **True**。节点作者的实测原话是「每窗换 seed 才跨窗保住脸；所有窗共用一个 seed
-  会让脸和声音一起漂移」。渲染器曾把它设成 False，结果第二窗音色明显变调（F0 291 → 364 Hz）。
+- `seed_per_shot` **缺省 True**。依据是节点作者的实测原话「每窗换 seed 才跨窗保住脸；所有窗共用一个 seed
+  会让脸和声音一起漂移」，本仓也见过把 False 设下去后第二窗音色变调（F0 291 → 364 Hz）。这是实测倾向，不是采样器机制约束（False 也能跑），没有特殊理由别改。
 - `self_anchor_voice=True`：第一窗渲完后，它自己的音频成为后续每窗的 `<Audio 1>` 参考，音色钉在模型
   实际念出来的那一版上。实测两窗角色C F0 340 / 327 Hz（差 0.7 个半音）。第一窗要安排一句干净独白。
 

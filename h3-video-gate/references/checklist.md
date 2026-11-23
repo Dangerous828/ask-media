@@ -6,7 +6,7 @@ OPS / SPEC-R / STATUS = H3-Studio 的 OPS-NOTES.md / RENDER-SPEC.md / STATUS.md;
 
 ## 1. 口型落点
 
-- 怎么判:逐句台词问"这句话时画面里谁的脸最显眼"。说话人在画外或背对镜头,而画内有正脸人物时,必须写 `<Subject N> does not speak; his lips remain completely closed.`;说话人在画内时,写清是谁开口、嘴部动作在哪个时间段。两人同框对话,一句只让一个人动嘴。
+- 怎么判:逐句台词问"这句话时画面里谁的脸最显眼"。说话人在画外或背对镜头,而画内有正脸人物时,**必须写明不说话且嘴唇闭合**(例:`<Subject N> does not speak; his lips remain completely closed.`,措辞可等效改写);说话人在画内时,写清是谁开口、嘴部动作在哪个时间段。两人同框对话,一句只让一个人动嘴。
 - 闸门边界:G17 只查 off-screen 附近有没有 lips + closed 字样,不判断写的对象对不对。
 - 依据:方言 246–249(模型把口型放到最显眼正脸上,实测 3 次中 2 次);ref 官方示例 "while his lips remain completely closed"。
 

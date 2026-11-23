@@ -99,7 +99,9 @@ CLI='<渲染机脚本目录>\h3qc.py'
 
 ### 出图（Qwen Image 2.1）
 
-下面的尺寸与种子均为**示例，非缺省**；缺省以实现实读为准。
+> **本节通用口径**：凡写「缺省 / 容量 / 像素值」的地方，一律以实现实读为准（`h3qc submit --help` / MCP schema / 覆盖键 `H3Q_IMAGE_*`，见 [still-api-params.md](references/still-api-params.md)）；带日期的数字只是该时点的快照。下文不再逐条重复这句话。
+
+下面命令里的尺寸与种子均为**示例，非缺省**。
 
 ```bash
 $PY -s $CLI submit --kind image \
@@ -110,9 +112,9 @@ $PY -s $CLI submit --kind image \
 ```
 
 - `--size` 是真实采样画布 `WxH`，宽高向下对齐到 32 的倍数，最小各 32；输出不再自动做 center crop。**要作视频首帧或参考的关键帧，按目标视频画布出**（`768x1344` / `1344x768` / `1024x576` 等）。
-  尺寸缺省由部署覆盖键 `H3Q_IMAGE_SIZE` 决定（`2k-16x9` / `2k-9x16` 是具名横/竖档，具体像素值以实现实读为准）；
+  尺寸缺省由部署覆盖键 `H3Q_IMAGE_SIZE` 决定（`2k-16x9` / `2k-9x16` 是具名横/竖档）；
   要竖屏出图显式给 `--size 2k-9x16` 或直接给 `WxH`。
-- 缺省值由渲染机/MCP 部署定义，**以实现实读为准**（`h3qc submit --help` / MCP schema / 覆盖键 `H3Q_IMAGE_*`，见 [still-api-params.md](references/still-api-params.md)）；2026-11-05 的实测快照见 [still-standard-tier-20261105.md](references/still-standard-tier-20261105.md)。可显式设置 `cfg`、`steps`、`loras`、`resolution`，不自动叠加 Turbo LoRA。
+- 缺省值的读法见本节开头的通用口径；2026-11-05 的实测快照见 [still-standard-tier-20261105.md](references/still-standard-tier-20261105.md)。可显式设置 `cfg`、`steps`、`loras`、`resolution`，不自动叠加 Turbo LoRA。
 - 图片分支会丢弃 `out_width` / `out_height`（视频尺寸）；`refine_denoise` / `refine_steps` 可透传给图片二采，见下方「出图（MiniMax H3-Image）」。
 - 带参考图：`--refs a.png,b.png`（CLI 文件须已在 ComfyUI 的 `input/`；MCP 上传本地源文件，见 §2.8）。`resolution=0` 默认按原参考尺寸编码，模型仍对齐 32；它控制参考编码，不替代 `size` 指定的采样画布。
 - **负向仅在 `cfg>1` 生效**；阈值定义与负向丢弃的分层见 [still-api-params](references/still-api-params.md)「术语与分层」节，此处不重复。显式 `cfg=1` 仍受尊重。
@@ -124,7 +126,7 @@ $PY -s $CLI submit --kind image \
 现役只保留 W4A8 一档（社区量化 Q4_K_M 已从脚本移除）。用
 `qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors` 文本编码器与
 `minimax_h3_image_vae_fp16.safetensors`，`MiniMaxH3ImageConditioning` + Euler/simple，
-实测时点（2026-11-05）为 6 步 / CFG 1.0；档位现状以实现实读为准（见 [still-api-params](references/still-api-params.md)）。
+实测时点（2026-11-05）为 6 步 / CFG 1.0。
 
 | engine | 权重 | loader |
 |---|---|---|
@@ -148,7 +150,7 @@ $PY -s $CLI submit --kind image --engine h3-image-w4a8 \
 # 上面 --steps 6 / --refine-denoise 0.30 --refine-steps 6（示例，非缺省）
 ```
 
-- `--refine-denoise` 缺省 0 = 单次采样；大于 0 才追加二采节点，`--refine-steps 0` 用渲染器默认步数（具体值以实现实读为准）。二采保构图与文字，纹理区会重绘；实测同 seed 下几何/文字类 PSNR 27–32 dB，高纹理类 17–19 dB。
+- `--refine-denoise` 缺省 0 = 单次采样；大于 0 才追加二采节点，`--refine-steps 0` 用渲染器默认步数。二采保构图与文字，纹理区会重绘；实测同 seed 下几何/文字类 PSNR 27–32 dB，高纹理类 17–19 dB。
 - `--refs` 透传到 conditioning 节点的 `images.image_N`；命令行文件名须已在 ComfyUI `input/`。`--checkpoint`、`--loras`、`--alpha`、输出尺寸覆盖不适用于该引擎。
 - **参考图边界**：现役只保留 W4A8，社区量化 Q4_K_M 已从脚本移除。参考图编辑维度 Qwen 2.1 比 H3 W4A8 更忠实，纯文生复杂规格仍是 H3 更强，两者按任务类型分开选。7 例对照与卡死经过见 [incidents.md](references/incidents.md) §2026-11-15。
 - MCP 的 `h3_generate_image` 目前只走 Qwen 通路，未暴露 `engine`；要用 W4A8 走上面的队列 CLI。
@@ -157,16 +159,16 @@ $PY -s $CLI submit --kind image --engine h3-image-w4a8 \
 
 | 调用方式 | 步数 | LoRA | 说明 |
 |---|---|---|---|
-| 默认值以实现实读为准（覆盖键 `H3Q_IMAGE_*`） | 见 2026-11-05 快照 | 见 2026-11-05 快照 | 负向仅 `cfg>1` 生效（阈值定义见 [still-api-params](references/still-api-params.md)「术语与分层」节）；耗时按实际尺寸、参考和排队情况判断 |
+| 见本节通用口径 | 见 2026-11-05 快照 | 见 2026-11-05 快照 | 负向仅 `cfg>1` 生效（阈值定义见 [still-api-params](references/still-api-params.md)「术语与分层」节）；耗时按实际尺寸、参考和排队情况判断 |
 | `--loras 'X:1.0'` | 显式设置或按默认选择 | 指定的 X | 按该 LoRA 的推荐参数设置 steps/CFG |
 | `--alpha 1` | 按默认选择 | 无 | 走 `SaveImageWithAlpha`（拆 alpha 再存） |
 
 底模**不用换**：`qwen_image_2.1_int8_convrot` 保持不变。
-文本编码器可选档：`qwen3vl_8b_int8_convrot`（INT8 快路）、`qwen3vl_8b_w4a8`（最小）；容量以实现实读为准。
+文本编码器可选档：`qwen3vl_8b_int8_convrot`（INT8 快路）、`qwen3vl_8b_w4a8`（最小）。
 
 **原生 2K 画布预设**（模型按这些尺寸训练，细节来自真实推理而非放大）：
 `2k-1x1`、`2k-3x4`、`2k-4x3`、`2k-2x3`、`2k-3x2`、`2k-9x16`、`2k-16x9`。
-像素值以实现实读为准；历史值见 [still-standard-tier-20261105.md](references/still-standard-tier-20261105.md) §四（2026-11-05 快照）。
+历史像素值见 [still-standard-tier-20261105.md](references/still-standard-tier-20261105.md) §四（2026-11-05 快照）。
 `--size` 直接给预设名即可，不要写死像素。显存与耗时随尺寸增大；视频首帧按项目目标画布显式选择尺寸。
 
 用 `qwen-image-2.1-fix-1.0` 那种画质修正 LoRA 时，按该 LoRA 自己文档给的推荐值**显式**传 `--steps` / `--cfg`，
@@ -280,7 +282,7 @@ queued → running → done
 ```
 
 - `blocked_vram` 是**有意停靠**：宁可不动，也不在只剩 1 GB 的卡上硬提交。腾出显存后重新提交即可。
-- **两个阈值**（`H3Q_MIN_FREE_GB` / `H3Q_FLOOR_GB`，2026-11-21 起 **4.0/3.0**）：可用显存低于 `MIN_FREE` 就先请求 `/free`；回收后仍低于 `HARD_FLOOR` 才停靠。阈值调整经过见 [incidents.md](references/incidents.md) §2026-10-20。
+- **两个阈值**（`H3Q_MIN_FREE_GB` / `H3Q_FLOOR_GB`，2026-11-21 起 **4.0/3.0**）：可用显存低于 `MIN_FREE` 就先请求 `/free`；回收后仍低于 `HARD_FLOOR` 才停靠。阈值调整经过（2026-11-21 从 2.0/1.5 提到 4.0/3.0）见 [incidents.md](references/incidents.md) §2026-11-21。
 - ComfyUI 挂掉时任务退回 `queued` 等待，不丢；恢复后自动续跑（`attempts` 会加一）。
 - `failed` 且 note 含 `TIMEOUT`：上游可能还在跑，**不要盲目重投**；先 `queue` 看现场。
 

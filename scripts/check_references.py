@@ -139,6 +139,7 @@ for rel in all_files:
 
 broken = []
 checked = 0
+skipped = {"archived": 0, "artifact": 0, "upstream": 0, "placeholder": 0, "nonslash": 0}
 for rel in sorted(all_files):
     if not rel.endswith('.md') or not in_scope(rel):
         continue
@@ -171,12 +172,18 @@ for rel in sorted(all_files):
         refs.extend(m.group(1) for m in BARE_PATH.finditer(plain))
         for ref in refs:
             checked += 1
-            if ('*' in ref or '\\' in ref or '<' in ref or '>' in ref
-                    or '{' in ref
-                    or PLACEHOLDER.match(ref) or PROJECT_ARTIFACT.match(ref)
-                    or '/' not in ref):
+            if ('*' in ref or '\\' in ref or '<' in ref or '>' in ref or '{' in ref
+                    or PLACEHOLDER.match(ref)):
+                skipped["placeholder"] += 1
+                continue
+            if PROJECT_ARTIFACT.match(ref):
+                skipped["artifact"] += 1
+                continue
+            if '/' not in ref:
+                skipped["nonslash"] += 1
                 continue
             if rel.startswith('drama-skills') and UPSTREAM_FITTURE.match(ref):
+                skipped["upstream"] += 1
                 continue
             if os.path.exists(os.path.join(ROOT, dirn, ref)):
                 continue
@@ -200,6 +207,10 @@ for rel in sorted(all_files):
             broken.append(f"{rel}:{lineno}  {ref}")
 
 print(f"检查引用 {checked} 条，断链 {len(broken)} 处")
+print("跳过（不计入断链）：占位符 {placeholder} · 项目产物 {artifact} · "
+      "无斜杠提及 {nonslash} · 上游夹具 {upstream}".format(**skipped))
+print("另整份豁免：MEASURED-/HANDOFF-/结论-（历史档，保留当时仓外路径原貌）与 "
+      "T8 语料卡（上游原文逐字收录）——这些文件内的引用不被本检查覆盖。")
 for b in broken:
     print("  " + b)
 sys.exit(1 if broken else 0)

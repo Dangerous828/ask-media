@@ -2,7 +2,7 @@
 
 **这不是死仓。** 这里收录 T8 案例库的可检索原文：**624 条可检索条目 = 613 条案例原文 + 9 个官方 Skill + 2 个社区 Skill**；`catalog.json` / [MASTER-INDEX.md](MASTER-INDEX.md) / [search.py](search.py) 均以这 624 条为准。另有 **273 张正式模板卡**仅存在于上游 `catalog-index-source.json` 的 `recommendationEntities`，**未入本地检索索引、search.py 搜不到**（如需检索须先按上游来源补建条目）。本地 `cards/` 目录共 284 个文件（= 9 官方 Skill + 2 社区 Skill + 273 模板卡原文），其中 273 张模板卡原文落在 `cards/` 但不在可检索的 624 条内。验证状态统一为**外部案例机制，本地 h3q 未测**。
 
-> **指纹口径**：`catalog-index-source.json` 的 `indexSha256` 是上游索引源在 `catalogGeneratedAt`（2026-10-06T00:00:00+08:00）生成时的指纹，对象是该索引源本身，**不是**本仓当前 `catalog.json` 的校验值；两者条数与生成时点不同，不可用该字段校验 `catalog.json`。如需对齐须按上游生成流程重算并回填，本公开版未随附生成脚本。
+> **指纹口径（2026-11-23 核实）**：`catalog-index-source.json` 的 `indexSha256` = `702c329d…`，**与本仓当前 `catalog.json` 的实测 SHA-256（`3a288cbf…`）不一致**，且仓内没有任何材料能证明它指代什么（试过索引文件自身、`catalog.json`、几种常见序列化都不匹配）。**结论：该字段目前不可用于校验任何东西**，按未解的历史字段对待；要指纹就 `shasum -a 256 catalog.json` 现算。索引其余自检项一致：`catalogItems` 的 id 集合与顺序与 `catalog.json` 624/624 完全相同。
 
 ## 三条进来路径
 

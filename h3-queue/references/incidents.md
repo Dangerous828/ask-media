@@ -17,6 +17,13 @@
 - 数字：`/free` 实测 **5 秒内从 13.9 GB 回落到 462 MB**。
 - 结论：`run_one()` 在 `set_state(done/failed)` 之后统一调 `release_vram()`（`/free` = `unload_models` + `free_memory`），成功失败都释放；日志留 `release_vram: models unloaded after job <jid>`。
 
+## 2026-11-21｜准入阈值 2.0/1.5 → 4.0/3.0
+
+- 条件：原 `H3Q_MIN_FREE_GB`/`H3Q_FLOOR_GB` = 2.0/1.5。
+- 症状：1.5 GB 的底线等于允许在只剩一两个 G 的卡上开跑——队列看着「明明没显存了还照样丢进去」。
+- 数字：H3 峰值约 15 GB；赌输就是 OOM + sticky context（见本文件 §2026-10-20）。
+- 结论：提到 4.0/3.0。低于 `MIN_FREE` 先请求 `/free`，回收后仍低于 `FLOOR` 才停靠。
+
 ## 2026-11-15｜multishot 渲染器切 v2 节点映射（CORE 版已备份）
 
 - 条件：操作者指令「去掉 CORE 全部替换」，`multishot_render_ref.py` 从 CORE 节点改为 V2 节点。

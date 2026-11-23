@@ -50,7 +50,7 @@ black ink, one pale silver-grey wash and a single warm red accent confined to th
 
 教训（指向具体句子）：
 - `Two thirds of the sheet stays untouched white paper` 是留白真正起作用的句子。只写 `大量留白`/`much negative space` 不告诉模型"多大比例"，这一条直接给占比。
-- `a single warm red accent confined to the scarf` 把"少量点色"落到位——**点色必须指定唯一承载物**，否则模型会在多处撒色。
+- `a single warm red accent confined to the scarf` 把"少量点色"落到位。**本案中把点色绑到唯一承载物后，模型才没在多处撒色**——不绑定会怎样，本条没测。
 - `varying in weight and occasionally breaks` 比 `fine line` 更像真实钢笔；只写 `fine` 容易得到均匀矢量线。
 
 ### 2 · FG-001 80 年代末赛博 OVA 赛璐珞（OscarAI）
@@ -68,7 +68,7 @@ the wall never brighter than the lit side of her face
 
 教训：
 - `one hard-edged shadow plane … completely crisp, no gradient` 是赛璐珞与"3D 打光"的分界线。写 `cel shading` 单独不够，模型会加渐变。
-- `flat` 与 `hard-edged` 必须同时出现：前者管色块，后者管边界。
+- 本案里 `flat` 与 `hard-edged` 是成对用的：前者管色块，后者管边界。只用其一的效果未测。
 - 上一行 `the wall never brighter than the lit side of her face` 用**两处表面的相对亮度**守住影调，比写 `low key` 有效——这与 `param-compare-gas-plate.md` 里"CFG 4.5 让画面变亮压不住 Low-key"是同一类问题的正向写法。
 
 ### 3 · FA-039 火柴人（手绘火柴人漫画）

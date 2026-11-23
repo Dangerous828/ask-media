@@ -26,7 +26,7 @@
 
 **R1 离线实测（2026-11-15）**：固定 1024 档同尺寸 A/B 净 **−20.51%** lap_var（收益被输出层吃掉并转负）；1536 档同尺寸 A/B **+31.22%**，只有同步 `CONCAT_OUT_SIZE=1536x864` 才保留。逐项数值、圆帽变形倍率与 `increase+crop` 保形数据见 [incidents.md](incidents.md) §2026-11-15 R1。`server.py` 的 `aspect` 逻辑与 schema 离线 8 例 PASS、`py_compile` PASS；**实出一张需 MCP 长驻服务重启后参数才可见，标「需 GPU + 需重启」**。
 
-**U1/S3 定案实测（2026-11-15，已定为交付方案）**：EP003 MS001（1024×576/447f）三种超分同尺寸 1536×864 lap_var 对比——U0 纯 lanczos 插值 42.76（基线）／**U1 latent 放大（`h3_upscale_video(width=1536, aspect="16:9")`）57.38 = +34.17%**／U2 放大→缩回1024→再放大 33.90 = **−20.73%**。三条结论固化：① **交付超分定 U1**——latent 放大相对 lanczos 基线 +34% 净增益，只加细节不重绘（不加第二遍扩散，不与 §2.11「不是成品超分器」矛盾：那说的是相对**源片**可能更软，这里 +34% 是相对**插值基线**，对 768/1024 小图拉 1536 有意义）；② **绝不缩回 1024**（U2 证明 −20.73%，比不放大更差），装配层 `CONCAT_OUT_SIZE` 必须随素材 1536×864；③ **像素超分 SeedVR2 仍 FAIL**（过锐化），只有 latent 放大可用。`aspect="16:9"` 生效前提是**重启 MCP 长驻服务**（旧进程按 scale=2 会得 1536×1152/1536×896）。
+**U1/S3 定案实测（2026-11-15，已定为交付方案）**：EP003 MS001（1024×576/447f）三种超分同尺寸 1536×864 lap_var 对比——U0 纯 lanczos 插值 42.76（基线）／**U1 latent 放大（`h3_upscale_video(width=1536, aspect="16:9")`）57.38 = +34.17%**／U2 放大→缩回1024→再放大 33.90 = **−20.73%**。三条结论固化：① **交付超分定 U1**——latent 放大相对 lanczos 基线 +34% 净增益，只加细节不重绘（不加第二遍扩散，不与 §2.11「不是成品超分器」矛盾：那说的是相对**源片**可能更软，这里 +34% 是相对**插值基线**，对 768/1024 小图拉 1536 有意义）；② **缺省不缩回 1024**（U2 在这组单片段上实测 −20.73%，比不放大更差；装配层 `CONCAT_OUT_SIZE` 随素材走 1536×864。确需缩回时按同尺寸 A/B 复测后再定）；③ **像素超分 SeedVR2 仍 FAIL**（过锐化），只有 latent 放大可用。`aspect="16:9"` 生效前提是**重启 MCP 长驻服务**（旧进程按 scale=2 会得 1536×1152/1536×896）。
 **接缝 cross-fade 定案**：S1 同段内窗缝 ΔYAVG 仅 1.3（模型内部已连续，不处理）；S2 跨镜头硬切帧间 MAD 76.59；S3 同素材 cross-fade d=0.25 把切点 MAD 压到 **15.93（降 79%）**。cross-fade 是**按切点启用的工具、非全量规则**——场切/反打/回主位（EP003 剪辑单 §2 的 C2/C3/C4/C5/C7/C9/C10）硬切是导演意图，默认保持；只有剪辑明确要求柔化某缝时才在装配脚本（未随公开版发布）的 `DISSOLVE` 里加条目。
 
 **试验顺序（按镜头内容分叉）**
@@ -45,7 +45,7 @@
 
 **multishot 段的硬约束**：服务端 multishot 分支不接受 `tier=final`（没有 pdd 二采；v2 内建超分在本机 16G 发糊、固定 `output_scale=1`）。**透传清单以实际部署为准**：完整参数见 [`h3-multishot.md`](h3-multishot.md) §2.14 与 adapter `short_drama_h3q_adapter.py` 的 `multishot_argv()`——除 width / height / frames_per_shot / shot_count / seed / steps 外，还含 `--reference-image-size` / `--reference-subjects` / `--auto-chunk-ffn` 以及 `scene_video` / `scene_video_start` / `scene_video_seconds` / `--model` / `bank_clip_frames` / `audio_pin_frames` 的端到端透传；不要按这里的旧短清单判断参数是否被支持。**2026-11-15 起 multishot 走 v2 `H3MultishotMemorySampler`（§2.14）**，该采样器**有**内建 latent 超分参数（`upscale_model_name=(H3 latent x1.5/x2)` + `output_scale`），但本机 16G 实测内建超分**发糊不可用**（见记忆 h3-v2-latent-upscale-bad-on-16g），故渲染器固定 `output_scale=1 / (none)`；这类素材要画质，只能走「成品帧回编码 + 低 σ refiner」或「像素域时序超分」/ §2.11 后处理。
 
-**升 final 必须锁 1536×864**（`width*height > 1536*864` 面积判据硬拒 1536×896），16 GB 一手峰值只验过 362 f。pdd draft→final 为何不是精修接续（无 pass-1 latent、lu2 字段已下线）见 [`../SKILL.md`](../SKILL.md)「两条通道的档位语义」与 [incidents.md](incidents.md)。
+**升 final 必须锁 1536×864**（`width*height > 1536*864` 面积判据硬拒 1536×896），16 GB 一手峰值只验过 362 f。pdd draft→final 为何不是精修接续（无 pass-1 latent、lu2 字段已下线）见 [`../SKILL.md`](../SKILL.md)「两条通道的档位语义」；实测数字在 [incidents.md](incidents.md) §2026-11-06/§2026-11-07。
 
 **R2 生成层实测（2026-11-15，独立 reviewer 完整播放验收 = REVISE）**：**定格句与时间线写满在画面层生效**（画面持续微动作、不是定格）；**尾段静默是生成层模型行为，修复走后期合成（需创作者授权 DSP），不是改提示词或 `self_anchor_voice`**。逐帧 MAD、音频收束曲线、切点解剖、REV-001/002、4/4 不达标等完整经过见 [incidents.md](incidents.md) §2026-11-15 R2。
 

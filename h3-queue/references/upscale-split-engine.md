@@ -8,7 +8,7 @@
 
 **split 引擎（lu2 分支内当时默认，2026-11-15 起随 lu2 下线，仅离线参考）**：`lu_render_ref.py` 的 pass2 换成 `MMH3 Ultimate Upscale` 单节点管线（bbaudio-2025/Comfyui-MMH3-UltimateUpscale，已装 `<渲染机根目录>\ComfyUI\custom_nodes\Comfyui-MMH3-UltimateUpscale`）：`MMH3TemporalSplitParams(chunk 136/overlap 17) → MMH3LatentUpscaleWithModelParams(3D upscaler 1344×768) → 主节点（每时间块整帧重采样，噪声掩膜保形，frame-0 钉源 + 颜色匹配）`。`--upscale-engine legacy3d` 可回退旧行为。
 
-- **⚠️ 空间分块必须关（`--tile-size 0`，2026-11-04 起客户端默认已是 0）**：破 ~300 帧上限靠时间分块就够，整帧采样显存无压力。镜像伪影实测与历史 bug 见 [incidents.md](incidents.md) §2026-11-04 tile；**2026-11-04 之前不带显式 `--tile-size 0` 跑的 final 都要复检有无镜像伪影**。
+- **核对空间分块为关**（`--tile-size 0`；2026-11-04 起客户端默认已是 0，改动过就显式关）：破 ~300 帧上限靠时间分块就够，整帧采样显存无压力。镜像伪影实测与历史 bug 见 [incidents.md](incidents.md) §2026-11-04 tile；**2026-11-04 之前不带显式 `--tile-size 0` 跑的 final 都要复检有无镜像伪影**。
 - **denoise 语义**：split 引擎精修强度走 `BasicScheduler(denoise=refine_denoise)`；1.0 = 每块按 conditioning 全重绘（内容大漂）。**默认 0.30（2026-11-04 起）**。
   - **0.30 是实测保形点**：`MOTION-EP001-L01B`（311f）与 `MOTION-EP001-L02-ONESHOT`（362f）均到 1920×1088，与同一遍 latent 逐点同构图、同姿态，细节为真实重建（门钉、匾额彩画、舞者五官、裙褶层次、二层观众人形）而非插值锐化。
   - **≥0.45 会开始重绘**：turbo LoRA 是照「纯噪声 4 步」训的，部分 denoise 落在它的训练分布外，模型按 turbo 习惯整体重画。**看到"内容变了"先查 denoise，不要先怀疑 upscaler。**

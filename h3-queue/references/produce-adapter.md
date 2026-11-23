@@ -39,7 +39,7 @@
 
   该「20 步正式档」只属已退役的 lu2 legacy（2026-11-15 下线，出处：本节引擎表与 [incidents.md](incidents.md) §2026-11-06/§2026-11-07）；现役 pdd final 二采 8 步，362 帧全程约 832.3s（≈14 分钟）。
 
-- **⚠️ Sol 加速档一律不要开**：`sol-profile` 默认 `off`；实测数字、构图跑掉与 `H3FrontLoadedSigmas` 冲突见 [incidents.md](incidents.md) §2026-11-07。
+- **Sol 加速档：缺省不开**。`sol-profile` 缺省 `off`；构图敏感的镜头禁用（实测构图会跑掉）。**非关键镜**若需要那 22.8% 的提速，可单镜试开并核构图锚点，别整片开。依据（一面镜子、一次对照）见 [incidents.md](incidents.md) §2026-11-07；`H3FrontLoadedSigmas` 不能配 PDD 是机制约束，另论。
 
 - **参考图槽位：不是 2 张，实测到 9 张（2026-11-08）**
 
@@ -98,14 +98,14 @@
 {
   "adapters": {
     "local-h3q-image": {
-      "command": ["python3", "~/.agents/skills/h3-queue/scripts/short_drama_h3q_adapter.py"],
+      "command": ["python3", "{技能目录}/scripts/short_drama_h3q_adapter.py"],
       "timeout_seconds": 1800,
       "reference_roles": ["reference_image", "first_frame"]
     },
     "local-h3q-video": {
-      "command": ["python3", "~/.agents/skills/h3-queue/scripts/short_drama_h3q_adapter.py"],
+      "command": ["python3", "{技能目录}/scripts/short_drama_h3q_adapter.py"],
       "timeout_seconds": 3600,
-      "reference_roles": ["reference_image", "first_frame"]
+      "reference_roles": ["reference_image", "first_frame", "last_frame"]
     }
   }
 }

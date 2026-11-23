@@ -14,7 +14,7 @@
 2. **校正放循环外、对成片做单一全局目标**（`color_level=scene` + `master_normalize=luma`）；逐段各自调色实测三镜内纹理 +142%、亮度 +18%，且每个接缝都有台阶。
 3. raw latent 接力优先于像素回编码（bit-identical、无 VAE 往返）；分辨率不一致直接拒绝，不悄悄走有损路径。
 4. refiner 内 `frame-0 anchor_strength=0.999` + 重叠区 cross-fade + frozen overlap mask，保证连续缝不被覆盖；`Join Match` / `Sigmas Tail` 量亮度、对比、细节台阶。
-5. 本机定量：multishot 内部接缝优于逐段拼（数字见 [`h3-multishot.md`](h3-multishot.md) §实测）；latent 放大后跨镜 MAD 3.2985→2.0899、跨镜/镜内最大比 7.46→1.80（接缝落差未被放大）。装配层不做 cross-fade，因为模型内部接缝已连续。
+5. 本机定量：multishot 内部接缝优于逐段拼（数字见 [`h3-multishot.md`](h3-multishot.md)「通道与参数」节内的定量段）；latent 放大后跨镜 MAD 3.2985→2.0899、跨镜/镜内最大比 7.46→1.80（接缝落差未被放大）。装配层不做 cross-fade，因为模型内部接缝已连续。
 
 **后续出片路线排序**
 

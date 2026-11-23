@@ -35,10 +35,9 @@ ComfyUI 8199，无 LoRA。用于核对"标准档为什么是 40 步 / CFG 3.5"�
 
 ## 二、CFG 1.0 不是"保守"，是关掉了负向通道
 
-线性 CFG 档的负向槽参与采样，蒸馏 / 低 CFG 档的负向被丢弃；两档的判定与丢弃分层见
-[still-api-params.md](still-api-params.md)「术语与分层」节，本快照不重复。
-因此"CFG 1.0 但想靠 negative 排除文字/水印"这种组合不成立：要排除项须用 `cfg>1` 的 `--negative`；
-要极快，就用 `cfg=1` 并接受画面更平、且不再有排除能力。
+本节的结论只有一句："CFG 1.0 但想靠 negative 排除文字/水印"这种组合不成立——要排除项须用 `cfg>1`
+的 `--negative`；要极快就用 `cfg=1`，并接受画面更平、且不再有排除能力。
+两档的判定与负向丢弃分层见 [still-api-params.md](still-api-params.md)「术语与分层」节。
 
 ## 三、蒸馏（Turbo）档已退役
 
