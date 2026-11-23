@@ -35,7 +35,7 @@ The kitchen behind her is dim: a red stand mixer with a red-and-white striped bo
 - `a steep close high-angle view looking down over the top of her messy bun` — r1 写 `just above her eye level` 时出图机位平；改成显式"看发顶"后 r2 俯角成立。**陡峭程度要用可见证据（看得见头顶）承载，不用模糊角度词**。
 - `the whisk slopes diagonally down and to the right to a cream-coated wire head suspended in front of her chest, below and to the viewer's left of her chin` — r1 写 `beside her face` 时出图打蛋器举到脸旁；写全斜向路径+终点相对下巴的位置后成立。**决定构图的前景道具必须写完整几何路径，不用笼统方位**。
 - `muted grey-pink tones` + `subdued highlights` — r1 写 `bright, slightly overexposed planes` + `broad wet sheen` 时出图过亮过润；换成中间调+局部高光后影调对上。**先定最亮最暗锚点，局部高光不得放大为整体状态**。
-- cfg 3.5→4.5 对正文跟随度有可见提升（同 seed 同正文对比），但这是单次观察，不是定律。代价是构图服从度下降，出图后要核构图锚点。当前缺省档即 `cfg=3.5`、`loras=none`（见 `h3-queue` 出图章节）。
+- cfg 3.5→4.5 对正文跟随度有可见提升（同 seed 同正文对比），但这是单次观察，不是定律。代价是构图服从度下降，出图后要核构图锚点。本条实测时点的缺省档即 `cfg=3.5`、`loras=none`（现行缺省以实现实读为准，见 `h3-queue` 出图章节）。
 
 **r1 的错误归因**：
 

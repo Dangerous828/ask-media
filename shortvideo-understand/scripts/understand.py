@@ -8,7 +8,7 @@ LLM 既多花钱又丢掉了对话上下文。
 用法：
     python3 scripts/understand.py "https://www.bilibili.com/video/BVxxxx/"
     python3 scripts/understand.py "https://v.douyin.com/xxxx/"
-    python3 scripts/understand.py BV1xrnz6gEVD              # 裸 BV 号
+    python3 scripts/understand.py BV1xxxxxxxxx              # 裸 BV 号
     python3 scripts/understand.py <URL> --look              # 加画面层（抽帧识图）
     python3 scripts/understand.py <URL> --look --frames 12
     python3 scripts/understand.py <URL> --timestamps 0,45,90 --look

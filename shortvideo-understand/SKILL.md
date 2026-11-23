@@ -52,8 +52,8 @@ cookie 由 `lib/chubby_common/cookies.py` 自动探测：扫描各浏览器 cook
 cd <本技能目录>
 
 # 最基本：只要文字稿（JSON 到 stdout）
-python3 scripts/understand.py "https://www.bilibili.com/video/BV1xrnz6gEVD/"
-python3 scripts/understand.py "BV1xrnz6gEVD"
+python3 scripts/understand.py "https://www.bilibili.com/video/BV1xxxxxxxxx/"
+python3 scripts/understand.py "BV1xxxxxxxxx"
 python3 scripts/understand.py "https://b23.tv/uMUrdgJ"  # 自动展开短链再提取 BV 号
 python3 scripts/understand.py "https://v.douyin.com/xxxxxxx/"
 

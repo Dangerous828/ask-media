@@ -125,7 +125,7 @@ license: MIT
 
 **否定与排除项**：正文只陈述存在什么，不写指令句。要压制的伪影、不要的字幕水印、不要的多余道具，全部走 `--negative`。
 
-本机 Qwen 链路是标准 CFG 双条件结构（工作流里 positive / negative 两个 CLIPTextEncode + CFGGuider 带 cfg），**cfg 与负向槽都真实可用**：默认 `DEFAULT_CFG = 3.5`、`loras=none`，负向全程参与采样。只有两种情况负向被跳过——显式 `cfg ≤ 1`（渲染器打 NOTE 并把 negative 置空），或挂了蒸馏/加速 LoRA 把 cfg 压到 1。
+本机 Qwen 链路是标准 CFG 双条件结构（工作流里 positive / negative 两个 CLIPTextEncode + CFGGuider 带 cfg），**cfg 与负向槽都真实可用**：缺省 CFG 与 LoRA 以实现实读为准（`h3q_img.py` 顶部常量 / MCP schema / 覆盖键 `H3Q_IMAGE_*`），实测时点（2026-11-09）为 CFG 3.5、无 LoRA，负向全程参与采样。只有两种情况负向被跳过——显式 `cfg ≤ 1`（渲染器打 NOTE 并把 negative 置空），或挂了蒸馏/加速 LoRA 把 cfg 压到 1。
 
 **不要把这条跟云端 API 的限制混淆**：阿里云 qwen-image-2.1 的 `negative_prompt` 请求参数确实不支持（那是产品层封装），但本机跑的是 ComfyUI 工作流，不受该限制。
 
