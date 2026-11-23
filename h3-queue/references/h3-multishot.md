@@ -56,7 +56,7 @@
 >
 > **2026-11-19 起三层都会在提交前拦住这个错误**：
 > ① `h3_gate.py --mode multishot`（G39 查窗口数/窗口开头/单镜段名混入，G40 逐窗查
-> `<d>` 格式、`<d>` 外中文、每窗 15s 上限）；② adapter `verify_multishot_script`
+> `<d>` 格式、`<d>` 外中文、每窗 ≤362f（15s 网格吸附后的物理帧数））；② adapter `verify_multishot_script`
 > 在 SSH/上传前拒绝；③ MCP `_verify_multishot_script` 在建临时文件前拒绝。
 > **多窗不再「整块豁免结构项」**——那是把检查删掉，不是适配。
 
@@ -91,7 +91,7 @@
 
 **分工**：同机位连续、请求总帧 ≤451 的段落用 multishot 一次出；换场、反打、总帧超限**建议**按 Ref2VA 逐段生成再硬切（adapter 已不再按 451 硬拦，超限会照常提交，显存风险自负）。
 
-**闸门**：multishot 脚本用 `h3_gate --mode multishot`，由 G39/G40 检查每窗格式与时长（每窗 ≤15s），G25 在 multishot 模式下不注册、不适用。
+**闸门**：multishot 脚本用 `h3_gate --mode multishot`，由 G39/G40 检查每窗格式与时长（每窗 ≤362f——15s 经 24fps/17k+5 向上吸附后的物理帧数），G25 在 multishot 模式下不注册、不适用。
 组窗前先用 gate 逐条检查每个**单镜**提示词（`--mode ref --frames <单窗帧数> --refs N`，必须 0 error）；单镜 >15s 默认被 G25 拦。
 `--allow-long-video` 仅供不经 h3q 的手搓直投通道显式豁免长端 warn，h3q adapter 不透传该 flag；h3q 常规路径仍受 G25 error 兜底。
 

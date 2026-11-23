@@ -2,6 +2,11 @@
 
 **这不是死仓。** 这里收录 T8 案例库的可检索原文：**624 条可检索条目 = 613 条案例原文 + 9 个官方 Skill + 2 个社区 Skill**；`catalog.json` / [MASTER-INDEX.md](MASTER-INDEX.md) / [search.py](search.py) 均以这 624 条为准。另有 **273 张正式模板卡**仅存在于上游 `catalog-index-source.json` 的 `recommendationEntities`，**未入本地检索索引、search.py 搜不到**（如需检索须先按上游来源补建条目）。本地 `cards/` 目录共 284 个文件（= 9 官方 Skill + 2 社区 Skill + 273 模板卡原文），其中 273 张模板卡原文落在 `cards/` 但不在可检索的 624 条内。验证状态统一为**外部案例机制，本地 h3q 未测**。
 
+> **卡片内的链接口径**：`cases/` 与 `cards/` 下的卡片是**上游原文逐字收录**，正文里的 `[Creative DNA](./creative-dna.json)`、
+> `[MiniMax H3](./prompts/minimax-h3.md)`、`[Seedance 2.0](./prompts/seedance-2.0.md)`、`references/summary.md`、
+> `references/template.md` 等**指向上游仓的结构**（上游有 `prompts/`、`references/`、`locales/`、`preview.gif`，本仓只收文本）。
+> 这些路径在本仓不存在，不是本仓的死链；为了保住"逐字收录"没有改原文。要查机制卡用本索引与 [search.py](search.py)，不要跟着卡片里的相对链接走。
+
 > **指纹口径（2026-11-23 核实）**：`catalog-index-source.json` 的 `indexSha256` = `702c329d…`，**与本仓当前 `catalog.json` 的实测 SHA-256（`3a288cbf…`）不一致**，且仓内没有任何材料能证明它指代什么（试过索引文件自身、`catalog.json`、几种常见序列化都不匹配）。**结论：该字段目前不可用于校验任何东西**，按未解的历史字段对待；要指纹就 `shasum -a 256 catalog.json` 现算。索引其余自检项一致：`catalogItems` 的 id 集合与顺序与 `catalog.json` 624/624 完全相同。
 
 ## 三条进来路径

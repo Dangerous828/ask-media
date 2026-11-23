@@ -41,7 +41,7 @@ ComfyUI 8199，无 LoRA。用于核对"标准档为什么是 40 步 / CFG 3.5"�
 
 ## 三、蒸馏（Turbo）档已退役
 
-旧 Turbo 蒸馏档的缺省为 **8 步 / CFG 1**：代码侧见 `video-studio/scripts/example_h3q.py` 的 `if steps and steps != 8:` 分支
+旧 Turbo 蒸馏档的缺省为 **8 步 / CFG 1**：代码侧见 `../../video-studio/scripts/example_h3q.py` 的 `if steps and steps != 8:` 分支
 （`8` 走排除分支、按默认档处理）；该档的 8 步 vs 45 步对照实测记在 [示例项目实测](../../video-studio/MEASURED-示例项目实测.md) §二。
 此处只注明来源，不重复测量结论。
 

@@ -89,7 +89,11 @@ Origin: the same public sample as the previous subsection. `creator_markdown_che
 contract between the five documents of one episode. It passes on the sample as shipped. Remove Character B from SHOT-002's visual basis and change MOTION-003's
 duration from 2s to 3s, and it reports the cause, not "validation failed":
 
+`skills/…` and `examples/…` below are relative to the `drama-skills/` directory; the sample project ships
+local-only and is not included here — substitute your own project path.
+
 ```text
+# run from drama-skills/
 $ python3 skills/short-drama/scripts/creator_markdown_check.py examples/creator-first/EP001 --project-root examples/creator-first
 OK: examples/creator-first/EP001
 

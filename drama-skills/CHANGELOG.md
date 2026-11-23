@@ -7,6 +7,10 @@
 的新增或收紧记为 `Changed`（可能阻断既有产物），`craft_default` 与 `taste_option` 记为
 `Added`（可被创作者覆盖）。
 
+> **路径约定**：本文件是历史记录，条目里的路径按当时上游仓的结构书写（`skills/<技能>/…`）。
+> 其中 `tests/`、`evaluations/`、`tools/`、`examples/`、`.clawhub/` 等目录属上游仓的测试与发布基建，
+> **本公开版有意未收录**；条目据此描述当时的改动，不代表本仓存在这些文件。
+
 自 `v0.6.2` 起，小节名采用 Keep a Changelog 的六个英文类别（`Added` / `Changed` /
 `Deprecated` / `Removed` / `Fixed` / `Security`），正文仍为中文；`v0.6.1` 及更早的小节
 保持原样。
@@ -916,7 +920,7 @@ JSON/JSONL、索引、指纹、覆盖表或 QA 记录。用户点名整集或整
 
 **索引未完全归类时，覆盖检查报出来**。一行被标为 `ambiguous_dialogue_or_action`
 的文本不会作为块进入索引，因此覆盖、时长与配音本都看不到它。新增
-`SHT01_SCREENPLAY_IS_NOT_FULLY_INDEXED`。`short-drama-write/SKILL.md` 同时改正：
+`SHT01_SCREENPLAY_IS_NOT_FULLY_INDEXED`。`skills/short-drama-write/SKILL.md` 同时改正：
 该情形的三种处理方式中，「保留为动作」此前写着可行，实际做不到。
 
 **资产接受记录的 `CD-` 前缀写进文档**。`creator_acceptance.decision_ref` 的
@@ -1012,7 +1016,7 @@ v0.4.2 是一次校准版本，有两个来源。一是和竞品的端到端对�
 ### 新增
 
 - **补上引擎与分集之间的那一层：机制循环**。新增
-  `short-drama-develop/references/mechanism-loop.md`，回答"同一件事凭什么值得再看一次"：
+  `skills/short-drama-develop/references/mechanism-loop.md`，回答"同一件事凭什么值得再看一次"：
   怎样写清一次运行、怎样区分一次运行与一次重复、循环耗尽的症状与根因（机制越有效，
   对手越必须变笨），以及收束、改造、移交三种处置和不成立的第四种（不处置旧循环就并接
   新循环）。同时写清换循环时最容易丢的是紧迫性而非新鲜感，以及没有具体去处的循环必然
@@ -1052,7 +1056,7 @@ v0.4.2 是一次校准版本，有两个来源。一是和竞品的端到端对�
   还爱不爱我"这一问题的反复证明——分离是证明的条件而非障碍；按误会归属分四支
   （无过失、一方误会、双向误会、一方不知道对方是谁），并写明"此刻不能立刻说清的理由"
   是最容易漏掉也最致命的一件。卡片仍是可被创作者一句话覆盖的 `craft_default`。
-- **剧本阶段可以估算时长了**。新增 `short-drama-write/scripts/duration_estimate.py`：按项目
+- **剧本阶段可以估算时长了**。新增 `skills/short-drama-write/scripts/duration_estimate.py`：按项目
   在 `short-drama.json` 的 `format.pacing` 里自己声明的速率，把台词字数与动作段数折算成秒，
   并与 `target_seconds_per_episode` 比较。套件**不带跨项目速率、不设容差带、不阻断交付**——
   密集争辩和沉默劳作本来就不是同一个折算比。没有声明速率时只报计数，不猜秒数。
@@ -1073,7 +1077,7 @@ v0.4.2 是一次校准版本，有两个来源。一是和竞品的端到端对�
   引用事实，不涉及审美。新增 `SHT21_BLOCK_UNCLAIMED` / `SHT21_BLOCK_CLAIMED_TWICE` /
   `SHT21_BLOCK_NOT_IN_SCREENPLAY`。按块 ID 而不是正文行比对：内容未变的块保留 ID，改写的块
   换新 ID 并让旧引用失效。
-- **动作的可生成性**。新增 `short-drama-video-prompts/references/generability.md`：
+- **动作的可生成性**。新增 `skills/short-drama-video-prompts/references/generability.md`：
   **仅当项目声明由生成模型承担画面时生效**。判据是"这个动作在日常影像里常见吗"，
   并给出四类高风险写法（精确拦截、不可见内部状态、否定式动作、三步以上双手编排）
   与五种改写方法。核心一句：戏剧信息来自常见动作的**组合与时机**，不来自动作本身的精巧。
@@ -1455,7 +1459,7 @@ VID-04 非法数值、跨平台路径唯一性、旧事务安全阻断及 Window
 - **Windows 安装不再把 CRLF 换行误判为套件混装（修复 #26）**。清单生成器与运行时校验器现在都按
   规范化后的 LF 文本计算 SHA-256；仅 CRLF/LF 不同的文件保持等价，真实内容变化仍会阻断。
   CI 新增真实 `windows-latest` 安装回归，覆盖此前 `/short-drama` 初始化在预检阶段被
-  `short-drama-assets/SKILL.md` hash mismatch 阻断的问题。机器可读 CLI JSON 也改为 ASCII-safe
+  `skills/short-drama-assets/SKILL.md` hash mismatch 阻断的问题。机器可读 CLI JSON 也改为 ASCII-safe
   转义，Windows 仍使用旧控制台代码页时，中文项目路径与标题不再导致输出阶段编码失败。
 
 - **短剧创作台的界面细节整轮返修**。内容目录里每行的汉字圆牌换成一套笔画一致的线描图标；

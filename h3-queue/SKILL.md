@@ -352,7 +352,7 @@ Python 客户端可直接 `urllib` 打这些端点；也可以复用渲染机上
 `h3_quick.py` 依赖的 `lib_workflow.py` 同样是**渲染机侧私有定制脚本，须另行取得并放在本脚本同目录，不入本仓库**；
 公开仓直接运行会因缺该模块 `ImportError`。其 `--tier` 合法值是 `draft|hq|ref8|ref6`。
 
-**远端环境变量统一命名**（`transcard.py` / `short_drama_h3q_adapter.py` / `video-studio/scripts/example_h3q.py` 一致）：
+**远端环境变量统一命名**（`transcard.py` / `short_drama_h3q_adapter.py` / `../video-studio/scripts/example_h3q.py` 一致）：
 主名 `H3Q_SSH_HOST`（SSH 可达的渲染机）、`H3Q_REMOTE_PY`（渲染机 python 路径）；
 旧名 `H3Q_HOST`、`H3Q_PY`、`H3Q_REMOTE_PYTHON` 仍作兼容别名，读取顺序为**新名 → 旧名**（两者都设时以新名为准）。
 三处脚本调的是同一台渲染机，设一套主名即可同时满足。

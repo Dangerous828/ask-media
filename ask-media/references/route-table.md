@@ -2,7 +2,7 @@
 
 > 技能名和阶段表在 [`../SKILL.md`](../SKILL.md)，这里不重复。
 > 本文件只回答一件事：**到了某一步，除 SKILL.md 之外还要读哪份二级文件。**
-> 路径均为仓库内相对路径，直接可解析（运行 `scripts/check_references.py` 可校验）。
+> 路径均为仓库内相对路径，直接可解析（运行 `../../scripts/check_references.py` 可校验）。
 
 ## 按阶段查
 
