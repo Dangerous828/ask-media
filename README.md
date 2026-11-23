@@ -20,8 +20,51 @@
 
 `AGENTS.md` 是根级路由与纪律约定。
 
+## 安装
+
+前提：一个支持 Agent Skills（`SKILL.md`）的客户端，例如 Claude Code、Codex、OpenCode、pi；部分脚本需要 Python 3.9+。
+
+### 方法一：skills 命令（推荐）
+
+```bash
+npx skills add Dangerous828/ask-media -y -g
+```
+
+`-g` 全局安装，所有目录可用；去掉 `-g` 则只装到当前目录。更新时重新执行同一条命令即可。如果该命令找不到技能，改用方法二手动链接。
+
+### 方法二：手动链接
+
+```bash
+git clone https://github.com/Dangerous828/ask-media.git && cd ask-media
+mkdir -p "$HOME/.claude/skills"
+for skill in ask-media video-studio video-previs h3-queue h3-prompt-writing h3-video-gate; do
+  ln -s "$PWD/$skill" "$HOME/.claude/skills/$skill"
+done
+```
+
+不同客户端的技能目录：
+
+- Claude Code：`~/.claude/skills/<技能名>/`
+- Codex：`${CODEX_HOME:-$HOME/.codex}/skills/<技能名>/`
+- OpenCode：`~/.config/opencode/skills/<技能名>/`
+
+每个技能都是独立安装单元，只用其中几个时，只链接对应目录即可。
+
+### 入口与环境
+
+- 影像任务先读 `ask-media/SKILL.md` 选路，再按阶段读对应的 owner 技能。
+- 需要额外环境的技能：`video-previs` 需要智谱 GLM API Key（`ZHIPUAI_API_KEY` 或 `GLM_API_KEY`）；`h3-queue` / `video-studio` 需要作者本地的 ComfyUI + h3q 生产队列，不附带；`shortvideo-understand` 需要 yt-dlp。其余技能多为纯文档，直接可用。
+
 ## 说明
 
 这是从内部技能库整理出的公开版本，仅包含通用方法论。项目实测数据、内部路径与客户相关信息已移除，因此部分文档中的"实测记录"引用的是脱敏后的示例标识。
 
 部分技能的完整能力依赖具体运行环境（本地 GPU 队列、特定 API 等）；文档描述方法与判据，不附带这些环境配置。
+
+## 许可
+
+- 本仓库自有技能：[MIT License](LICENSE)，Copyright (c) 2026 Dangerous828。
+- 随仓附带的三方技能保留各自许可：
+  - `drama-skills/`：MIT，Copyright (c) 2026 drama-skills contributors（上游 [zenstory-ai/drama-skills](https://github.com/zenstory-ai/drama-skills)）
+  - `shortvideo-understand/`：MIT，Copyright (c) 2026 Chubby
+  - `humanizer/`：CC BY-NC 4.0，Copyright (c) 2026 shiujan，仅限非商业使用；商用授权见 [lieflat.work](https://lieflat.work/skills/less-ai-tone/)
