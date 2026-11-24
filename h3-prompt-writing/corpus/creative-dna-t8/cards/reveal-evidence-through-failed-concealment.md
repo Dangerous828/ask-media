@@ -5,7 +5,6 @@
 - 验证状态：外部案例机制，**本地 h3q 未测**；不写成通过配方。
 - 边界：英文骨架不是 H3 正文，禁止直接复制投产；机制不等于全局禁令。
 
-> **原文块内的相对链接**（`references/…`、`./prompts/…`、`creative-dna.json`、`locales/…`、`preview.gif`）指向**上游仓结构**，本仓只收文本、没有这些文件；查机制与检索入口见 [INDEX.md](../INDEX.md)。
 
 ## 原文（逐字收录，不改写）
 
@@ -23,19 +22,17 @@ Create a new execution from the reusable mechanism, not a surface reskin of any 
 
 ## Workflow
 
-1. Read [references/summary.md](references/summary.md) for fit, input slots, and the concise starting example.
-2. Read [references/template.md](references/template.md) completely before drafting.
-3. Preserve the user's subject and objective, then fill every missing scene, trigger, event-chain, camera, sound, and payoff slot.
-4. Treat these anchors as mandatory:
+1. Preserve the user's subject and objective, then fill every missing scene, trigger, event-chain, camera, sound, and payoff slot.
+2. Treat these anchors as mandatory:
 
 - Use one continuous embodied first-person observer whose height and distance changes come from physical movement.
 - Require at least two concealment attempts that each expose a deeper contradiction.
 - Hand off from object proof to a sustained facial or bodily reaction.
 - End with a visible behavior change rather than a third reveal.
 
-5. Change source-specific people, setting, props, palette, dialogue, shot boundaries, sound family, and payoff surfaces together.
-6. Compile MiniMax H3 and Seedance 2.0 independently; do not leak one model's field syntax into the other.
-7. Silently verify anchor coverage, continuity, timing, physical causality, and anti-copy distance before returning the final prompts.
+3. Change source-specific people, setting, props, palette, dialogue, shot boundaries, sound family, and payoff surfaces together.
+4. Compile MiniMax H3 and Seedance 2.0 independently; do not leak one model's field syntax into the other.
+5. Silently verify anchor coverage, continuity, timing, physical causality, and anti-copy distance before returning the final prompts.
 
 ## MiniMax H3
 

@@ -22,19 +22,17 @@ Create a new execution from the reusable mechanism, not a surface reskin of any 
 
 ## Workflow
 
-1. Read [references/summary.md](references/summary.md) for fit, input slots, and the concise starting example.
-2. Read [references/template.md](references/template.md) completely before drafting.
-3. Preserve the user's subject and objective, then fill every missing scene, trigger, event-chain, camera, sound, and payoff slot.
-4. Treat these anchors as mandatory:
+1. Preserve the user's subject and objective, then fill every missing scene, trigger, event-chain, camera, sound, and payoff slot.
+2. Treat these anchors as mandatory:
 
 - Lock one adult portrait, background, lens distance and light for the complete performance.
 - Accumulate at least three readable tension indicators without resetting earlier evidence.
 - Place one brief self-protective concealment gesture after the peak and then reveal the face again.
 - Hold visible emotional residue such as wet eyes, altered breath or gaze in the terminal state.
 
-5. Change source-specific people, setting, props, palette, dialogue, shot boundaries, sound family, and payoff surfaces together.
-6. Compile MiniMax H3 and Seedance 2.0 independently; do not leak one model's field syntax into the other.
-7. Silently verify anchor coverage, continuity, timing, physical causality, and anti-copy distance before returning the final prompts.
+3. Change source-specific people, setting, props, palette, dialogue, shot boundaries, sound family, and payoff surfaces together.
+4. Compile MiniMax H3 and Seedance 2.0 independently; do not leak one model's field syntax into the other.
+5. Silently verify anchor coverage, continuity, timing, physical causality, and anti-copy distance before returning the final prompts.
 
 ## MiniMax H3
 

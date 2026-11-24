@@ -5,7 +5,6 @@
 - 验证状态：外部案例机制，**本地 h3q 未测**；不写成通过配方。
 - 边界：英文骨架不是 H3 正文，禁止直接复制投产；机制不等于全局禁令。
 
-> **原文块内的相对链接**（`references/…`、`./prompts/…`、`creative-dna.json`、`locales/…`、`preview.gif`）指向**上游仓结构**，本仓只收文本、没有这些文件；查机制与检索入口见 [INDEX.md](../INDEX.md)。
 
 ## 原文（逐字收录，不改写）
 
@@ -29,7 +28,7 @@ Direct an elegant product film around real form and behavior, not a generic whit
 4. Define a motion language driven by real edges, mechanisms, highlights, variant motion, or silhouette matches.
 5. Use separate reference images for hero identity, material/mechanism detail, and optional final composition; never treat a grid as a video storyboard.
 6. Keep copy sparse. Lock exact words, single-line layout, readable contrast, and entry behavior before compiling.
-7. Build and audit the prompt with `references/template.md`.
+7. Build and audit the prompt.
 
 ## Seedance rules
 

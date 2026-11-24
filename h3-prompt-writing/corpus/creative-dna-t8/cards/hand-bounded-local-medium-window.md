@@ -5,7 +5,6 @@
 - 验证状态：外部案例机制，**本地 h3q 未测**；不写成通过配方。
 - 边界：英文骨架不是 H3 正文，禁止直接复制投产；机制不等于全局禁令。
 
-> **原文块内的相对链接**（`references/…`、`./prompts/…`、`creative-dna.json`、`locales/…`、`preview.gif`）指向**上游仓结构**，本仓只收文本、没有这些文件；查机制与检索入口见 [INDEX.md](../INDEX.md)。
 
 ## 原文（逐字收录，不改写）
 
@@ -23,19 +22,17 @@ Create a new execution from the reusable mechanism, not a surface reskin of any 
 
 ## Workflow
 
-1. Read [references/summary.md](references/summary.md) for fit, input slots, and the concise starting example.
-2. Read [references/template.md](references/template.md) completely before drafting.
-3. Preserve the user's subject and objective, then fill every missing adult identity, environment, boundary, alternate medium, proof region, apex, release, and sound slot.
-4. Treat these anchors as mandatory:
+1. Preserve the user's subject and objective, then fill every missing adult identity, environment, boundary, alternate medium, proof region, apex, release, and sound slot.
+2. Treat these anchors as mandatory:
 
 - 激活前先建立一名明确成年原创控制者、稳定环境和可见的空闲双手。
 - 双手几何必须先于换媒形成，活动边缘始终绑定指尖或手部边线。
 - 替代媒介严格限制在移动边界内部，边界两侧空间精确注册，外部保持基线状态。
 - 至少用三种几何或覆盖区证明同一规则；最大覆盖留到后段，再主动收回并以原媒介反应或残留确认结束。
 
-5. Change source-specific people, wardrobe, environment, edge styling, exact gestures, timing, reaction, and sound family together.
-6. Compile MiniMax H3 and Seedance 2.0 independently; do not leak one model's field syntax into the other.
-7. Silently verify hand-before-effect causality, edge registration, clipping, geometry variation, late apex, baseline return, and anti-copy distance.
+3. Change source-specific people, wardrobe, environment, edge styling, exact gestures, timing, reaction, and sound family together.
+4. Compile MiniMax H3 and Seedance 2.0 independently; do not leak one model's field syntax into the other.
+5. Silently verify hand-before-effect causality, edge registration, clipping, geometry variation, late apex, baseline return, and anti-copy distance.
 
 ## MiniMax H3
 

@@ -5,7 +5,6 @@
 - 验证状态：外部案例机制，**本地 h3q 未测**；不写成通过配方。
 - 边界：英文骨架不是 H3 正文，禁止直接复制投产；机制不等于全局禁令。
 
-> **原文块内的相对链接**（`references/…`、`./prompts/…`、`creative-dna.json`、`locales/…`、`preview.gif`）指向**上游仓结构**，本仓只收文本、没有这些文件；查机制与检索入口见 [INDEX.md](../INDEX.md)。
 
 ## 原文（逐字收录，不改写）
 
@@ -29,7 +28,7 @@ Turn a story idea into Seedance-native clip prompts. This is a T8-authored compa
 4. Define environment anchors and screen geography before camera moves.
 5. Split a long film into clips of at most 15 seconds. Give every clip a visible opening state, change, payoff, and handoff frame/action.
 6. Choose generation assets deliberately: character images for identity, scene images for environment, and videos only for a named action/camera/style role.
-7. Compile each clip with `references/template.md`, then audit continuity across clips.
+7. Compile each clip, then audit continuity across clips.
 
 ## Seedance rules
 

@@ -5,7 +5,6 @@
 - 验证状态：外部案例机制，**本地 h3q 未测**；不写成通过配方。
 - 边界：英文骨架不是 H3 正文，禁止直接复制投产；机制不等于全局禁令。
 
-> **原文块内的相对链接**（`references/…`、`./prompts/…`、`creative-dna.json`、`locales/…`、`preview.gif`）指向**上游仓结构**，本仓只收文本、没有这些文件；查机制与检索入口见 [INDEX.md](../INDEX.md)。
 
 ## 原文（逐字收录，不改写）
 
@@ -28,7 +27,7 @@ Design a fresh mixed-media event around physical contact and continuous transfor
 3. Make the first causal event a readable contact between the drawn entity and a real hand/object.
 4. Preserve one trace across transformations: line, tail, smear, contour, color, or rhythmic motion.
 5. Let the camera notice and follow slightly late; do not keep the entity perfectly centered.
-6. Build a continuous action paragraph with `references/template.md` unless a genuine cut is required.
+6. Build a continuous action paragraph unless a genuine cut is required.
 
 ## Seedance rules
 

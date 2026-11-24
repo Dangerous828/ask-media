@@ -5,7 +5,6 @@
 - 验证状态：外部案例机制，**本地 h3q 未测**；不写成通过配方。
 - 边界：英文骨架不是 H3 正文，禁止直接复制投产；机制不等于全局禁令。
 
-> **原文块内的相对链接**（`references/…`、`./prompts/…`、`creative-dna.json`、`locales/…`、`preview.gif`）指向**上游仓结构**，本仓只收文本、没有这些文件；查机制与检索入口见 [INDEX.md](../INDEX.md)。
 
 ## 原文（逐字收录，不改写）
 
@@ -38,8 +37,8 @@ An urgent intervention creates conflict, a controlled visual proof makes the hid
 ## 使用方法
 
 1. 先保留用户主体和目标，再按推荐格式补齐场景、事件链、镜头和结果。
-2. 阅读 [Creative DNA](./creative-dna.json)，重新实例化变量，不做来源表面换名词。
-3. 分别查看 [MiniMax H3](./prompts/minimax-h3.md) 与 [Seedance 2.0](./prompts/seedance-2.0.md) 的已验证实例。
+2. 阅读 Creative DNA，重新实例化变量，不做来源表面换名词。
+3. 分别查看 MiniMax H3 与 Seedance 2.0 的已验证实例。
 4. GitHub 使用 GIF 快速预览；Electron 媒体包播放完整有声 MP4。
 
 ## 来源与署名
@@ -589,29 +588,6 @@ An urgent intervention creates conflict, a controlled visual proof makes the hid
     "MiniMax H3",
     "Seedance 2.0"
   ],
-  "source_ref": "source.json",
-  "creative_dna_ref": "creative-dna.json",
-  "summary_ref": "SUMMARY.md",
-  "prompt_refs": {
-    "minimax_h3": "prompts/minimax-h3.md",
-    "seedance_2_0": "prompts/seedance-2.0.md"
-  },
-  "skill_ref": "../../../skills/direct-proof-state-handoff",
-  "preview_refs": {
-    "gif": "preview.gif",
-    "poster": "poster.webp",
-    "mp4": "media/reddit-1vhloyz-walter-prompt-guide/preview.mp4"
-  },
-  "preview_paths": {
-    "gif": "preview.gif",
-    "poster": "poster.webp",
-    "mp4": "media/reddit-1vhloyz-walter-prompt-guide/preview.mp4"
-  },
-  "preview_status": {
-    "gif": "available",
-    "poster": "available",
-    "mp4": "available_in_electron_media_pack"
-  },
   "template_id": "t8c007-proof-object-reaction-handoff",
   "template_action": "selector",
   "duplicate_of": null,
@@ -675,7 +651,7 @@ non_diegetic_music: None
 
 - 保留因果机制与结构锚点，不复刻来源人物、地点、道具、构图或标志性效果。
 - 核对主体身份、空间关系、事件先后、运镜职责与最终状态。
-- 新用途应返回 [Creative DNA](../creative-dna.json) 重新实例化。
+- 新用途应返回 Creative DNA 重新实例化。
 ````
 
 ### prompts/seedance-2.0.md
@@ -711,7 +687,7 @@ validation: "passed"
 
 - 保留因果机制与结构锚点，不复刻来源人物、地点、道具、构图或标志性效果。
 - 核对主体身份、空间关系、事件先后、运镜职责与最终状态。
-- 新用途应返回 [Creative DNA](../creative-dna.json) 重新实例化。
+- 新用途应返回 Creative DNA 重新实例化。
 ````
 
 ### source.json
@@ -736,14 +712,6 @@ validation: "passed"
     "author": "GrayingGamer",
     "post_url": "https://www.reddit.com/r/StableDiffusion/comments/1vhloyz/walter_white_and_the_minimax_h3_official/",
     "playback_mode": "source_post",
-    "preview_gif": "./preview.gif",
-    "preview_mp4": "media/reddit-1vhloyz-walter-prompt-guide/preview.mp4",
-    "poster": "./poster.webp",
-    "preview_status": {
-      "gif": "available",
-      "poster": "available",
-      "mp4": "available_in_electron_media_pack"
-    },
     "fallback_mode": "open_original_post"
   }
 }

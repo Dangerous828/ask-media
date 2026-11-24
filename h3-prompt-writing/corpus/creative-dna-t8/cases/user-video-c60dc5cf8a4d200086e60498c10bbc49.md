@@ -5,7 +5,6 @@
 - 验证状态：外部案例机制，**本地 h3q 未测**；不写成通过配方。
 - 边界：英文骨架不是 H3 正文，禁止直接复制投产；机制不等于全局禁令。
 
-> **原文块内的相对链接**（`references/…`、`./prompts/…`、`creative-dna.json`、`locales/…`、`preview.gif`）指向**上游仓结构**，本仓只收文本、没有这些文件；查机制与检索入口见 [INDEX.md](../INDEX.md)。
 
 ## 原文（逐字收录，不改写）
 
@@ -725,29 +724,6 @@
   "source_duration_seconds": 10.125,
   "target_duration_seconds": 15.0,
   "models": ["MiniMax H3", "Seedance 2.0"],
-  "source_ref": "source.json",
-  "creative_dna_ref": "creative-dna.json",
-  "summary_ref": "SUMMARY.md",
-  "prompt_refs": {
-    "minimax_h3": "prompts/minimax-h3.md",
-    "seedance_2_0": "prompts/seedance-2.0.md"
-  },
-  "skill_ref": "../../../skills/identity-locked-density-reset-recap-hero",
-  "preview_refs": {
-    "gif": "preview.gif",
-    "poster": "poster.webp",
-    "mp4": "media/user-video-c60dc5cf8a4d200086e60498c10bbc49/preview.mp4"
-  },
-  "preview_paths": {
-    "gif": "preview.gif",
-    "poster": "poster.webp",
-    "mp4": "media/user-video-c60dc5cf8a4d200086e60498c10bbc49/preview.mp4"
-  },
-  "preview_status": {
-    "gif": "available",
-    "poster": "available",
-    "mp4": "available_in_electron_media_pack"
-  },
   "template_id": "t8-case-identity-locked-density-reset-recap-hero-v1",
   "template_action": "selector",
   "duplicate_of": null,
@@ -996,14 +972,6 @@ Validation: PASS
     "author": "T8 original creator contribution",
     "post_url": "https://github.com/T8mars/minimax-h3-prompt-skill-T8/tree/main/catalog/cases/user-video-c60dc5cf8a4d200086e60498c10bbc49",
     "playback_mode": "source_post",
-    "preview_gif": "./preview.gif",
-    "preview_mp4": "media/user-video-c60dc5cf8a4d200086e60498c10bbc49/preview.mp4",
-    "poster": "./poster.webp",
-    "preview_status": {
-      "gif": "available",
-      "poster": "available",
-      "mp4": "available_in_electron_media_pack"
-    },
     "fallback_mode": "open_original_post"
   }
 }

@@ -5,7 +5,6 @@
 - 验证状态：外部案例机制，**本地 h3q 未测**；不写成通过配方。
 - 边界：英文骨架不是 H3 正文，禁止直接复制投产；机制不等于全局禁令。
 
-> **原文块内的相对链接**（`references/…`、`./prompts/…`、`creative-dna.json`、`locales/…`、`preview.gif`）指向**上游仓结构**，本仓只收文本、没有这些文件；查机制与检索入口见 [INDEX.md](../INDEX.md)。
 
 ## 原文（逐字收录，不改写）
 
@@ -20,15 +19,6 @@ description: "Design natural vertical street-interview and walk-and-talk video p
 # Direct Street Interview Video
 
 Create an original street interaction from a reusable documentary mechanism. This is a non-official, user-contributed Skill; it is not a MiniMax or ByteDance preset.
-
-## Required reading
-
-1. Read [references/summary.md](references/summary.md) for style, fit, usage, and source limitations.
-2. Read [references/template.md](references/template.md) for invariants, variable slots, ablations, transfer tests, and repairs.
-3. Read the target model template before compiling:
-   - MiniMax H3: [references/h3-template.md](references/h3-template.md)
-   - Seedance 2.0: [references/seedance-template.md](references/seedance-template.md)
-4. Consult [references/source-analysis.md](references/source-analysis.md) only when explaining why a repair exists. Do not reproduce its people, wardrobe, location, or dialogue.
 
 ## Intake
 

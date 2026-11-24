@@ -5,7 +5,6 @@
 - 验证状态：外部案例机制，**本地 h3q 未测**；不写成通过配方。
 - 边界：英文骨架不是 H3 正文，禁止直接复制投产；机制不等于全局禁令。
 
-> **原文块内的相对链接**（`references/…`、`./prompts/…`、`creative-dna.json`、`locales/…`、`preview.gif`）指向**上游仓结构**，本仓只收文本、没有这些文件；查机制与检索入口见 [INDEX.md](../INDEX.md)。
 
 ## 原文（逐字收录，不改写）
 
@@ -700,29 +699,6 @@
     "MiniMax H3",
     "Seedance 2.0"
   ],
-  "source_ref": "source.json",
-  "creative_dna_ref": "creative-dna.json",
-  "summary_ref": "SUMMARY.md",
-  "prompt_refs": {
-    "minimax_h3": "prompts/minimax-h3.md",
-    "seedance_2_0": "prompts/seedance-2.0.md"
-  },
-  "skill_ref": "../../../skills/raise-shared-contact-to-airborne-peak",
-  "preview_refs": {
-    "gif": "preview.gif",
-    "poster": "poster.webp",
-    "mp4": "media/user-video-8cc6ac74d1d823cc7d99d90451f6214e/preview.mp4"
-  },
-  "preview_paths": {
-    "gif": "preview.gif",
-    "poster": "poster.webp",
-    "mp4": "media/user-video-8cc6ac74d1d823cc7d99d90451f6214e/preview.mp4"
-  },
-  "preview_status": {
-    "gif": "available",
-    "poster": "available",
-    "mp4": "available_in_electron_media_pack"
-  },
   "template_id": "t8-case-shared-contact-height-escalation-v1",
   "template_action": "selector",
   "duplicate_of": null,
@@ -785,7 +761,7 @@ non_diegetic_music: Original 112 BPM prepared-marimba and muted hand-drum patter
 
 - 保留因果机制与结构锚点，不复刻来源人物、地点、道具、构图或标志性效果。
 - 核对主体身份、空间关系、事件先后、运镜职责与最终状态。
-- 新用途应返回 [Creative DNA](../creative-dna.json) 重新实例化。
+- 新用途应返回 Creative DNA 重新实例化。
 ````
 
 ### prompts/seedance-2.0.md
@@ -822,7 +798,7 @@ validation: "passed"
 
 - 保留因果机制与结构锚点，不复刻来源人物、地点、道具、构图或标志性效果。
 - 核对主体身份、空间关系、事件先后、运镜职责与最终状态。
-- 新用途应返回 [Creative DNA](../creative-dna.json) 重新实例化。
+- 新用途应返回 Creative DNA 重新实例化。
 ````
 
 ### source.json
@@ -847,14 +823,6 @@ validation: "passed"
     "author": "unknown",
     "post_url": "https://local.t8/user-supplied/8cc6ac74d1d823cc7d99d90451f6214e",
     "playback_mode": "source_post",
-    "preview_gif": "./preview.gif",
-    "preview_mp4": "media/user-video-8cc6ac74d1d823cc7d99d90451f6214e/preview.mp4",
-    "poster": "./poster.webp",
-    "preview_status": {
-      "gif": "available",
-      "poster": "available",
-      "mp4": "available_in_electron_media_pack"
-    },
     "fallback_mode": "open_original_post"
   }
 }

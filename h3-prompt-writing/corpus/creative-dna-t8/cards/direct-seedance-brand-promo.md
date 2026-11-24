@@ -5,7 +5,6 @@
 - 验证状态：外部案例机制，**本地 h3q 未测**；不写成通过配方。
 - 边界：英文骨架不是 H3 正文，禁止直接复制投产；机制不等于全局禁令。
 
-> **原文块内的相对链接**（`references/…`、`./prompts/…`、`creative-dna.json`、`locales/…`、`preview.gif`）指向**上游仓结构**，本仓只收文本、没有这些文件；查机制与检索入口见 [INDEX.md](../INDEX.md)。
 
 ## 原文（逐字收录，不改写）
 
@@ -28,7 +27,7 @@ Create a product-specific promotional short rather than a generic effects reel. 
 3. Reject or omit anything that cannot be verified. Never redraw an unavailable logo or fabricate a metric.
 4. Select one story spine: intent-to-result, interaction-to-proof, problem-to-outcome, or image-to-benefit.
 5. Plan only the beats that fit 4–15 seconds. Each beat must reveal new product evidence.
-6. Assign every generation asset one narrow role and compile with `references/template.md`.
+6. Assign every generation asset one narrow role and compile.
 7. Show the pre-production card before any paid generation or upload.
 
 ## Seedance rules

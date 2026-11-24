@@ -5,7 +5,6 @@
 - 验证状态：外部案例机制，**本地 h3q 未测**；不写成通过配方。
 - 边界：英文骨架不是 H3 正文，禁止直接复制投产；机制不等于全局禁令。
 
-> **原文块内的相对链接**（`references/…`、`./prompts/…`、`creative-dna.json`、`locales/…`、`preview.gif`）指向**上游仓结构**，本仓只收文本、没有这些文件；查机制与检索入口见 [INDEX.md](../INDEX.md)。
 
 ## 原文（逐字收录，不改写）
 
@@ -28,7 +27,7 @@ Create a two-character menu animation without identity swaps or illegible UI. Th
 3. Draft one approval frame externally when the user needs visual confirmation. Treat it as layout/style guidance, not an undeclared exact frame guarantee.
 4. Verify every requested UI string before prompt writing. Reduce copy if it cannot remain readable.
 5. Plan a short interaction chain: idle state → focus change → selection/confirmation → resolved co-op state.
-6. Compile with `references/template.md`; keep character, UI, palette, and screen geography stable.
+6. Compile; keep character, UI, palette, and screen geography stable.
 
 ## Seedance rules
 

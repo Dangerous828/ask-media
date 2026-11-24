@@ -5,7 +5,6 @@
 - 验证状态：外部案例机制，**本地 h3q 未测**；不写成通过配方。
 - 边界：英文骨架不是 H3 正文，禁止直接复制投产；机制不等于全局禁令。
 
-> **原文块内的相对链接**（`references/…`、`./prompts/…`、`creative-dna.json`、`locales/…`、`preview.gif`）指向**上游仓结构**，本仓只收文本、没有这些文件；查机制与检索入口见 [INDEX.md](../INDEX.md)。
 
 ## 原文（逐字收录，不改写）
 
@@ -28,7 +27,7 @@ Make an abstract mechanism feel physically built and teachable. This is a T8-aut
 3. Design only the characters that improve explanation. Define their paper construction and limited gesture system.
 4. Build the stage from foreground, midground, background, and far-background planes. Give every moving element a physical paper mechanism.
 5. Split knowledge into causal beats. A 15-second clip normally supports about three or four readable changes; longer work becomes multiple clips of at most 15 seconds.
-6. Assign reference images narrow character, scene, mechanism, or style roles and compile with `references/template.md`.
+6. Assign reference images narrow character, scene, mechanism, or style roles and compile.
 
 ## Seedance rules
 
