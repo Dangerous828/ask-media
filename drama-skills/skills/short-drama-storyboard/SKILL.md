@@ -179,6 +179,7 @@ license: MIT
 | 景别推进 | wide → medium → close-up → detail → reaction → wide |
 | J/L cut | 声音先入或后出，画面切了声音不断；接缝感知最低 |
 | 遮挡过渡 / 动作承接 / 声音桥等 | 手法清单、本通道可用性、可复制句式与核对步骤的唯一权威源是 `$short-drama-video-prompts` 的 `../short-drama-video-prompts/references/seam-transition.md`。本节不复制它：32 种手法分七类，选路是先分类再选手法 |
+| 转场卡 | 两段各自出片、**同一空间**（场景/光位/在场集合/位移四项判据全成立）但机位或站位有变时，在 A、B 之间插入一段由 **A 的真实末帧 + B 的真实首帧** 生成的过渡段，成片按 A → C → B 接。代价是多一整段片长与一次生成，中段只保身份与空间、不保表情与说话人。判据与投递约束见 `$short-drama-video-prompts` 的 `../short-drama-video-prompts/references/seam-transition.md` §0.4 与 #18 用法 B |
 | 首尾帧接力 | 按真实端点与当前执行档案判断是否可用、能否共存其他参考；制作条件见同一份 reference 的第17、18条，不在本表缓存通道能力 |
 
 切点有信息增量就切，不要为了“无缝”把该切的戏压成一个长镜头。生成侧的多镜写法（`[Shot N]`、气闸、接力）见 `$h3-prompt-writing` 的 §Shot Joining: Three Layers。

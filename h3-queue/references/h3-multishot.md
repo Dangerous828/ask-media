@@ -15,7 +15,7 @@
 
 **代价要写进决策**：双窗 20 分钟以上（EP005 S-002 判废经过见 [incidents.md](incidents.md) §2026-11-19/20）；需要 `scene_video` 做场景锚，否则房间会被重画；静默窗有编台词风险。
 
-**选路硬依据（2026-11-21 实测）**：单镜 `first_frame`（锁首帧）与 `refs`（身份板）在 adapter 层**互斥**，同 job 不可兼得（直接报错）。所以**双人同场、既要锁起帧又要双身份板的连续段，只有 multishot 一条路**（两窗各挂各的身份板）——别再试「单镜带两人」绕路。context_pin 验证状态见 [incidents.md](incidents.md) §2026-11-21（0.45.3 实测通过；容器缝与词层缝分开）。
+**选路硬依据（2026-11-21 实测）**：单镜 `first_frame`（锁首帧）与 `refs`（身份板）在 adapter 层**互斥**，同 job 不可兼得（直接报错）。所以**双人同场、既要逐帧锁起帧又要双身份板的连续段，只有 multishot 一条路**（两窗各挂各的身份板）——别再试「单镜带两人」绕路。**只要起点构图接上、不要求逐帧锁**时还有第二条：末槽续接——身份板照挂，上一段真实末帧占最后一个 `reference_image` 槽（不是 `first_frame`，所以不触发上面那条互斥），正文首句 `The shot opens on the same framing as <Picture N>.`；它不继承动作，做法见 [continuity-routes.md](continuity-routes.md) §2.13。context_pin 验证状态见 [incidents.md](incidents.md) §2026-11-21（0.45.3 实测通过；容器缝与词层缝分开）。
 
 **"同机位"本身不是用多窗的理由**——能拆就拆成单镜；多窗也管不了词层的相位断与情绪跳档，先在词层判型修词（判型顺序见 `../../drama-skills/skills/short-drama-video-prompts/references/seam-transition.md` §0.1 第 0 步，判据见 `../../h3-prompt-writing/references/failure-modes.md`）。两则反面教材（EP005 002 双窗 26 分钟判废、EP004 006+007 两轮词层缝）经过见 [incidents.md](incidents.md) §2026-11-19/20。
 

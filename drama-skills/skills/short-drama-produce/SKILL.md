@@ -122,9 +122,15 @@ python3 <本技能目录>/scripts/production_tool.py audit <project>
   生成结果续接时，下一段 job 同时绑定上一段实际视频和从该视频取得的实际尾帧，并保留
   `continuity_video`、`actual_tail_frame` 的不同职责；供应商 role 由目标模型 adapter 翻译。支持原生视频
   上下文续接的入口按其角色组合提交，不以计划尾帧或文字代替真实文件。本地 h3q 不接受
-  `reference_video`：若上游要求继承整段运动/声音上下文，就回 video-prompts 重设计；若上游已经
-  选择单帧视觉接力，则可提交已验收的真实尾帧为下一段 `first_frame`，注明只继承可见状态、
-  不继承原运动或音频。首尾配对与全参考互斥，当前范围见 h3-queue 输入能力（`../../../h3-queue/SKILL.md`）。上一段必须已在审查技能
+  `reference_video`：若上游要求继承整段运动/声音上下文，就回 video-prompts 重设计。
+  单帧续接在本地 h3q 上有**两条**路，别只记得第一条：
+  ① **末槽续接**（默认优先）：身份板/场景板照旧挂，把已验收的真实尾帧放进**最后一个参考槽**，
+     正文首句写 `The shot opens on the same framing as <Picture N>.`。身份与起点同时保住、
+     剪硬切观感无缝（实测见 `../../../h3-queue/references/incidents.md` §2026-11-13）。
+     这条路的 technique 是 `ref2va` 多槽，**不是 `i2va`**。
+  ② **首帧接力**：把尾帧提交为下一段 `first_frame`，注明只继承可见状态、不继承原运动或音频；
+     这条路整段丢掉身份/地理参考，只在不需要身份锁时用。
+  首尾配对与全参考互斥，当前范围见 h3-queue 输入能力（`../../../h3-queue/SKILL.md`）。上一段必须已在审查技能
   通过画风验收并批准复用，它的帧才可能进入下一段。creator-first 视频 job 还会把同集 `剧本.md`
   纳入确认输入指纹和私有快照；项目存在 `h3-series-config.json` 时也一并固定，供跨镜身份与时间检查。
   本地 h3q adapter 在上传前逐字核对实际 `<d>` 台词。旧的已确认任务若快照没有剧本会明确标记 NOTCHK，

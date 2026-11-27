@@ -215,6 +215,16 @@ Keep this file outside the project:
 `command` is an argv array, never a shell string. Timeout is 1–3600 seconds. Do not put credentials in this file;
 let the adapter read its environment or operating-system credential store.
 
+**本仓内置的两条通道已经写好了，不用自己编 `command`**：本地 h3q 出图 / 出视频
+（`local-h3q-image` / `local-h3q-video`）的可直接照抄的完整 config 在
+[`h3-queue/references/produce-adapter.md`](../../../../h3-queue/references/produce-adapter.md) §2.8
+「short-drama-produce 接入口」，command 指向 `h3-queue/scripts/short_drama_h3q_adapter.py`。
+那份文件同时写了各档位参数、分辨率上限与「草稿 → 创作者看 → final」的顺序。
+
+仓里那份是存档值，**跑之前按运行时实读核对**：渲染机 `h3qc submit --help`、
+adapter 对 `parameters.tier` 的校验、以及该机实际的 adapter 脚本路径。
+换机器时最容易失效的就是 `command` 里那条绝对路径。
+
 A profile may add `"reference_roles": [...]`, the roles its configured model accepts. When present,
 `run` refuses any binding whose role is not listed. A `reference_audio` binding always needs it:
 a model without an audio input can drop the voice without an error. Either way `run` stops before

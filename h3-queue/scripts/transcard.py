@@ -128,6 +128,12 @@ def frame_mad(a: Path, b: Path) -> float:
     return float(res.stdout.strip())
 
 
+MIN_FRAMES = 5  # 17k+5 的网格最小档；技术下限
+# 107f（4.458s）是「够装一段过渡动作」的推荐值，不是技术下限：
+# 2026-11-27 实测 22f(0.92s) / 39f(1.63s) 两条转场卡两端 MAD 4.16/3.40 与 4.34/3.62，都锁住了。
+# 短于 107f 只告警（动作容量风险），不再硬拦——否则创作者选短卡时只能绕过 main()。
+
+
 def gate_check(prompt_file: Path, frames: int) -> str:
     # 闸门缺失是硬错误，不允许静默跳过——否则 --skip-gate 这个显式开关形同虚设。
     if not Path(GATE).is_file():
@@ -260,7 +266,8 @@ def main() -> int:
     ap.add_argument("--before", required=True, help="A 段视频（取真实末帧）")
     ap.add_argument("--after", required=True, help="B 段视频（取真实首帧）")
     ap.add_argument("--prompt-file", required=True, help="C 的 base 三段提示词")
-    ap.add_argument("--frames", type=int, required=True, help="C 的帧数（17k+5，最短 107）")
+    ap.add_argument("--frames", type=int, required=True,
+                    help="C 的帧数（17k+5，最短 5；107f=4.458s 是推荐值）")
     ap.add_argument("--width", type=int, required=True)
     ap.add_argument("--height", type=int, required=True)
     ap.add_argument("--seed", type=int, default=42)
@@ -276,7 +283,11 @@ def main() -> int:
         if not p.is_file():
             raise SystemExit("找不到视频: %s" % p)
     if (args.frames - 5) % 17:
-        raise SystemExit("frames=%d 不是 17k+5（最短 107 / 4.458s）" % args.frames)
+        raise SystemExit("frames=%d 不是 17k+5（最小 5f；107f=4.458s 是推荐值）" % args.frames)
+    if args.frames < 107:
+        print("[WARN] frames=%d（%.3fs）短于常用的 107f/4.458s：两端仍能锁住（实测 22f/39f 的 MAD "
+              "3.4–4.3），但这段只能装很短的位移，词稿里别写走位或多拍动作。"
+              % (args.frames, args.frames / 24.0), file=sys.stderr)
     out_dir = Path(args.out_dir).expanduser().resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
     slug = re.sub(r"[^A-Za-z0-9_-]+", "-", args.label)[:40] or "transcard"

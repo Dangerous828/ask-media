@@ -51,9 +51,12 @@ H3 的结构字段用英文；这不等于把中文对白翻成英文。每句�
   上游可选择独立全参考起链，或只继承可见状态的真实尾帧 `first_frame` 视觉接力；需要两端状态时也可选FL2VA。
   组合能力和损失统一见 h3-queue 输入能力（`../../../../h3-queue/SKILL.md`），接缝选择见 [段间接缝](seam-transition.md)。
   既有案例的3.38与41.87是当时输入和度量下的读数，不是所有镜头的通过阈值或必然失败证明；选择后按实际素材核对，剪辑补不出缺失动作。
-  不要把上一段尾帧塞进 `reference_image` 冒充续接：
-  它只带来上一段的画质损失和漂移，带不来动作与声音连续。只有当上一段已通过画风验收并被批准复用，
-  且起始空间状态确实无法用原生参考表达时，才可以把它的一帧作为一张 `构图` 参考加入，而不替换原生参考。
+  上一段尾帧进 `reference_image` 有两种说法，别混：
+  **① 冒充续接**（说它继承了动作/声音）——不行，它带不来连续，只带来上一段的画质损失与漂移。
+  **② 末槽续接**（只说身份与起点构图接上）——这是既定路线：身份板/场景板照挂，尾帧占**最后一个参考槽**，
+  正文首句固定 `The shot opens on the same framing as <Picture N>.`。前提只有一条：上一段已通过画风验收并被批准复用。
+  实测（2026-11-13 EP003 001→002a）构图/身份/道具数量一致、剪硬切观感无缝；
+  做法见 `../../../../h3-queue/references/continuity-routes.md` §2.13，选路位置见 `seam-transition.md` §0.1 步 2c。
 - **音色不能锁**：每段同轨重新生成人声，同一角色跨段音色会漂。需要稳定声线时，由创作者决定是否在后期
   做人声分离/静音后以 TTS 重建对白层（见 `short-drama-edit`），或接受这个风险；直接叠加 TTS 会形成双人声。
 
@@ -335,8 +338,13 @@ detailed_description: [Shot 1] … <0 秒时画面里真有的人和状态> … 
 ## 连续段
 
 H3 的首/尾帧模式与 full-reference 模式互斥，不能在同一请求混用 `first_frame`/`last_frame` 和
-`reference_image`/`reference_video`/`reference_audio`。连续段需要上一段实际视频和实际尾帧时，统一走
-full-reference：
+`reference_image`/`reference_video`/`reference_audio`。
+
+> **本节讲的是云端 H3 的连续段。本地 h3q 通道没有 `reference_video`**（`supported_generation_modes`
+> 只有 `first_frame` / `first_last_frame` / `reference`），所以下面这条 `reference_video` 路线在本地
+> 执行不出来。本地要接上一段，只能走末槽续接（见上）或 `first_frame` 首帧接力。
+
+连续段需要上一段实际视频和实际尾帧时，统一走 full-reference：
 
 - 上一段实际视频：`reference_video`，正文称 `<Video 1>`，控制动作、节奏和声音连续；
 - 该视频的实际尾帧：`reference_image`，正文称 `<Picture 1>`，只作为新段开场的可见姿态与构图锚点。

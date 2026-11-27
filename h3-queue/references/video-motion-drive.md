@@ -10,18 +10,7 @@
 >
 > 判别：用户说“学这个动作”“照着做”“动作参考视频”“极乐净土那种”“音频也加进去”→ 本文；说“拆镜”“反推分镜表”“写 MOTION 提示词”→ 文字复刻。拿不准时问一句：“是把视频直接喂给模型，还是把动作拆成文字写进词里？”
 >
-> **实例（EP003）**：项目 `example-project`，成片与动作源在 NAS，与 EP001/EP002 同一层级：`<NAS项目目录>/example-project/EP003/`
->
-> | 文件（NAS，相对 `EP003/`） | 内容 |
-> |---|---|
-> | `EP003-dance-345f-videoref-audio.mp4` | 成片，512×896 / 345f / 14.375s / AAC |
-> | `EP003-dance-345f-x2.mp4` | 成片硬切重复两次，28.75s |
-> | `动作源/source.mp4` | B 站 BV-示例 原片（猫耳金发女仆，无台词，14.03s） |
-> | `动作源/action_ref.mp4` | 传给 ComfyUI 的动作源（原速，720×1280 / 337f，带 AAC 原声） |
-> | `文档/EP003_dance_videoref_audio.json` | 填好占位符的实际提交图 |
-> | `文档/投递单-EP003-动作驱动.md`、`验收-EP003-动作驱动.md`、`视频提示词.md`、`EP003_ref2va_prompt_345f.txt`、`EP003-dance-345f-videoref-audio.meta.json` | 投递单、验收、词稿、送检件、运行记录 |
->
-> 实证：2026-11-21 EP003「角色A学猫耳女仆卖萌动作」，345 帧 / 14.375s / 512×896，Windows ComfyUI 8199 一次成功，验收六项硬指标 PASS。
+> **实测经过**：这条通道的首条完整实例（素材清单、帧数换算、拍点时码、零污染核验、风格兑现情况）见 [incidents.md](incidents.md) §2026-11-21「EP003 视频动作驱动首条实例」，耗时见同节后的「EP003 任务耗时（视频动作直投通道）」。本文只留现行规则。
 
 ## 1. 什么时候走这条
 
@@ -31,7 +20,7 @@
 | 动作能用文字写清（走位、对白、普通表演） | 文字编排，走 h3q 队列（`../SKILL.md`） |
 | 只要锁同场连续镜头的构图、机位、色温 | h3q 的 `scene_video`（场景锚，不是动作驱动，音频不接） |
 
-动作视频只当**动作源**。人物与画风永远来自已验收的身份板与视觉设定，参考视频里的人物、服装、水印不进成片（EP003 源视频是金发猫耳女仆，成片零污染，29 帧 OCR 与目视确认）。
+动作视频只当**动作源**。人物与画风永远来自已验收的身份板与视觉设定，参考视频里的人物、服装、水印不进成片。零污染要按 §7 的核法逐项过，不能靠目视一句「没看到」。
 
 ## 2. 本通道不走 h3q 队列
 
@@ -57,8 +46,8 @@
 
 | 字段 | 位置 | 规则 |
 |---|---|---|
-| `length` | 节点 5 | 帧数，必须 17k+5（345=17×20+5；243=17×14+5）。**取动作视频真实帧数换算后向上取最近的 17k+5**：EP003 的 337f 源片取 345（向下取是 328，会截掉动作尾段）。向上取会使生成比源片多几帧（此处 +8f），多出的尾部靠动作自然收束补齐，不回放源片开头；时序对齐按 §4 的拍点秒数为准，不按帧号一一对应 |
-| `width`/`height` | 节点 5 | 16G 卡实测 512×896 可跑 345 帧（峰值 15.55GiB）。更大分辨率先降帧数 |
+| `length` | 节点 5 | 帧数，必须 17k+5（345=17×20+5；243=17×14+5）。**取动作视频真实帧数换算后向上取最近的 17k+5**：向下取会截掉动作尾段；向上取多出的几帧靠动作自然收束补齐，不回放源片开头。换算实例见 [incidents.md](incidents.md) §2026-11-21「EP003 视频动作驱动首条实例」。时序对齐按 §4 的拍点秒数为准，不按帧号一一对应 |
+| `width`/`height` | 节点 5 | 16G 卡实测 512×896 可跑 345 帧。更大分辨率先降帧数 |
 | `noise_seed` | 节点 6 | 任意整数 |
 | `ref_image_size` | 节点 5 | `match`。身份板是多视图拼板时脸可能偏弱，脸漂再改 `max` 或换单张正面图重投 |
 
@@ -72,12 +61,26 @@
 
 ## 4. 提交前
 
-1. **动作视频不要裁剪或变速**，除非创作者点名。EP003 压成 10s/1.4 倍速被否决，改回原速 14s。
+1. **动作视频不要裁剪或变速**，除非创作者点名。压短或放快之后，词里的时码与拍点全部对不上；改回原速是唯一干净的解（一次被否决的经过见 [incidents.md](incidents.md) §2026-11-21「EP003 视频动作驱动首条实例」）。
 2. 词稿按 `h3-prompt-writing` 的 Ref2VA 写法，过 `h3_gate.py --mode ref --frames <length> --allow-long-video`，0 error（≤362f 时不带 flag 也应 0 error；>362f 时必带 flag，G25 降为 warn 仍不计 error）。长视频 warn 需在投递单记录理由；>362f 显存余量极小，先降分辨率再考虑升帧。
-3. **词的起点态必须等于身份板/首帧的状态**；参考视频里的动作拍点按时码写进词，每拍给秒数（EP003 的七拍：前伸 0.3s → 托腮 2.7–4.0s → 比心 5.2–6.4s → 垂手 → 再前伸 10.1s → 比划 11.3s → 拢领 12.5s → 合十 13.8s）。
-4. **词里的手型要跟参考视频一致**。EP003 词写 open palms，参考是握拳前推，成片跟了参考。口径冲突时参考视频赢，词只管时序，别在词里和参考打架。
-5. 把外观污染写进排除：参考视频里的人物特征（猫耳、女仆装、金发、水印）逐项点名为不要。
-6. 素材传到 Windows `input\`，传前后各核 SHA256。ComfyUI `LoadImage`/`LoadVideo` 对中文文件名会出问题，用 ASCII 名。
+   `--mode ref` 是**六段官方 Ref2VA**（`subject_definitions` / `summary` / `retention_analysis` /
+   `detailed_description` / `overall_soundscape` / `non_diegetic_music`），不是三段基础模式：
+   写了 `integrated_multimodal_description` 会被 G03 拒，内容要并进 `detailed_description`。
+   这条通道在六段之外还有三条硬格式，漏了必报 error：
+   - `subject_definitions` 每条写成 `<Subject N> is … in <Picture k>`——**身份板在词稿里就是 `<Picture 1>`**
+     （对应图模板节点 20 `LoadImage`）。只写「来自身份板」而不写 `<Picture k>` 会被 G30 判「没有可核对的参考来源」。
+   - `summary` 开头写任务类型前缀 `[reference generation]`（G23）。
+   - `retention_analysis` **每一行**都以 `<Subject N> (appears in [Shot N]): fully_preserved - …` 开头（G09）；
+     想说明动作时序也挂在这条标签下，不要另起一句无标签的说明。
+   `detailed_description` 在 `[Shot 1]` 之前要 1–2 句英文风格开场（G04）。
+3. 清单里这一镜要 `technique: motion_drive`、绑定一个 `action_video` + 至少一个 `identity`，
+   并给 `submit`（`workflow: motion_drive`、`width`、`height`、`refs_order`）——缺宽高报 `SUBMIT004`，
+   缺 `refs_order` 报 `SUBMIT011`。`manifest_job.py` 会明确拒绝为这一镜建 job 并指回本文，
+   这是有意的 fail closed，不是 bug。
+4. **词的起点态必须等于身份板/首帧的状态**；参考视频里的动作拍点按时码写进词，每拍给秒数。七拍写满的一份词稿见 [incidents.md](incidents.md) §2026-11-21「EP003 视频动作驱动首条实例」。
+5. **词里的手型要跟参考视频一致**。口径冲突时参考视频赢，词只管时序，别在词里和参考打架（词写 open palms、参考是握拳前推、成片跟了参考的实例见 [incidents.md](incidents.md) §2026-11-21「EP003 视频动作驱动首条实例」）。
+6. 把外观污染写进排除：参考视频里的人物特征（猫耳、女仆装、金发、水印）逐项点名为不要。
+7. 素材传到 Windows `input\`，传前后各核 SHA256。ComfyUI `LoadImage`/`LoadVideo` 对中文文件名会出问题，用 ASCII 名。
 
 ## 5. 一次性 runner 与后台投递
 
@@ -85,7 +88,7 @@ runner：`../templates/video_motion_drive_runner.py`。它提交一次、轮询 
 
 要点：
 
-- **runner 必须脱离 SSH 会话**。EP003 实测 runner 进程随 SSH 子进程回收而退出（`status` 停在 submitted），产物不丢（ComfyUI 仍在跑），但回收要改由 Mac 侧轮询。用模板脚本启动（下文命令路径相对本文件所在的 `references/`）：
+- **runner 必须脱离 SSH 会话**。挂在 SSH 上的 runner 会随子进程回收而退出，`status` 停在 submitted，产物不丢（ComfyUI 仍在跑），但回收只能改由 Mac 侧轮询。用 `../templates/launch_detached.ps1`（路径相对本文件所在的 `references/`；下同）启动（2026-11-22 实测：SSH 退出后进程继续运行到结束）：
   ```
   scp ../templates/launch_detached.ps1 ../templates/video_motion_drive_runner.py <渲染主机SSH别名>:/path/to/motion_drive_delivery/
   ssh <渲染主机SSH别名> 'powershell -NoProfile -ExecutionPolicy Bypass -File <ComfyUI根目录>\motion_drive_delivery\launch_detached.ps1 -Script <ComfyUI根目录>\motion_drive_delivery\video_motion_drive_runner.py -WorkDir <ComfyUI根目录>\motion_drive_delivery -Log <ComfyUI根目录>\motion_drive_delivery\runner.log'
@@ -97,10 +100,10 @@ runner：`../templates/video_motion_drive_runner.py`。它提交一次、轮询 
 
 ## 6. 耗时与进度
 
-- 实测：345 帧 + 视频动作 + 音频参考 + Motion_Repair，**7000 秒（116.7 分钟）**，峰值显存 15.55GiB，20GB 模型全程 offload，**采样 20 步，每步约 5m42s**。
-- 之前 243 帧单视频参考那次 3323 秒。**帧数每多 42%，耗时翻倍以上**，预估别按线性算。
+- **耗时按非线性估**：帧数每多四成，墙钟就翻倍以上，别按线性外推。两次同通道任务的帧数与墙钟对照见 [incidents.md](incidents.md) §2026-11-21「EP003 任务耗时（视频动作直投通道）」。
+- 一条跑一两个小时是常态（20 步、20GB 模型全程 offload），排期按这个量级报。
 - **看进度**：ComfyUI 的采样进度条写在 `<渲染机根目录>\logs\serve.log`，读最后一行 `NN%|…| step/total [已用<剩余, N s/it]`。h3q 队列的 `progress` 字段不覆盖这条通道（它不经过 h3q），要自己读 serve.log。
-- **判断是不是卡死**：看 serve.log 最后写入时间与 GPU 功耗（`nvidia-smi`，满载推理约 270W，卡死会掉）。CPU 主进程不动是正常的（GPU-bound）。EP003 当时因为只看 CPU 与日志停写，两度怀疑卡死，其实一直在算。
+- **判断是不是卡死**：看 serve.log 最后写入时间与 GPU 功耗（`nvidia-smi`，满载推理约 270W，卡死会掉）。CPU 主进程不动是正常的（GPU-bound）——只看 CPU 占用和日志停写会误判成卡死。
 
 ## 7. 验收
 
@@ -115,11 +118,11 @@ runner：`../templates/video_motion_drive_runner.py`。它提交一次、轮询 
 | 完整性 | 零拷贝帧、黑帧、定格、断裂；MAD 最大值位置是动作起手而非切点 |
 | 循环补完 | 每 0.25s 条带看半截动作有没有被补成完整循环（抬手后又放下） |
 
-风格项单列，不并入硬指标：EP003 的 DV 重颗粒/灰绿偏色/暗角只部分兑现，成片偏干净暖调写真。风格类问题回创作者拍板（接受 / 后期补 / 重出），别用统计反驳观感。
+风格项单列，不并入硬指标：参考视频的颗粒、偏色、暗角这类质感，兑现与否要按成片实看，别假定模型会照搬。风格类问题回创作者拍板（接受 / 后期补 / 重出），别用统计反驳观感（一次只部分兑现的实测见 [incidents.md](incidents.md) §2026-11-21「EP003 视频动作驱动首条实例」）。
 
 ## 8. 已知边界
 
-- 本通道产物 512×896，没有 pdd 的超分链。要交付分辨率走 `h3-queue` §2.11 的 latent 放大（成品帧回编码，不重采样），放大前确认 GPU 空闲。
+- 本通道产物 512×896，没有 pdd 的超分链。要交付分辨率走 `h3-queue` [§2.11 · latent-upscale](latent-upscale.md) 的 latent 放大（成品帧回编码，不重采样），放大前确认 GPU 空闲。
 - 参考音轨是「参考节奏与质感」，不是 1:1 复制原声。要原声得外部混流。
 - 单次提交就占满 16G 卡一两个小时，期间 h3q 里排的任务会 `occluded` 等卡。开跑前确认队列里没有更急的活。
 - Windows 机器要在线。`ssh <渲染主机SSH别名>` 偶发解析失败，重试即可。

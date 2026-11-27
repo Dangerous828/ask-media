@@ -27,6 +27,11 @@ from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any, BinaryIO
 
+try:  # PyYAML reads 制作清单.yaml; the suite already requires it elsewhere.
+    import yaml
+except ImportError:  # pragma: no cover - dependency is declared by the suite
+    yaml = None
+
 MINIMUM_PYTHON = (3, 9)
 if sys.version_info < MINIMUM_PYTHON:
     raise SystemExit(
@@ -1134,6 +1139,36 @@ def _storyboard_frame_prompt(section: str, frame_id: str) -> str:
     return "\n".join(line[1:].lstrip() for line in content).strip()
 
 
+def _manifest_shot_for_prompt(root: Path, source: str) -> dict[str, Any] | None:
+    """The manifest shot whose `prompt` is ``source``, or None."""
+    if yaml is None:
+        return None
+    # 从提示词文件往上找最近的 制作清单.yaml，不按路径深度拼。
+    # 原来写死 `root/parts[0]/parts[1]/制作清单.yaml`，只有 `剧集/<EP>/脚本/x.txt`
+    # 这种四段路径成立；`<EP>/脚本/x.txt`（测试夹具使用的布局）会拼成
+    # `<EP>/脚本/制作清单.yaml`，读不到清单，随后报「剧本没有输入参考图声明」。
+    manifest = None
+    directory = (root / source).parent
+    for _ in range(4):
+        candidate = directory / "制作清单.yaml"
+        if candidate.is_file():
+            manifest = candidate
+            break
+        if directory == root or root not in directory.parents and directory != root:
+            break
+        directory = directory.parent
+    if manifest is None:
+        return None
+    try:
+        document = yaml.safe_load(manifest.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    for shot in (document or {}).get("shots") or []:
+        if isinstance(shot, dict) and str(shot.get("prompt") or "") == source:
+            return shot
+    return None
+
+
 def _verify_video_duration(
     root: Path, source: str, source_entry: str, adapter: str,
     parameters: Mapping[str, Any],
@@ -1282,6 +1317,14 @@ def _verify_markdown_source(
         declared_by_slot = {binding["slot_id"]: binding for binding in declared}
         endpoint_roles = {"起始帧": "first_frame", "结束帧": "last_frame"}
         for binding in bindings:
+            # 直接下标会 KeyError：清单绑了资产、剧本那条 `- 输入参考图：` 却没解析出同名槽位时，
+            # 报错退化成一行 repr，读者看不出是「两边槽位名对不上」。
+            if binding["slot_id"] not in declared_by_slot:
+                raise ValueError(
+                    "job binding %r has no matching slot in the source entry's "
+                    "- 输入参考图： line; the slot id, path and label must be written "
+                    "in the episode document too" % binding["slot_id"]
+                )
             purpose = declared_by_slot[binding["slot_id"]].get("purpose")
             role = binding["role"]
             if purpose in endpoint_roles or role in endpoint_roles.values():
@@ -1455,6 +1498,75 @@ def _quality_revision_inputs(root: Path, job: Mapping[str, Any]) -> list[str]:
     return inputs
 
 
+PROMPT_MODE_BY_TECHNIQUE = {
+    "ref2va": "ref",
+    "frame_ref2va": "ref",
+    "motion_drive": "ref",
+    "t2va": "base",
+    "i2va": "base",
+    "fl2va": "base",
+    # multishot 一文件多窗、每窗只写正文，**没有段名**（闸门 G39 禁止窗口出现段名），
+    # 所以不参与段式比对；它的格式由 h3_gate --mode multishot 的 G39/G40 管。
+}
+REF_ONLY_SECTIONS = {"subject_definitions", "summary", "retention_analysis", "detailed_description"}
+BASE_ONLY_SECTION = "integrated_multimodal_description"
+
+
+def _prompt_sections(text: str) -> set[str]:
+    """词稿顶层段名（`name:` 独占一行）。"""
+    return {
+        match.group(1)
+        for match in re.finditer(r"^([a-z_]+):[ \t]*$", text, re.MULTILINE)
+    }
+
+
+def _check_prompt_mode(root: Path, source: str | None, prompt: str) -> None:
+    """词稿段式必须与这一镜的 technique 对应。
+
+    `h3_gate.py --mode auto` 是从文件自己判段的：一份三段式词稿在 auto 下永远判成
+    base 并顺利通过，即使这一镜挂了参考图、本该写六段。闸门不比对 technique，
+    清单只查字段，creator_markdown_check 不查段名——所以「挂了参考却写三段式」
+    一路没人拦，直到提交出去。这里补上这一环，fail closed。
+    """
+    if source is None:
+        return
+    shot = _manifest_shot_for_prompt(root, source)
+    if not isinstance(shot, dict):
+        return
+    technique = str(shot.get("technique") or "").strip().lower()
+    expected = PROMPT_MODE_BY_TECHNIQUE.get(technique)
+    if expected is None:
+        return
+    sections = _prompt_sections(prompt)
+    # 只判「段名写成了另一种模式」，不判「缺段」——缺段是 h3_gate 的事，
+    # 这里再管一遍会把用占位正文的用例全拦掉，也会抢在别的报错前面。
+    looks_base = BASE_ONLY_SECTION in sections
+    looks_ref = bool(sections & (REF_ONLY_SECTIONS - {BASE_ONLY_SECTION}))
+    if looks_base and looks_ref:
+        raise ValueError(
+            "%s 的词稿同时出现基础模式与 Ref2VA 的段名（%s）；一段词稿只能是其中一种，"
+            "按 %s 应为%s段。" % (source, sorted(sections), technique,
+                                  "六" if expected == "ref" else "三")
+        )
+    if looks_base and expected == "ref":
+        raise ValueError(
+            "%s 是 Ref2VA 类 technique（%s），词稿要用六段"
+            "（subject_definitions / summary / retention_analysis / "
+            "detailed_description / overall_soundscape / non_diegetic_music）；"
+            "现在写的是基础模式三段（integrated_multimodal_description）。"
+            "h3_gate 的 --mode auto 会按文件自判成 base 并放行，所以段式错配只能在这里拦。"
+            % (source, technique)
+        )
+    if looks_ref and expected == "base":
+        raise ValueError(
+            "%s 是基础模式 technique（%s），词稿要用三段"
+            "（integrated_multimodal_description / overall_soundscape / "
+            "non_diegetic_music）；现在写的是 Ref2VA 六段（%s）。"
+            "六段只用于 ref2va / frame_ref2va / motion_drive。"
+            % (source, technique, sorted(sections & REF_ONLY_SECTIONS))
+        )
+
+
 def _normalize_job(root: Path, raw: object) -> dict[str, Any]:
     if not isinstance(raw, Mapping) or set(raw) - ALLOWED_JOB_KEYS:
         raise ValueError("job contains unsupported fields")
@@ -1482,6 +1594,7 @@ def _normalize_job(root: Path, raw: object) -> dict[str, Any]:
         raise ValueError("source_entry must be a visible uppercase Markdown entry ID")
     if source_entry is not None and source is None:
         raise ValueError("source_entry requires source")
+    _check_prompt_mode(root, source, prompt)
     creator_source_modality = _canonical_creator_source_modality(source)
     if creator_source_modality == modality and source_entry is None:
         raise ValueError("creator Markdown source requires source_entry")

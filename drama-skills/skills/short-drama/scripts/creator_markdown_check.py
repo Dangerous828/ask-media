@@ -2235,14 +2235,18 @@ def validate_episode(episode: Path, project_root: Optional[Path] = None) -> list
                 # 通道互斥，身份由上一段已验收真实末帧继承，不能再要求挂身份板。
                 # PLAN 计划帧不是真实末帧（seam-transition §4.4.17），且起始帧
                 # PLAN 被要求指向本镜，不能拿它豁免身份图。
+                # 首帧接力：身份由上一段已验收的末帧继承，所以不需要身份板。
+                # i2va/fl2va 下 identity 是禁止角色（provider 通道互斥），
+                # 这两种 technique 的「首帧 + 可选尾帧」本身就是接力形态，
+                # 不能再要求挂身份板，否则有可见人物的 i2va/fl2va 镜头永远修不好。
+                purposes = {(item[3][4] or "").strip() for item in slots}
                 is_first_frame_relay = (
-                    len(slots) == 1
-                    and slots[0][2] == "REF"
-                    and (slots[0][3][4] or "").strip() == "起始帧"
+                    len(slots) >= 1
+                    and all(item[2] == "REF" for item in slots)
+                    and "起始帧" in purposes
+                    and purposes <= {"起始帧", "结束帧"}
                 )
-                has_identity_ref = is_first_frame_relay or any(
-                    (item[3][4] or "").strip() == "身份" for item in slots
-                )
+                has_identity_ref = is_first_frame_relay or "身份" in purposes
                 if not has_identity_ref:
                     errors.append(
                         f"{motion_id}: 镜头有可见人物但无身份图参考，身份漂移概率高；"

@@ -158,6 +158,28 @@ def check(
                 "message": f"fewer than {MIN_REFERENCES} references; the multi-reference "
                            "identity-plate rule does not apply (single first frame / text-only)"}
 
+    # 首尾帧接力（i2va/fl2va）：身份由首帧那一格继承，而 shot-manifest 明确禁止
+    # i2va/fl2va 挂 identity 角色——两处都要求会让这两种 technique 永远过不去。
+    # 只认「全部参考都是首帧/结束帧」的形态，混了别的参考照常要求身份板。
+    def _endpoint_role(item: Any) -> str:
+        if not isinstance(item, Mapping):
+            return ""
+        purpose = str(item.get("purpose") or item.get("用途") or "").strip()
+        if purpose:
+            return purpose
+        return str(item.get("role") or "").strip()
+
+    endpoint_only = all(
+        _endpoint_role(item) in {"起始帧", "结束帧", "first_frame", "last_frame"}
+        for item in references
+    ) and any(
+        _endpoint_role(item) in {"起始帧", "first_frame"} for item in references
+    )
+    if endpoint_only:
+        return {**base, "status": "not_applicable",
+                "message": "first/last-frame relay: identity is inherited from the first "
+                           "frame, so the multi-reference identity-plate rule does not apply"}
+
     all_tokens: list[str] = []
     for character in cast or []:
         all_tokens.extend(_tokens(character, cast_aliases))

@@ -229,6 +229,45 @@ def report_path(root: Path, relative: str) -> Path:
     return root / "审查" / "look" / f"{relative}.look.json"
 
 
+def _episode_key(path: Path, root: Path) -> str:
+    """`剧集/<EP>/…` 返回 <EP>；项目级文件返回空串。"""
+    try:
+        relative = path.resolve().relative_to(root.resolve()).as_posix()
+    except ValueError:
+        relative = path.as_posix()
+    match = re.match(r"^剧集/([^/]+)/", relative)
+    return match.group(1) if match else ""
+
+
+def baselines_for_media(root: Path, media: list[Path]) -> list[Path]:
+    """只取与媒体同一集的基准；集内没登记才退项目级，**不跨集借基准**。
+
+    原来把所有 `剧集/*/剧本.md` 的基准汇总成一个池子，第二集没登记基准时会静默
+    拿第一集的图去判——换场景的第二集会被判「画风不符」，看起来像新一集坏了。
+    """
+    entries = [item for item in baseline_entries(root) if item.get("basis")]
+    episodes = {_episode_key(path, root) for path in media} - {""}
+    if len(episodes) == 1:
+        episode = next(iter(episodes))
+        same = [item for item in entries if item.get("episode") == episode]
+        if same:
+            return _dedup_baselines(root, same)
+    project_level = [item for item in entries if not item.get("episode")]
+    return _dedup_baselines(root, project_level)
+
+
+def _dedup_baselines(root: Path, items: list[dict]) -> list[Path]:
+    result: list[Path] = []
+    seen: set[Path] = set()
+    for item in items:
+        path = root / item["path"]
+        if path in seen:
+            continue
+        seen.add(path)
+        result.append(path)
+    return result
+
+
 def baseline_entries(root: Path) -> list[dict]:
     """登记的基准：[{path, basis}]；basis 为同小节的认可依据是否存在。"""
     entries: list[dict] = []
@@ -250,14 +289,30 @@ def baseline_entries(root: Path) -> list[dict]:
             stripped = line.strip()
             match = LOOK_LINE.match(stripped)
             if match:
-                section.append({"id": match.group(1), "path": match.group(2).strip()})
+                section.append({"id": match.group(1), "path": match.group(2).strip(),
+                                "episode": _episode_key(doc, root)})
             elif BASIS_LINE.match(stripped):
                 has_basis = True
     return entries
 
 
 def baselines_from_project(root: Path) -> list[Path]:
-    return [root / item["path"] for item in baseline_entries(root) if item["basis"]]
+    """**池化**表单：把每一集登记的基准汇总成一个列表，不分归属。
+
+    生产路径不要用它——按媒体所在集取基准走 `baselines_for_media`，
+    否则第二集会静默借到第一集的基准。这里只给「收集了哪些条目」这类单元测试用。
+    """
+    result: list[Path] = []
+    seen: set[Path] = set()
+    for item in baseline_entries(root):
+        if not item["basis"]:
+            continue
+        path = root / item["path"]
+        if path in seen:
+            continue
+        seen.add(path)
+        result.append(path)
+    return result
 
 
 def _contact_sheet(base: Path, media: Path, target: Path) -> None:
@@ -886,7 +941,7 @@ def main(argv: list[str] | None = None) -> int:
         root = Path(args.project)
         if args.command == "measure":
             baseline = ([Path(p) for p in args.baseline] if args.baseline
-                        else baselines_from_project(root))
+                        else baselines_for_media(root, [Path(p) for p in args.media]))
             return measure(root, [Path(p) for p in args.media], baseline,
                            Path(args.derived_from) if args.derived_from else None,
                            kind=args.kind, comparison=args.comparison,

@@ -51,6 +51,10 @@
 - **Qwen等图片通道**：按实际图片接口记录有序图像与用途，不把H3的 Subject/Picture 标签当作静帧通用语法。
 - **H3参考视频通道**：图片/视频/音频的能力与格式以所选方言和当前执行接口为准；Subject/Picture 归属按 参考标签（`../../../../h3-prompt-writing/references/ref-subject-picture.md`） 解释，同一角色的多视图不应被误写成多个在场实体。
 - **真实首帧/尾帧**：绑定当前段明确的起态/终态；构图参考和角色板不因名称含“关键帧”就自动作为首帧。
+- **上一段真实末帧当参考（末槽续接）**：身份板+场景板照挂，末帧占**最后一个参考槽**，正文首句写
+  `The shot opens on the same framing as <Picture N>.`。这是「身份要保、起点要接上」的既定路线，
+  不是"再补一张构图参考"；与 `first_frame` 互斥（首/尾帧与参考输入不能混），做法见
+  [`h3-queue/references/continuity-routes.md`](../../../../h3-queue/references/continuity-routes.md) §2.13。
 
 示例记录中出现过单图/双图可用、三张独立身份图时丢人或错配的现象。这些观测只覆盖单/双图可用，不足以推出跨模型能力上限；本仓的「同框身份图 ≤2 张」是实践建议而非模型硬上限（权威写法见 `../../../../h3-prompt-writing/references/ref-subject-picture.md` §3／§5），该记录保留为多参考干扰线索，不推翻也不重定这条实践上限。
 

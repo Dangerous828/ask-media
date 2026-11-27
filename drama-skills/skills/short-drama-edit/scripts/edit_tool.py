@@ -1009,15 +1009,28 @@ def _headings(path: Path, heading: re.Pattern[str]) -> Optional[set[str]]:
 
 
 def _motion_shots(episode: Path) -> dict[str, str]:
-    """`{MOTION-...: SHOT-...}` from each video prompt's 「分镜」 line."""
+    """`{MOTION-...: SHOT-...}` from each video prompt's 「分镜」 line.
+
+    同一镜的 MOTION 名有三种等价写法（shot_id、本地 id、去掉 SHOT- 前缀），
+    都登记到同一镜，避免剪辑单用别名时被判「未采用」。
+    """
 
     fields = _heading_fields(episode / MOTION_DOCUMENT, MOTION_HEADING, "分镜")
-    return {
-        motion: found.group(0)
-        for motion, value in fields.items()
-        for found in [SHOT_REFERENCE.search(value)]
-        if found
-    }
+    shots: dict[str, str] = {}
+    for motion, value in fields.items():
+        found = SHOT_REFERENCE.search(value)
+        if not found:
+            continue
+        shot_id = found.group(0)
+        shots[motion] = shot_id
+        # creator_markdown_check 用去掉 SHOT- 前缀的 shot_id 当 MOTION id
+        # （SHOT-EP001-07 → MOTION-EP001-07），本工具原来只认 shot_id 与本地 id，
+        # 同一条剪辑单两边一边通过一边报「不在提示词中」。三种写法都登记。
+        shots.setdefault(f"MOTION-{shot_id}", shot_id)
+        stripped = shot_id.removeprefix("SHOT-") if shot_id.startswith("SHOT-") else ""
+        if stripped:
+            shots.setdefault(f"MOTION-{stripped}", shot_id)
+    return shots
 
 
 def _source_findings(episode: Path, cuts: Sequence[Cut], unused: Sequence[str]) -> list[str]:
@@ -1054,8 +1067,14 @@ def _source_findings(episode: Path, cuts: Sequence[Cut], unused: Sequence[str]) 
     used = {cut.motion for cut in cuts}
     motions, shots = known["MOTION-"], known["SHOT-"]
     if motions is not None:
+        # 同一镜在清单里可能对应多个 MOTION 名（shot_id、本地 id、去掉 SHOT- 前缀）。
+        # 原来的判据拿 SHOT id 去比 MOTION id 集合，类型对不上恒为 False，
+        # 于是一个别名被采用后，同镜的另外两个名字仍会被判「未采用」。
+        # 改成先把已采用的 MOTION 名折算成镜，再按镜归属认账。
+        used_shots = {shot_of[m] for m in used if m in shot_of}
+        used_shots |= {m for m in used if m.startswith("SHOT-")}
         findings.extend(_unaccounted_shots(
-            motions, cuts, unused, accounted={m for m in motions if shot_of.get(m) in used},
+            motions, cuts, unused, accounted={m for m in motions if shot_of.get(m) in used_shots},
         ))
     if shots is not None:
         findings.extend(_unaccounted_shots(
