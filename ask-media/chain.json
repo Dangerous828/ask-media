@@ -28,7 +28,7 @@
     {
       "no": 3,
       "stage": "资产",
-      "doc": "视觉设定.md",
+      "doc": "`剧本.md` `## 视觉 canon 与导演` 的视觉条目",
       "nodes": [
         {
           "skill": "short-drama-assets"
@@ -38,7 +38,7 @@
     {
       "no": 4,
       "stage": "导演",
-      "doc": "导演.md",
+      "doc": "`剧本.md` `## 视觉 canon 与导演` 的导演决定",
       "nodes": [
         {
           "skill": "short-drama-direct"
@@ -51,7 +51,7 @@
     {
       "no": 5,
       "stage": "场记",
-      "doc": "设定集/场记.md",
+      "doc": "`剧集/<EP>/场记.md`（一集一本）",
       "nodes": [
         {
           "skill": "short-drama"
@@ -62,7 +62,7 @@
     {
       "no": 6,
       "stage": "分镜",
-      "doc": "分镜.md",
+      "doc": "`剧本.md` `## 分镜` + `场记.md` + `制作清单.yaml`",
       "nodes": [
         {
           "skill": "short-drama-storyboard"
@@ -76,7 +76,7 @@
     {
       "no": 7,
       "stage": "图片提示词",
-      "doc": "图片提示词.md",
+      "doc": "`脚本/image/IMG-*.txt`",
       "nodes": [
         {
           "skill": "short-drama-image-prompts"
@@ -92,7 +92,7 @@
     {
       "no": 8,
       "stage": "视频提示词",
-      "doc": "视频提示词.md",
+      "doc": "`脚本/motion_*.txt` + `制作清单.yaml`",
       "nodes": [
         {
           "skill": "short-drama-video-prompts"

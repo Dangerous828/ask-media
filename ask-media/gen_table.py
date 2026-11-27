@@ -27,7 +27,15 @@ def render(chain):
     ]
     for st in chain["chain"]:
         skills = " / ".join(f"`{n['skill']}`" for n in st["nodes"])
-        doc = f"`{st['doc']}`" if st.get("doc") else "—"
+        raw = st.get("doc")
+        if not raw:
+            doc = "—"
+        elif "`" in raw:
+            # doc 自带反引号（如「剧本.md `## 分镜` + 场记.md」）：原样输出，
+            # 再包一层会把整串变成同一段代码，嵌套反引号渲染即断。
+            doc = raw
+        else:
+            doc = f"`{raw}`"
         rows.append(f"| {st['no']} | **{st['stage']}** | {doc} | {skills} |")
     return "\n".join(rows)
 

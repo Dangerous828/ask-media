@@ -8,6 +8,8 @@
 
 入口是 `ask-media/SKILL.md`——影像任务先读它选路。它把工作分成 11 个阶段（开发 → 剧本 → 资产 → 导演 → 场记 → 分镜 → 图片词 → 视频词 → 生产 → 验收 → 剪辑交付），每个阶段指向对应的 owner 技能。阶段表由 `ask-media/chain.json` 生成，改阶段只改 JSON 再跑 `gen_table.py`。
 
+短剧套件用 creator-first 单文件契约：每集产出 `剧本.md`、`制作清单.yaml`、`场记.md`（一集一本）和 `脚本/image/IMG-*.txt`、`脚本/motion_*.txt`（一图/一镜一个文件）；旧的 `视觉设定.md`/`导演.md`/`分镜.md`/`图片提示词.md`/`视频提示词.md` 只作 legacy 输入，由阶段 owner 并入上述文件，不另建副本。完整写法见 `drama-skills/skills/short-drama/references/document-contract.md`。
+
 主要技能：
 
 - **链路入口**：`ask-media`、`creative-dna-cards`
