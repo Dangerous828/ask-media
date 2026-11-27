@@ -14,12 +14,12 @@ license: MIT
 |---|---|---|---|
 | 1 | **开发** | — | `short-drama-novel-analyze` / `short-drama-develop` |
 | 2 | **剧本** | `剧本.md` | `short-drama-write` |
-| 3 | **资产** | `视觉设定.md` | `short-drama-assets` |
-| 4 | **导演** | `导演.md` | `short-drama-direct` / `director-style-presets` |
-| 5 | **场记** | `设定集/场记.md` | `short-drama` |
-| 6 | **分镜** | `分镜.md` | `short-drama-storyboard` / `storyboard-30s` |
-| 7 | **图片提示词** | `图片提示词.md` | `short-drama-image-prompts` / `doc-still-prompt` / `anim3d-still-pitfalls` |
-| 8 | **视频提示词** | `视频提示词.md` | `short-drama-video-prompts` / `h3-prompt-writing` / `h3-video-gate` |
+| 3 | **资产** | `剧本.md` `## 视觉 canon 与导演` 的视觉条目 | `short-drama-assets` |
+| 4 | **导演** | `剧本.md` `## 视觉 canon 与导演` 的导演决定 | `short-drama-direct` / `director-style-presets` |
+| 5 | **场记** | `剧集/<EP>/场记.md`（一集一本） | `short-drama` |
+| 6 | **分镜** | `剧本.md` `## 分镜` + `场记.md` + `制作清单.yaml` | `short-drama-storyboard` / `storyboard-30s` |
+| 7 | **图片提示词** | `脚本/image/IMG-*.txt` | `short-drama-image-prompts` / `doc-still-prompt` / `anim3d-still-pitfalls` |
+| 8 | **视频提示词** | `脚本/motion_*.txt` + `制作清单.yaml` | `short-drama-video-prompts` / `h3-prompt-writing` / `h3-video-gate` |
 | 9 | **生产** | `制作成果/` | `short-drama-produce` / `h3-queue` |
 | 10 | **验收** | `审查/` | `short-drama-review` / `video-studio` |
 | 11 | **剪辑交付** | `剪辑单.md` | `short-drama-edit` / `concat-video` / `narration-route` |
@@ -31,7 +31,7 @@ license: MIT
 
 ## 先判这是不是短剧项目
 
-判据是**盘上有没有 `剧集/<EP>/` 六文档**，不是片长：
+判据是**盘上有没有 `剧集/<EP>/` 的新结构文件（剧本 + 制作清单 + 场记 + 脚本）**；旧六文档只作 legacy，不是片长：
 
 - **有** → 走完整阶段链，十一阶段判据归 `drama-skills` 那 12 个 `short-drama-*`。
 - **30 秒上下的独立短片、无项目目录** → 阶段链相同，但分镜用 `storyboard-30s`、场景账用 `short-film-scene-continuity`。
@@ -49,7 +49,7 @@ license: MIT
 - **③ 资产／项目档案 → ⑨ 生产**：画风基准必须带「认可依据」（谁、何时、认可了什么，附认可项／待补证维度）才算登记，缺这一行验收只能给 `PROVISIONAL`；认可依据来自创作者本人确认，agent 不代写。会话里点名了目标视频模型，就先落进 `production_profile`（`unset` 不算已选）——它决定原生时长、参考方式与正文语言，没落档案就往下写词，后面整链要返工。档案字段拆法见 `../drama-skills/skills/short-drama/references/production-form-profiles.md`，写入与接受步骤归 `short-drama`。
 - **⑤ 场记 → ⑥ 分镜**：六本账未对齐，**不许写第一张分镜和第一条提示词**；缺账先补场记，不带着“机位和光位回头再说”往下写。一张 `CARD-` 强制对应一个 `SHOT-`。哪怕只有一个场景也要建最基础白模。
 - **白模 → ⑥ ⑦ ⑧**：白模摆出来的**实摆值**（机位高、俯仰角、距离、焦距）与原来的计划值常常对不上。回写顺序：账本 → 分镜镜头语言行 → **分镜英文正文的机位句** → 已写的视频提示词 → 账本「未对齐项」记原因。**下游任一份没同步就不算做完**。先写分镜、事后才建白模、然后不回头改，是最常见的错位——那种情况下白模白做了。
-- **⑥ 分镜 → ⑦ 图片词**：写分镜前确认 `设定集/场记.md` 存在且已对齐；下游只准引用账本里的值。
+- **⑥ 分镜 → ⑦ 图片词**：写分镜前确认 `剧集/<EP>/场记.md` 存在且已对齐；下游只准引用账本里的值。
 - **⑧ 视频词 → ⑨ 生产**：过 `h3-video-gate` 才算交稿；闸门只查结构，查不出画风错、接缝断、身份漂移。
 - **⑨ 生产 → ⑩ 验收**：生产是“生成一条 → 验收一条 → 才决定下一条输入”的循环，不是一次跑完再统一审。被拒素材的派生产物随之作废。产物被打回时**先判症状归属再选回哪一步**：画风/身份回 ③⑦，机位与状态回 ⑤⑥，表演与接缝回 ⑧，别在 ⑨ 原地改参数重跑——同一症状重跑不修法。判型入口见 [阶段路由表](references/route-table.md) ⑧⑩ 两行。
 - **执笔与投递（⑦⑧⑨，单张/单段同）**：提示词正文由**干净上下文的子代理**执笔，哪怕只写一张图、一段视频；改图／图编辑指令同属提示词，一镜一任务、代理不复用到下一镜。每一次投生产由一个**全新的子代理**执行，一次投递一个代理，h3q 队列与图编辑网关同样算。主会话只备交接材料、收回执、验收产物，不亲笔、不代投。判据见 [开发纪律](references/discipline.md) §七。

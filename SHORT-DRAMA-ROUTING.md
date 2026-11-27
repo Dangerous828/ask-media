@@ -12,8 +12,8 @@
 
 | 当前实际使用技能 | 继续承担的工作 | 任务命中时必读的项目知识 |
 |---|---|---|
-| shortvideo-understand / video-previs | 复刻项目的原片文字稿、拉片、切点与代表帧；准备阶段从剧本新建白模 | 复刻读 [视频复刻模式](drama-skills/skills/short-drama/references/video-remake.md)，产出写进 `项目开发/原片拆解.md`，代表帧登记为画风基准；从剧本新建的白模用于写 `设定集/场记.md`，与场记账双向引用，**不作生成参考图** |
-| video-shot-reverse | 只读逐镜反推、重建九份 `RR-*` 准备文档、观测转 caption 与 QC；不渲染白模、不改机位数值 | 复刻读 [视频复刻模式](drama-skills/skills/short-drama/references/video-remake.md)，九份文档落 `项目开发/原片还原/` 并按 [六文档契约](drama-skills/skills/short-drama/references/document-contract.md) 回填；清单见 [逆推准备文档体系](video-shot-reverse/references/reverse-documents.md)；导演／分镜／成片复审按 [逐镜证据台账](drama-skills/skills/short-drama/references/observation-ledger.md) 补依据分级与 QC，不改三个阶段的 owner 与验收六项；merge 索引见 [消费场景](video-shot-reverse/references/consumers.md) |
+| shortvideo-understand / video-previs | 复刻项目的原片文字稿、拉片、切点与代表帧；准备阶段从剧本新建白模 | 复刻读 [视频复刻模式](drama-skills/skills/short-drama/references/video-remake.md)，产出写进 `项目开发/原片拆解.md`，代表帧登记为画风基准；从剧本新建的白模用于写 `剧集/<EP>/场记.md`，与场记账双向引用，**不作生成参考图** |
+| video-shot-reverse | 只读逐镜反推、重建九份 `RR-*` 准备文档、观测转 caption 与 QC；不渲染白模、不改机位数值 | 复刻读 [视频复刻模式](drama-skills/skills/short-drama/references/video-remake.md)，九份文档落 `项目开发/原片还原/` 并按 [创作文件契约](drama-skills/skills/short-drama/references/document-contract.md) 回填；清单见 [逆推准备文档体系](video-shot-reverse/references/reverse-documents.md)；导演／分镜／成片复审按 [逐镜证据台账](drama-skills/skills/short-drama/references/observation-ledger.md) 补依据分级与 QC，不改三个阶段的 owner 与验收六项；merge 索引见 [消费场景](video-shot-reverse/references/consumers.md) |
 | short-drama-direct | 在正式分镜前写导演方案、观看与空间调度 | 读 [director](drama-skills/skills/short-drama-direct/SKILL.md) 的行动、知情、镜头计划和单场注意力工作包；定叙事必需的空间事实与关系，机位高度/焦段/景别数值留给场记账；交分镜 owner，不直接写提示词 |
 | doc-still-prompt | 单帧成文方法、忠实译文与事实核对；当前写作者回填同一正式条目 | 资产条目由 [image-prompts](drama-skills/skills/short-drama-image-prompts/SKILL.md) 持有Look与制版；镜头条目由 [storyboard](drama-skills/skills/short-drama-storyboard/SKILL.md) 持有用途、瞬间与连续性。构图参考、起态、姿势证据与终态分别投影，不自动视为视频首帧 |
 | anim3d-still-pitfalls | 定位3D翻车、提供修法，配合doc-still改词 | 身份/视角事实读 [assets](drama-skills/skills/short-drama-assets/SKILL.md)；制作可用性读 [review](drama-skills/skills/short-drama-review/SKILL.md) |
@@ -28,7 +28,7 @@
 
 - 用户明确请求本套件正式创作文档时，仍按套件原有阶段职责写作；当前技能需要的上游决定确实缺失或发生变化时，才回对应文档解决。明确的专项任务由当前技能完成，不循环派单。
 - 同一正文回填现有条目，不叠加所有交付模板。doc-still需要单帧门禁快照时，从正式条目导出同一内容并核对，不另写平行版本。
-- 新项目按六文档主链加入《导演.md》；旧项目只有补写导演层后才启用 director-v1，不批量伪造上游。创作者接受的阶段产物保持接受状态；新的实际冲突具体说明，技术观察不自动触发返工。
+- 新项目按「剧本 → 视觉 canon/导演（同一文件）→ 场记（每集）→ 分镜（同一文件）→ 图片/视频提示词」落盘；旧项目只有把导演决定并入 `剧本.md` 后才启用 director-v1，不批量伪造上游。创作者接受的阶段产物保持接受状态；新的实际冲突具体说明，技术观察不自动触发返工。
 - 纯队列、显存、服务状态和下载既有产物不启动创作路由。读取知识不触发媒体生成、服务重启、渠道切换或额外审批；新生产仍以本次明确授权和真实可提交输入为前提。
 - 本地图片/视频通常经 h3q 提交；用户授权的 AI-Canvas-tauri 工作流可直连 ComfyUI，例外及其限制见 `h3-queue/SKILL.md`。`ask-studio` 保持停用，不执行其旧路由和切镜流程。
 - 复核结合本镜必要事实、实际发送英文、有序参考与真实产物，不只读作者自述；只检查当前请求范围。

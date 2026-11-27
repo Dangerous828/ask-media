@@ -1,6 +1,6 @@
 # 图片提示词阶段契约
 
-本阶段只拥有 `剧集/<EP>/图片提示词.md` 中的 `IMG-...` 项：用途、参考边界和可复制正文。它继承
+本阶段只拥有 `剧集/<EP>/脚本/image/` 中的 `IMG-...` 项：用途、参考边界和可复制正文。它继承
 视觉设定与项目视觉方向，不改写资产身份、地理、剧情状态或镜头边界。
 
 每项参考都写清可以控制什么、不能控制什么；像素结论来自实际可读图像或有来源的素材说明，未核对的保持未知。
@@ -27,7 +27,7 @@
 | IMG-10 | reviewed_invariant | Views of one Location in the same time/weather state share key-light source, colour-temperature relation, and contrast direction; any difference cites a recorded cause and its delta. |
 | IMG-11 | reviewed_invariant | A lookdev frame binds accepted visual direction and production profile across a declared character-expression, core-location, or high-pressure test axis; a high-pressure frame also binds exact screenplay blocks for story state and information permission, while style references may control only declared surface treatment and never identity, fixed geography, story state, cast count, or prop text. |
 | IMG-12 | reviewed_invariant | Each real input reference has a stable `REF-...` slot binding explicit order, a visible project-relative path or other unambiguous artifact locator, a Chinese label, and may-control/must-not-control scope. Reordering preserves slot identity; replacing media explicitly revises that slot's locator. `IMG-...` remains reserved for image-prompt headings. |
-| IMG-13 | structural_invariant | An `IMG-...` item named by a continuity lock in `视觉设定.md` carries that lock's surface verbatim in its copyable prompt. |
+| IMG-13 | structural_invariant | An `IMG-...` item named by a continuity lock in `剧本.md（视觉 canon）` carries that lock's surface verbatim in its copyable prompt. |
 | IMG-14 | structural_invariant | Every `REF-...` slot an image-prompt item declares carries one 用途 from the closed set 身份/造型状态/地理/构图/尺度/效果/起始帧/结束帧/风格, the same vocabulary the storyboard uses, so one picture answers one question. An asset board normally uses the first six; 起始帧 and 结束帧 belong to a shot. |
 
 规则分级由高到低：`structural_invariant`（结构缺陷，阻断）、

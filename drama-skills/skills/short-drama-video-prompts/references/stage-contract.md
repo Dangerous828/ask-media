@@ -1,7 +1,7 @@
 # 视频提示词阶段契约
 
-本阶段只拥有 `剧集/<EP>/视频提示词.md` 中的 `MOTION-...` 项与按需的时间线音乐章节。它继承镜头
-起点、终点、时长、对白和冻结帧，不回写分镜或视觉设定：镜头边界、职责、起终状态和关键帧正文都不在
+本阶段只拥有 `剧集/<EP>/脚本/motion_*.txt` 中的 `MOTION-...` 项与按需的时间线音乐章节。它继承镜头
+起点、终点、时长、对白和冻结帧，不回写 `剧本.md`「## 分镜」或 canon 节：镜头边界、职责、起终状态和关键帧正文都不在
 本阶段手里。
 
 唯一的例外是参考准备。SKILL 工作流第 2、3 步要求在同一请求内刷新受影响镜头的「输入参考图」
@@ -41,9 +41,9 @@
 | VID-22 | reviewed_invariant | Copyable text describes the intended image and action. IDs, workflow status, hashes and file paths stay outside it. Prefer observable states where they clarify execution; necessary negative constraints are allowed. Unless explicitly authored, prohibit non-diegetic subtitles, captions and dialogue overlays while preserving approved in-scene text and its exact content, carrier and placement. |
 | VID-23 | reviewed_invariant | For models generating audio with video, specify the intended dialogue, VO, OS, vocalizations, effects, ambience and silence. Keep source, speaker, language and verbatim dialogue boundaries. Summaries must match the actual sound layers; follow model-specific music syntax without assuming missing layers will always be generated. |
 | VID-24 | structural_invariant | An image-to-video shot carries the storyboard's `REF-...` and `PLAN-...` slots unchanged, each with its 用途, so the motion document itself answers which start frame and which identity, geography, and prop pictures this shot sends — and, for `PLAN-...`, in which order the creator attaches them. The reference mode — first frame, first and last frame, or multi-slot reference — is read from that 用途 combination and translated by the matched model dialect; where a model makes frame and reference conditioning mutually exclusive, the start frame joins the reference group rather than splitting the request. |
-| VID-25 | structural_invariant | Quoted Chinese in a copyable body is delivered, not authored. Every run of four or more Han characters inside a `<d>` tag or quotation marks resolves, ignoring punctuation and spacing, to text that already exists in `剧本.md`, `视觉设定.md` or `分镜.md`. A line the shot wishes the character had said belongs upstream in the screenplay, not in the prompt. Runs of three characters or fewer are in-frame labels and interjections far more often than lines, so they stay with review rather than the mechanical check. |
+| VID-25 | structural_invariant | Quoted Chinese in a copyable body is delivered, not authored. Every run of four or more Han characters inside a `<d>` tag or quotation marks resolves, ignoring punctuation and spacing, to text that already exists in `剧本.md`, `剧本.md（视觉 canon）` or `剧本.md（分镜节）`. A line the shot wishes the character had said belongs upstream in the screenplay, not in the prompt. Runs of three characters or fewer are in-frame labels and interjections far more often than lines, so they stay with review rather than the mechanical check. |
 | VID-26 | craft_default | Absent a director's choice, performance intensity follows form and genre. At motion-comic and wish-fulfilment peaks, key poses and expressions go outward—an expression change readable at a glance, whole-arm gestures, emotion carried by the upper body and the whole face—still written as common whole-body actions, never with the plot resting on a micro-expression. AI live action keeps a subtler realism but still gives each peak one readable performance beat. An inferred inner state is not deleted but translated into a visible expression or movement. |
-| VID-27 | structural_invariant | A voice reference is bound on its own `参考音频` line of a `MOTION-...` entry, never inside `输入参考图` and never on a `SHOT-...`. Each slot names a `人物` entry of `视觉设定.md` who speaks in this copyable body a line the screenplay gives that character, points at a readable project audio file equal to the path that character's `声音参考` records, has 用途 `音色`, and numbers audio 顺序 from 1 separately from pictures. Whether the bound voice actually carried into the take is heard after generation, not asserted here. |
+| VID-27 | structural_invariant | A voice reference is bound on its own `参考音频` line of a `MOTION-...` entry, never inside `输入参考图` and never on a `SHOT-...`. Each slot names a `人物` entry of `剧本.md（视觉 canon）` who speaks in this copyable body a line the screenplay gives that character, points at a readable project audio file equal to the path that character's `声音参考` records, has 用途 `音色`, and numbers audio 顺序 from 1 separately from pictures. Whether the bound voice actually carried into the take is heard after generation, not asserted here. |
 
 ### `CON`
 
@@ -55,7 +55,7 @@
 | CON-04 | structural_invariant | A continuity change states before, after, cause/source scene, effective range, and affected visible IDs. |
 | CON-05 | taste_option | Declared montage, ellipsis, dream, or subjective imagery may intentionally break ordinary continuity. |
 | CON-06 | structural_invariant | A continuity change names every existing downstream document it affects; future work is described, not pre-created. |
-| CON-07 | structural_invariant | A continuity lock declared in `视觉设定.md` fixes one verbatim surface plus its shot and image scope; every in-scope frozen keyframe, motion prompt, and named image prompt carries that surface unchanged. |
+| CON-07 | structural_invariant | A continuity lock declared in `剧本.md（视觉 canon）` fixes one verbatim surface plus its shot and image scope; every in-scope frozen keyframe, motion prompt, and named image prompt carries that surface unchanged. |
 
 规则分级由高到低：`structural_invariant`（结构缺陷，阻断）、
 `reviewed_invariant`（需证据判断）、`craft_default`（常用做法，可覆盖）、

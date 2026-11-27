@@ -26,13 +26,29 @@ license: MIT
 
 ## Quick Start
 
-只在用户明确要求实际生成后，从当前 `图片提示词.md`、`分镜.md` 或 `视频提示词.md`
+只在用户明确要求实际生成后，从当前 `脚本/image/`、`剧本.md（分镜节）` 或 `脚本/motion_*.txt`
 取出本次提示词，建立一个有边界的运行 job。`source` 指向拥有这条提示词的当前 Markdown；
 creator-first job 必须点名 `source_entry` 选择器，并逐张填写 `reference_bindings`，
 带真实参考图却缺绑定的 job 直接失败、不替它猜 role。选择器映射（`IMG-*` / `MOTION-*` /
 `SHOT-*#KF-*`）、KF role 与正文的对应、`用途`↔provider role（含 MiniMax / Seedance 取值）、
 参考音频绑定、`PLAN-...` 与 `references` 镜像的失败边界，全部见
 [adapter-contract.md](references/adapter-contract.md#job-file)，本节不复述。
+
+从新结构清单建 job（不提交、不连渲染机）：
+
+```bash
+python3 scripts/manifest_job.py <project> \
+  --manifest 剧集/<EP>/制作清单.yaml --shot <SHOT> --output job.json
+python3 scripts/production_tool.py prepare <project> --job job.json
+```
+
+`manifest_job.py` 支持视频单镜/多窗，也支持按关键帧建图片 job：
+
+```bash
+python3 scripts/manifest_job.py <project> \
+  --manifest 剧集/<EP>/制作清单.yaml --keyframe <KF-ID> --output job.json
+python3 scripts/production_tool.py prepare <project> --job job.json
+```
 
 创作者自己在工具里出图、产出落在 `剧集/<EP>/制作成果/images/` 后，由分镜 owner 绑成
 `用途：起始帧` 的 `REF-...`；图片始终不进项目时走 `PLAN-...`。走 Magpie MCP
@@ -41,13 +57,29 @@ creator-first job 必须点名 `source_entry` 选择器，并逐张填写 `refer
 未声明接受 `reference_audio` 时 `run` 在提交前失败，见
 [adapter-contract.md](references/adapter-contract.md#adapter-config)。本地图片由内置 adapter
 按 base64 data URI 送出，不自建上传服务。输出放在 `剧集/<EP>/制作成果/`；这个 job 是生产工具的
-临时输入，不计入六份创作文档：
+临时输入，不计入每集创作文件：
 
 ```bash
 python3 {技能目录}/scripts/production_tool.py prepare <project> --job <临时-job.json>
 ```
 
 先展示 `prepare` 的完整预览；此时不会调用供应商。
+
+## 生产清单（多镜 / 多手法）
+
+一集有多个镜头，或同一集混用 `ref2va` / `i2va` / `fl2va` / `multishot` / `motion_drive` 时，先写
+`剧集/<EP>/制作清单.yaml`，再由 [shot_manifest.py](scripts/shot_manifest.py) 校验并生成闸门/提交命令。
+清单是**生产 build file**，不是第七份创作文档：只承载资产版本、词稿标签、通道槽位与提交参数；
+剧情、台词、提示词正文仍归各自 owner。完整 schema、technique 槽位表与迁移顺序见
+[shot-manifest.md](references/shot-manifest.md)。
+
+- `validate`：资产 SHA/准入、technique 必填与禁止槽位、词稿标签双向 diff、refs 顺序/subjects 自洽；
+  `origin_plan` 不是当前 plan 的镜头给 warning「旧方案复用，需重新核对绑定」。
+- `plan`：输出该镜的 `h3_gate.py` 与 `h3qc` 命令；远端 ASCII 路径用 `<REMOTE_...>` 占位，按投递单替换。
+- 清单与 job 的关系：清单是 preflight，`production_tool.py` 的 job 仍是执行单元；
+  `identity`/`scene`/`prop`/`style` 映射到 job 的 `reference_image`，`audio` 映射到 `reference_audio`，
+  `scene_video`/`action_video` 只走 h3qc / motion-drive 直投。
+- 闸门只查格式；标签与资产/槽位是否对得上由清单查。两者都过才提交。
 
 ## 提交前必须自看
 
@@ -65,12 +97,12 @@ python3 {技能目录}/scripts/production_tool.py prepare <project> --job <临�
 job、prompt、参数、输出路径或直接输入任一变化，旧确认立即失效。不得代替创作者填写确认。
 当前已确认 job 是本轮唯一工作单元；运行结束后回报结果并交还控制权，不自动准备下一批或启动审查。
 
-`分镜.md` 的「输入参考图」路径只是创作阶段的可读依据与使用意图，不是生产输入快照。进入生产时，
-creator-first job 必须从 `图片提示词.md`、`分镜.md` 或 `视频提示词.md` 的对应条目建立绑定；
+`剧本.md（分镜节）` 的「输入参考图」路径只是创作阶段的可读依据与使用意图，不是生产输入快照。进入生产时，
+creator-first job 必须从 `脚本/image/`、`剧本.md（分镜节）` 或 `脚本/motion_*.txt` 的对应条目建立绑定；
 `prepare` 展示的 `reference_bindings`、`references` 与已确认 job 才是本次 adapter 实际读取哪些
 文件字节、各自允许影响什么的权威。非 creator 的结构化规格可不填 `source_entry`/`reference_bindings`，
-继续只使用显式 `references`；但新的 image/video job 只要 `source` 指向 canonical `图片提示词.md`、
-`分镜.md` 或 `视频提示词.md` 就强制使用对应 selector，不能靠省略字段降级绕过。升级前已经 prepare 并落盘的
+继续只使用显式 `references`；但新的 image/video job 只要 `source` 指向 canonical `脚本/image/`、
+`剧本.md（分镜节）` 或 `脚本/motion_*.txt` 就强制使用对应 selector，不能靠省略字段降级绕过。升级前已经 prepare 并落盘的
 旧 job 仍可按原指纹读取。
 新生产结果不自动回填或刷新分镜；需要把它改为后续输入时，由分镜 owner 修订文档，再建立新 job
 并重新预览、确认。
@@ -113,11 +145,11 @@ python3 <本技能目录>/scripts/production_tool.py audit <project>
 
 ## 输入选择
 
-- **image**：读取 `图片提示词.md` 的当前 `IMG-*` 可复制正文，或 `分镜.md` 的当前 `SHOT-*#KF-*`
+- **image**：读取 `脚本/image/` 的当前 `IMG-*` 可复制正文，或 `剧本.md（分镜节）` 的当前 `SHOT-*#KF-*`
   所选角色正文，加上必要参考图和明确的输出尺寸/数量；creator-first job 使用 `source_entry`
   锁定这一条。资产板走 `IMG-*`，镜头静帧按 frame plan 的 role 选择 composition/start/pose_proof/end；
   两者不互相替代，起始帧缺失时不以冻结构图顶替。
-- **video**：读取 `视频提示词.md` 的当前 `MOTION-*` 可复制正文，并核对 `分镜.md` 中对应镜头、
+- **video**：读取 `脚本/motion_*.txt` 的当前 `MOTION-*` 可复制正文，并核对 `剧本.md（分镜节）` 中对应镜头、
   冻结关键帧、时长与画幅；creator-first job 使用 `source_entry` 锁定这一条。连续段选择从上一段
   生成结果续接时，下一段 job 同时绑定上一段实际视频和从该视频取得的实际尾帧，并保留
   `continuity_video`、`actual_tail_frame` 的不同职责；供应商 role 由目标模型 adapter 翻译。支持原生视频
@@ -139,7 +171,7 @@ python3 <本技能目录>/scripts/production_tool.py audit <project>
   中改词，也不为 TTS 另建创作文档。表演要求来自这句台词的括注和上下文：执行端接受自然语言语气时，
   写成一句语气说明放在台词前（「憋屈地压低声音，咬着牙应一声：是。」），同一角色每句挂同一段参考音色；
   只接受枚举情绪时映射到最近的一档，再用强度、音调细调。只给音色、不给语气时，短剧台词会念成播音腔。
-- **music**：读取 `视频提示词.md` 中创作者已确认的时间线音乐章节；主题曲使用已确认歌词，纯配乐
+- **music**：读取 `脚本/motion_*.txt` 中创作者已确认的时间线音乐章节；主题曲使用已确认歌词，纯配乐
   不携带歌词。供应商不能精确承诺时长时，生成源音轨后仍由 `$short-drama-edit` 按文档里的混音意图完成落点、
   循环、淡入淡出和对白 ducking。
 
@@ -183,7 +215,7 @@ adapter 配置必须在项目外，只包含 argv 命令和超时；凭据由 ad
 
 `prepare` 对每个图片和视频 job 做两项机械检查，任一不过直接失败，不预览、不计费：
 
-1. **普通镜头必须已有创作者认可的画风基准。** 《视觉设定.md》「## 画风基准」至少一行 `- LOOK-...`，且同小节
+1. **普通镜头必须已有创作者认可的画风基准。** 《剧本.md》「视觉 canon 与导演」「## 画风基准」至少一行 `- LOOK-...`，且同小节
    有 `- 认可依据：` 行。只有 LOOK 行、没有认可依据的不算。真正的 Look 开发首跑（还没有任何基准）
    由创作者决定，在 job 的 `parameters` 写 `"no_look_baseline_ack": true`，预览里会看到。
    **角色板、场景板、道具板、分镜板属于设计资产，它们定义画风基准，不能在 job 里缺声明后被当成普通镜头。**
@@ -229,7 +261,7 @@ Magpie MCP 三条路径都走同一个 `ref_gate`，因此都会自动生效。
 `../short-drama-review/scripts/ref_gate.py` 解析共享副本，解析不到才回退到同目录的 `scripts/ref_gate.py`；
 adapter 侧可用 `SHORT_DRAMA_REF_GATE` 显式覆盖共享副本路径，`production_tool.py` 按这两级解析、不读该变量。
 `~/.agents/skills/...` 只是同步目标，不作为默认源。生产私有快照会按原项目相对路径带上
-《视觉设定.md》、当前与父媒体 look 报告及生成谱系，并另存哈希清单；h3q adapter 在首次 SSH、参考处理和上传前
+《剧本.md》「视觉 canon 与导演」、当前与父媒体 look 报告及生成谱系，并另存哈希清单；h3q adapter 在首次 SSH、参考处理和上传前
 用同一命令再验一次，不能只靠 prepare 放行。闸门拒绝时必须先看返回的 `code` 与 `message`：
 `missing_look_baseline` 表示缺少基准或设计资产未声明；`reference_not_accepted` 表示生成物未获批复用；
 `cast_identity_plate_missing` 表示整组没带身份板；`cast_identity_reference_missing` 表示某个出场角色缺身份图；

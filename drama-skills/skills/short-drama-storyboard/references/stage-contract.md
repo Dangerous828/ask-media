@@ -1,11 +1,11 @@
 # 分镜阶段契约
 
-本阶段只拥有 `剧集/<EP>/分镜.md` 中的 `SHOT-...`、镜头职责、来源、时长、起止边界、声音、视觉依据和
+本阶段只拥有 `剧集/<EP>/剧本.md（分镜节）` 中的 `SHOT-...`、镜头职责、来源、时长、起止边界、声音、视觉依据和
 冻结关键帧。它继承剧本事实与视觉设定，不改写剧情或资产身份。
 
-启用 director-v1 时先继承 `short-drama-direct` 的《导演.md》，再按单场工作包完成正式镜头与画面证明；
+启用 director-v1 时先继承 `short-drama-direct` 的《剧本.md》「视觉 canon 与导演」，再按单场工作包完成正式镜头与画面证明；
 未启用的旧项目仍可直接从剧本进入。覆盖比较、候选方案和调度推演只保留选中的决定；来源使用
-场景 ID。已存在的图片提示词条目可用 `IMG-...` 可见标题引用；它不是已生成图片的证明，也不是分镜的前置门禁。没有条目时直接引用《视觉设定.md》，不建立 coverage、shots、keyframes、audition 或接受记录。
+场景 ID。已存在的图片提示词条目可用 `IMG-...` 可见标题引用；它不是已生成图片的证明，也不是分镜的前置门禁。没有条目时直接引用《剧本.md》「视觉 canon 与导演」，不建立 coverage、shots、keyframes、audition 或接受记录。
 
 ## 本阶段规则
 
@@ -34,7 +34,7 @@
 | SHT-19 | reviewed_invariant | When a coverage audition is used, its approaches genuinely differ by knowledge timing, alignment, performance space, strongest image, landing, losses, or production fit; it uses no fixed option, grid, framing, or shot-count formula, and the selected approach is stated before formal shots are written. |
 | SHT-20 | reviewed_invariant | Shot revision identity follows directing responsibility rather than array position or text similarity: reorder preserves IDs, insertion creates one, split/merge retires replaced IDs and creates successors, and active coverage plus downstream refs are reconciled before delivery. |
 | SHT-21 | reviewed_invariant | A keyframe's copyable text carries only what will be visible; IDs, workflow notes, file paths and craft commentary stay outside the prompt. Two prompts that differ only by identifiers are a template, not two frames. |
-| SHT-22 | structural_invariant | Each shot carries a required `视觉依据` field, written after the frozen keyframe, listing every visible character, place, or prop whose identity, Look, or geography must remain recognizable; each item resolves to an existing `视觉设定.md` entry. Whatever the keyframe text calls by name — an entry name or its declared `画面代称` — appears there. Small/background subjects remain in scope when recognition matters; offscreen voices and unidentifiable fragments do not. |
+| SHT-22 | structural_invariant | Each shot carries a required `视觉依据` field, written after the frozen keyframe, listing every visible character, place, or prop whose identity, Look, or geography must remain recognizable; each item resolves to an existing `剧本.md（视觉 canon）` entry. Whatever the keyframe text calls by name — an entry name or its declared `画面代称` — appears there. Small/background subjects remain in scope when recognition matters; offscreen voices and unidentifiable fragments do not. |
 | SHT-23 | structural_invariant | An omitted reference choice is not consent to text-to-video. After reference discovery, each shot either binds all verified real images as `REF-...`, declares creator-supplied pictures as `PLAN-...` slots that locate an existing `IMG-...` board or `SHOT-...#KF-...` planned frame (a SHOT start/end shorthand requires the unique corresponding plan role, never composition), preserves partial bindings while naming the still-missing start/identity/geography/prop images, or records the creator's explicit text-to-video choice. A prompt entry, plausible filename, or text description never counts as a real image, and a `PLAN-...` slot never claims one: it states that the picture is supplied outside the project at generation time, which is why it cannot be sent to production. |
 | SHT-24 | reviewed_invariant | A visual basis describes this frame, not the episode's cast list. Each declared 控制 scope stays within what this frame can carry, and a binding is not carried forward merely because the subject remains in the scene. |
 | SHT-25 | structural_invariant | Every real reference image a shot binds declares one 用途 from the closed set 身份/造型状态/地理/构图/尺度/效果/起始帧/结束帧/风格, so the shot can say which start frame and which identity/geography/prop pictures a downstream job sends. At most one 起始帧 and one 结束帧 per shot, and 结束帧 requires 起始帧. |
@@ -58,7 +58,7 @@
 | CON-04 | structural_invariant | A continuity change states before, after, cause/source scene, effective range, and affected visible IDs. |
 | CON-05 | taste_option | Declared montage, ellipsis, dream, or subjective imagery may intentionally break ordinary continuity. |
 | CON-06 | structural_invariant | A continuity change names every existing downstream document it affects; future work is described, not pre-created. |
-| CON-07 | structural_invariant | A continuity lock declared in `视觉设定.md` fixes one verbatim surface plus its shot and image scope; every in-scope frozen keyframe, motion prompt, and named image prompt carries that surface unchanged. |
+| CON-07 | structural_invariant | A continuity lock declared in `剧本.md（视觉 canon）` fixes one verbatim surface plus its shot and image scope; every in-scope frozen keyframe, motion prompt, and named image prompt carries that surface unchanged. |
 
 规则分级由高到低：`structural_invariant`（结构缺陷，阻断）、
 `reviewed_invariant`（需证据判断）、`craft_default`（常用做法，可覆盖）、
